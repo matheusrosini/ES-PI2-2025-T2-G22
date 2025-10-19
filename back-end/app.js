@@ -161,6 +161,97 @@ app.post('/esqueci-senha', async (req, res) => {
     }
 });
 
+
+// =========================================
+// 🔹 ROTAS DE INSTITUIÇÃO (requisito 3.2 - parte 1)
+// =========================================
+
+// Criar nova instituição
+app.post('/instituicoes', autenticar, async (req, res) => {
+    const { nome } = req.body;
+
+    if (!nome) return res.status(400).json({ erro: 'Informe o nome da instituição.' });
+
+    try {
+        const conn = await getConnection();
+        await conn.query('INSERT INTO instituicao (nome) VALUES (?)', [nome]);
+        conn.end();
+        res.json({ sucesso: true, mensagem: 'Instituição cadastrada com sucesso!' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ erro: 'Erro ao cadastrar instituição.' });
+    }
+});
+
+// Listar todas as instituições
+app.get('/instituicoes', autenticar, async (req, res) => {
+    try {
+        const conn = await getConnection();
+        const resultado = await conn.query('SELECT * FROM instituicao');
+        conn.end();
+        res.json({ instituicoes: resultado });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ erro: 'Erro ao listar instituições.' });
+    }
+});
+
+// Atualizar instituição
+app.put('/instituicoes/:id', autenticar, async (req, res) => {
+    const { nome } = req.body;
+    const { id } = req.params;
+
+    if (!nome) return res.status(400).json({ erro: 'Informe o novo nome da instituição.' });
+
+    try {
+        const conn = await getConnection();
+        const [verifica] = await conn.query('SELECT * FROM instituicao WHERE id_instituicao = ?', [id]);
+
+        if (!verifica) {
+            conn.end();
+            return res.status(404).json({ erro: 'Instituição não encontrada.' });
+        }
+
+        await conn.query('UPDATE instituicao SET nome = ? WHERE id_instituicao = ?', [nome, id]);
+        conn.end();
+        res.json({ sucesso: true, mensagem: 'Instituição atualizada com sucesso!' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ erro: 'Erro ao atualizar instituição.' });
+    }
+});
+
+// Excluir instituição (somente se não tiver cursos)
+app.delete('/instituicoes/:id', autenticar, async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const conn = await getConnection();
+
+        // Verifica se há cursos vinculados
+        const cursos = await conn.query('SELECT * FROM curso WHERE id_instituicao = ?', [id]);
+        if (cursos.length > 0) {
+            conn.end();
+            return res.status(400).json({ erro: 'Não é possível excluir: há cursos vinculados a esta instituição.' });
+        }
+
+        // Exclui instituição
+        const resultado = await conn.query('DELETE FROM instituicao WHERE id_instituicao = ?', [id]);
+        conn.end();
+
+        if (resultado.affectedRows === 0) {
+            return res.status(404).json({ erro: 'Instituição não encontrada.' });
+        }
+
+        res.json({ sucesso: true, mensagem: 'Instituição excluída com sucesso!' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ erro: 'Erro ao excluir instituição.' });
+    }
+});
+
+
+
 app.listen(port, () => {
     console.log(`Servidor rodando em http://localhost:${port}/`);
 });
