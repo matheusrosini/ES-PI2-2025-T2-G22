@@ -251,6 +251,356 @@ app.delete('/instituicoes/:id', autenticar, async (req, res) => {
 });
 
 
+// =========================================
+// 🔹 ROTAS DE CURSO (requisito 3.2 - parte 2)
+// =========================================
+
+// Criar novo curso
+app.post('/cursos', autenticar, async (req, res) => {
+    const { nome, id_instituicao } = req.body;
+
+    if (!nome || !id_instituicao) {
+        return res.status(400).json({ erro: 'Informe nome e id_instituicao.' });
+    }
+
+    try {
+        const conn = await getConnection();
+
+        // Verifica se instituição existe
+        const [inst] = await conn.query('SELECT * FROM instituicao WHERE id_instituicao = ?', [id_instituicao]);
+        if (!inst) {
+            conn.end();
+            return res.status(404).json({ erro: 'Instituição não encontrada.' });
+        }
+
+        await conn.query('INSERT INTO curso (nome, id_instituicao) VALUES (?, ?)', [nome, id_instituicao]);
+        conn.end();
+        res.json({ sucesso: true, mensagem: 'Curso cadastrado com sucesso!' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ erro: 'Erro ao cadastrar curso.' });
+    }
+});
+
+// Listar todos os cursos (com nome da instituição)
+app.get('/cursos', autenticar, async (req, res) => {
+    try {
+        const conn = await getConnection();
+        const resultado = await conn.query(`
+            SELECT c.id_curso, c.nome AS nome_curso, i.nome AS nome_instituicao
+            FROM curso c
+            JOIN instituicao i ON c.id_instituicao = i.id_instituicao
+        `);
+        conn.end();
+        res.json({ cursos: resultado });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ erro: 'Erro ao listar cursos.' });
+    }
+});
+
+// Atualizar curso
+app.put('/cursos/:id', autenticar, async (req, res) => {
+    const { nome, id_instituicao } = req.body;
+    const { id } = req.params;
+
+    if (!nome || !id_instituicao) {
+        return res.status(400).json({ erro: 'Informe nome e id_instituicao.' });
+    }
+
+    try {
+        const conn = await getConnection();
+
+        // Verifica se curso existe
+        const [curso] = await conn.query('SELECT * FROM curso WHERE id_curso = ?', [id]);
+        if (!curso) {
+            conn.end();
+            return res.status(404).json({ erro: 'Curso não encontrado.' });
+        }
+
+        // Verifica se instituição existe
+        const [inst] = await conn.query('SELECT * FROM instituicao WHERE id_instituicao = ?', [id_instituicao]);
+        if (!inst) {
+            conn.end();
+            return res.status(404).json({ erro: 'Instituição não encontrada.' });
+        }
+
+        await conn.query('UPDATE curso SET nome = ?, id_instituicao = ? WHERE id_curso = ?', [nome, id_instituicao, id]);
+        conn.end();
+        res.json({ sucesso: true, mensagem: 'Curso atualizado com sucesso!' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ erro: 'Erro ao atualizar curso.' });
+    }
+});
+
+// Excluir curso (somente se não houver disciplinas vinculadas)
+app.delete('/cursos/:id', autenticar, async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const conn = await getConnection();
+
+        // Verifica se há disciplinas vinculadas
+        const disciplinas = await conn.query('SELECT * FROM disciplina WHERE id_curso = ?', [id]);
+        if (disciplinas.length > 0) {
+            conn.end();
+            return res.status(400).json({ erro: 'Não é possível excluir: há disciplinas vinculadas a este curso.' });
+        }
+
+        // Exclui curso
+        const resultado = await conn.query('DELETE FROM curso WHERE id_curso = ?', [id]);
+        conn.end();
+
+        if (resultado.affectedRows === 0) {
+            return res.status(404).json({ erro: 'Curso não encontrado.' });
+        }
+
+        res.json({ sucesso: true, mensagem: 'Curso excluído com sucesso!' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ erro: 'Erro ao excluir curso.' });
+    }
+});
+
+
+// =========================================
+// 🔹 ROTAS DE DISCIPLINA (requisito 3.2 - parte 3)
+// =========================================
+
+// Criar disciplina
+app.post('/disciplinas', autenticar, async (req, res) => {
+    const { nome, sigla, codigo, periodo, id_curso } = req.body;
+
+    if (!nome || !id_curso) {
+        return res.status(400).json({ erro: 'Informe nome e id_curso.' });
+    }
+
+    try {
+        const conn = await getConnection();
+
+        // Verifica se o curso existe
+        const [curso] = await conn.query('SELECT * FROM curso WHERE id_curso = ?', [id_curso]);
+        if (!curso) {
+            conn.end();
+            return res.status(404).json({ erro: 'Curso não encontrado.' });
+        }
+
+        await conn.query(
+            'INSERT INTO disciplina (nome, sigla, codigo, periodo, id_curso) VALUES (?, ?, ?, ?, ?)',
+            [nome, sigla, codigo, periodo, id_curso]
+        );
+        conn.end();
+        res.json({ sucesso: true, mensagem: 'Disciplina cadastrada com sucesso!' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ erro: 'Erro ao cadastrar disciplina.' });
+    }
+});
+
+// Listar disciplinas com informações do curso
+app.get('/disciplinas', autenticar, async (req, res) => {
+    try {
+        const conn = await getConnection();
+        const resultado = await conn.query(`
+            SELECT d.id_disciplina, d.nome AS nome_disciplina, d.sigla, d.codigo, d.periodo,
+                   c.nome AS nome_curso
+            FROM disciplina d
+            JOIN curso c ON d.id_curso = c.id_curso
+        `);
+        conn.end();
+        res.json({ disciplinas: resultado });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ erro: 'Erro ao listar disciplinas.' });
+    }
+});
+
+// Atualizar disciplina
+app.put('/disciplinas/:id', autenticar, async (req, res) => {
+    const { nome, sigla, codigo, periodo, id_curso } = req.body;
+    const { id } = req.params;
+
+    if (!nome || !id_curso) {
+        return res.status(400).json({ erro: 'Informe nome e id_curso.' });
+    }
+
+    try {
+        const conn = await getConnection();
+
+        // Verifica se a disciplina existe
+        const [disciplina] = await conn.query('SELECT * FROM disciplina WHERE id_disciplina = ?', [id]);
+        if (!disciplina) {
+            conn.end();
+            return res.status(404).json({ erro: 'Disciplina não encontrada.' });
+        }
+
+        // Verifica se o curso existe
+        const [curso] = await conn.query('SELECT * FROM curso WHERE id_curso = ?', [id_curso]);
+        if (!curso) {
+            conn.end();
+            return res.status(404).json({ erro: 'Curso não encontrado.' });
+        }
+
+        await conn.query(
+            'UPDATE disciplina SET nome = ?, sigla = ?, codigo = ?, periodo = ?, id_curso = ? WHERE id_disciplina = ?',
+            [nome, sigla, codigo, periodo, id_curso, id]
+        );
+        conn.end();
+        res.json({ sucesso: true, mensagem: 'Disciplina atualizada com sucesso!' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ erro: 'Erro ao atualizar disciplina.' });
+    }
+});
+
+// Excluir disciplina (apenas se não tiver turmas vinculadas)
+app.delete('/disciplinas/:id', autenticar, async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const conn = await getConnection();
+
+        // Verifica se há turmas vinculadas
+        const turmas = await conn.query('SELECT * FROM turma WHERE id_disciplina = ?', [id]);
+        if (turmas.length > 0) {
+            conn.end();
+            return res.status(400).json({ erro: 'Não é possível excluir: há turmas vinculadas a esta disciplina.' });
+        }
+
+        const resultado = await conn.query('DELETE FROM disciplina WHERE id_disciplina = ?', [id]);
+        conn.end();
+
+        if (resultado.affectedRows === 0) {
+            return res.status(404).json({ erro: 'Disciplina não encontrada.' });
+        }
+
+        res.json({ sucesso: true, mensagem: 'Disciplina excluída com sucesso!' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ erro: 'Erro ao excluir disciplina.' });
+    }
+});
+
+
+// =========================================
+// 🔹 ROTAS DE TURMA (requisito 3.2 - parte 4)
+// =========================================
+
+// Criar turma
+app.post('/turmas', autenticar, async (req, res) => {
+    const { nome, dia, horario, local, id_disciplina } = req.body;
+
+    if (!nome || !id_disciplina) {
+        return res.status(400).json({ erro: 'Informe nome e id_disciplina.' });
+    }
+
+    try {
+        const conn = await getConnection();
+
+        // Verifica se a disciplina existe
+        const [disciplina] = await conn.query('SELECT * FROM disciplina WHERE id_disciplina = ?', [id_disciplina]);
+        if (!disciplina) {
+            conn.end();
+            return res.status(404).json({ erro: 'Disciplina não encontrada.' });
+        }
+
+        await conn.query(
+            'INSERT INTO turma (nome, dia, horario, local, id_disciplina) VALUES (?, ?, ?, ?, ?)',
+            [nome, dia, horario, local, id_disciplina]
+        );
+
+        conn.end();
+        res.json({ sucesso: true, mensagem: 'Turma cadastrada com sucesso!' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ erro: 'Erro ao cadastrar turma.' });
+    }
+});
+
+// Listar turmas com informações da disciplina
+app.get('/turmas', autenticar, async (req, res) => {
+    try {
+        const conn = await getConnection();
+        const resultado = await conn.query(`
+            SELECT t.id_turma, t.nome AS nome_turma, t.dia, t.horario, t.local,
+                   d.nome AS nome_disciplina, d.sigla, d.codigo
+            FROM turma t
+            JOIN disciplina d ON t.id_disciplina = d.id_disciplina
+        `);
+        conn.end();
+        res.json({ turmas: resultado });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ erro: 'Erro ao listar turmas.' });
+    }
+});
+
+// Atualizar turma
+app.put('/turmas/:id', autenticar, async (req, res) => {
+    const { nome, dia, horario, local, id_disciplina } = req.body;
+    const { id } = req.params;
+
+    if (!nome || !id_disciplina) {
+        return res.status(400).json({ erro: 'Informe nome e id_disciplina.' });
+    }
+
+    try {
+        const conn = await getConnection();
+
+        // Verifica se a turma existe
+        const [turma] = await conn.query('SELECT * FROM turma WHERE id_turma = ?', [id]);
+        if (!turma) {
+            conn.end();
+            return res.status(404).json({ erro: 'Turma não encontrada.' });
+        }
+
+        // Verifica se a disciplina existe
+        const [disciplina] = await conn.query('SELECT * FROM disciplina WHERE id_disciplina = ?', [id_disciplina]);
+        if (!disciplina) {
+            conn.end();
+            return res.status(404).json({ erro: 'Disciplina não encontrada.' });
+        }
+
+        await conn.query(
+            'UPDATE turma SET nome = ?, dia = ?, horario = ?, local = ?, id_disciplina = ? WHERE id_turma = ?',
+            [nome, dia, horario, local, id_disciplina, id]
+        );
+        conn.end();
+        res.json({ sucesso: true, mensagem: 'Turma atualizada com sucesso!' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ erro: 'Erro ao atualizar turma.' });
+    }
+});
+
+// Excluir turma (com confirmação simples)
+app.delete('/turmas/:id', autenticar, async (req, res) => {
+    const { id } = req.params;
+    const { confirmar } = req.query;
+
+    if (confirmar !== 'true') {
+        return res.status(400).json({ mensagem: 'Confirme a exclusão enviando "?confirmar=true" na URL.' });
+    }
+
+    try {
+        const conn = await getConnection();
+
+        const resultado = await conn.query('DELETE FROM turma WHERE id_turma = ?', [id]);
+        conn.end();
+
+        if (resultado.affectedRows === 0) {
+            return res.status(404).json({ erro: 'Turma não encontrada.' });
+        }
+
+        res.json({ sucesso: true, mensagem: 'Turma excluída com sucesso!' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ erro: 'Erro ao excluir turma.' });
+    }
+});
+
+
 
 app.listen(port, () => {
     console.log(`Servidor rodando em http://localhost:${port}/`);
