@@ -18,7 +18,8 @@
   },
   "homepage": "https://github.com/matheusrosini/ES-PI2-2025-T2-G22#readme",
   "dependencies": {
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "mysql2": "^3.15.3"
   },
   "devDependencies": {
     "@types/express": "^5.0.5",
