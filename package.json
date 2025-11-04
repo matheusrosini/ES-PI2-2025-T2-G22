@@ -1,0 +1,28 @@
+{
+  "name": "es-pi2-2025-t2-g22",
+  "version": "1.0.0",
+  "description": "Projeto NotaDez para o Projeto Integrado II",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/matheusrosini/ES-PI2-2025-T2-G22.git"
+  },
+  "author": "Matheus Rosini, Matheus Narducci, Luis Felipe Moura, Leonardo Dionel",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/matheusrosini/ES-PI2-2025-T2-G22/issues"
+  },
+  "homepage": "https://github.com/matheusrosini/ES-PI2-2025-T2-G22#readme",
+  "dependencies": {
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.5",
+    "@types/node": "^24.10.0",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.9.3"
+  }
+}
