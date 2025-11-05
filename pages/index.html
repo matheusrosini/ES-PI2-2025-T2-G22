@@ -23,12 +23,122 @@
         </tr>
       </thead>
       <tbody>
-        <!-- As turmas vão apareceraqui -->
+        <!-- As turmas vão aparecer aqui -->
       </tbody>
     </table>
   </div>
+  
+  <!-- Modal de Cadastro -->
+  <div class="modal" id="modalTurma">
+    <div class="modal-content">
+      <h2>Cadastrar Turma</h2>
+      
+      <label>Nome da Turma</label>
+      <input type="text" id="nomeTurma" placeholder="Ex: 1º Ano C"/>
 
+      <label>Ano/Série</label>
+      <input type="text" id="anoSerie" placeholder="Ex: 1º Ano/2025"/>
+
+      <label>Turno</label>
+      <select id="turnoTurma">
+        <option value="manha">Manhã</option>
+        <option value="tarde">Tarde</option>
+        <option value="noite">Noite</option>
+      </select>
+      
+      <label>Professor(a)</label>
+      <input type="text" id="professorTurma" placeholder="Nome do Professor(a)"/>
+
+      <label>Capacidade</label>
+      <input type="number" id="capacidadeTurma" placeholder="Ex: 40"/>
+
+      <button id="salvarTurmaBtn">Salvar</button>
+      <button id="fecharModalBtn">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- Uma caixa de alerta personalizada -->
+  <div id="alertBox" class="alert-box">
+    <div class="alert-content">
+      <p id="alertMessage"></p>
+      <button id="closeAlertBtn">OK</button>
+    </div>
+  </div>
   
-  
+  <script>
+    const modal = document.getElementById('modalTurma');
+    const novaTurmaBtn = document.getElementById('novaTurmaBtn');
+    const tabelaTurmas = document.getElementById('tabela-turmas').getElementsByTagName('tbody')[0];
+    const alertBox = document.getElementById('alertBox');
+    const alertMessage = document.getElementById('alertMessage');
+    const closeAlertBtn = document.getElementById('closeAlertBtn');
+
+    // Mostra modal
+    novaTurmaBtn.addEventListener('click', () => {
+      modal.style.display = 'block';
+    });
+
+    // Fecha modal
+    function fecharModal() {
+      modal.style.display = 'none';
+      limparCampos();
+    }
+
+    // Limpa os campos
+    function limparCampos() {
+      document.getElementById('nomeTurma').value = '';
+      document.getElementById('anoSerie').value = '';
+      document.getElementById('turnoTurma').value = 'manha';
+      document.getElementById('professorTurma').value = '';
+      document.getElementById('capacidadeTurma').value = '';
+    }
+
+    // Coloquei um alerta diferente ao inves do padrao se usar apenas alert()
+    function showAlert(message) {
+      alertMessage.textContent = message;
+      alertBox.style.display = 'flex';
+      document.body.style.pointerEvents = 'none';
+      alertBox.style.pointerEvents = 'auto';
+    }
+
+    // Fecha o alerta
+    closeAlertBtn.addEventListener('click', () => {
+      alertBox.style.display = 'none';
+      document.body.style.pointerEvents = 'auto';
+    });
+
+    // Função para conseguir salvar a turma
+    function salvarTurma() {
+      const nome = document.getElementById('nomeTurma').value;
+      const ano = document.getElementById('anoSerie').value;
+      const turno = document.getElementById('turnoTurma').value;
+      const professor = document.getElementById('professorTurma').value;
+      const capacidade = document.getElementById('capacidadeTurma').value;
+      
+      if (!nome || !ano || !turno || !professor || !capacidade) {
+        showAlert('⚠️ Por favor, preencha todos os campos.');
+        return;
+      }
+
+      const linha = `
+        <tr>
+          <td>${nome}</td>
+          <td>${ano}</td>
+          <td>${turno}</td>
+          <td>${professor}</td>
+          <td>${capacidade}</td>
+        </tr>
+      `;
+      tabelaTurmas.insertAdjacentHTML('beforeend', linha);
+      fecharModal();
+    }
+
+
+    window.onclick = function(event) {
+      if (event.target === modal) fecharModal();
+    };
+    document.getElementById('fecharModalBtn').addEventListener('click', fecharModal);
+    document.getElementById('salvarTurmaBtn').addEventListener('click', salvarTurma);
+  </script>
 </body>
 </html>
