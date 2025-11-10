@@ -1,16 +1,21 @@
 import { Request, Response } from "express";
+import { db } from "../database/db";
 
-let users: string[] = [];
+export const getUsers = (req: Request, res: Response) => {
+  db.query("SELECT * FROM usuarios", (err, results) => {
+    if (err) return res.status(500).json({ error: err });
+    res.json(results);
+  });
+};
 
-export function getUsers(req: Request, res: Response) {
-  res.json(users);
-}
-
-export function createUser(req: Request, res: Response) {
-  const { name } = req.body;
-  if (!name) {
-    return res.status(400).json({ message: "Nome é obrigatório" });
-  }
-  users.push(name);
-  res.status(201).json({ message: "Usuário criado com sucesso!" });
-}
+export const createUser = (req: Request, res: Response) => {
+  const { nome, email, telefone } = req.body;
+  db.query(
+    "INSERT INTO usuarios (nome, email, telefone) VALUES (?, ?, ?)",
+    [nome, email, telefone],
+    (err) => {
+      if (err) return res.status(500).json({ error: err });
+      res.status(201).json({ message: "Usuário criado com sucesso!" });
+    }
+  );
+};
