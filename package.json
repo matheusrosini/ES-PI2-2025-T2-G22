@@ -5,26 +5,17 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "ts-node-dev --respawn --transpile-only src/server.ts"
+    "dev": "node src/server.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/matheusrosini/ES-PI2-2025-T2-G22.git"
   },
-  "author": "Matheus Rosini, Matheus Narducci, Luis Felipe Moura, Leonardo Dionel",
+  "author": "Matheus Rosini Borges de Salles, Matheus Henrique Portugal Narducci, Luis Felipe Moura, Leonardo Dionel Lima Silva",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/matheusrosini/ES-PI2-2025-T2-G22/issues"
-  },
-  "homepage": "https://github.com/matheusrosini/ES-PI2-2025-T2-G22#readme",
   "dependencies": {
+    "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "mysql2": "^3.15.3"
-  },
-  "devDependencies": {
-    "@types/express": "^5.0.5",
-    "@types/node": "^24.10.0",
-    "ts-node-dev": "^2.0.0",
-    "typescript": "^5.9.3"
   }
 }
