@@ -2,7 +2,7 @@ const express = require("express");
 require("dotenv").config();
 const db = require("./database/db");
 
-const usuarioRoutes = require("./routes/usuarioRoutes");
+const userRoutes = require("./routes/userRoutes");
 const instituicaoRoutes = require("./routes/instituicaoRoutes");
 const cursoRoutes = require("./routes/cursoRoutes");
 const disciplinaRoutes = require("./routes/disciplinaRoutes");
@@ -10,7 +10,7 @@ const disciplinaRoutes = require("./routes/disciplinaRoutes");
 const app = express();
 app.use(express.json());
 
-app.use("/api/usuarios", usuarioRoutes);
+app.use("/usuarios", userRoutes);
 app.use("/api/instituicoes", instituicaoRoutes);
 app.use("/api/cursos", cursoRoutes);
 app.use("/api/disciplinas", disciplinaRoutes);

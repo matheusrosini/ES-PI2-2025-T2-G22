@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const controller = require("../controllers/usuarioController");
+const controller = require("../controllers/userController");
 
+// Rotas de usuários
 router.get("/", controller.getAll);
 router.post("/", controller.create);
 router.get("/:id", controller.getById);
