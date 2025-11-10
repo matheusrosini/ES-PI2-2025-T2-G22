@@ -27,6 +27,24 @@
       </tbody>
     </table>
   </div>
+
+  <!-- Importacao de launos-->
+  <div class="container">
+    <h2>Alunos da Turma</h2>
+    <button id="importCsvBtn">Importar CSV</button>
+    <input type="file" id="csvInput" accept=".csv" style="display:none">
+
+    <table id="tabela-alunos">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Matrícula</th>
+          <th>Data de Nascimento</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
   
   <!-- Modal de Cadastro -->
   <div class="modal" id="modalTurma">
@@ -139,6 +157,56 @@
     };
     document.getElementById('fecharModalBtn').addEventListener('click', fecharModal);
     document.getElementById('salvarTurmaBtn').addEventListener('click', salvarTurma);
+
+
+     <!-- Importar CSV dos alunos-->
+
+
+    importCsvBtn.addEventListener('click', () => {
+      if (!alertOpen) csvInput.click();
+    });
+
+    csvInput.addEventListener('change', (event) => {
+      const file = event.target.files[0];
+
+      if (!file) {
+        showAlert("Nenhum arquivo selecionado.");
+        return;
+      }
+
+      const reader = new FileReader();
+
+      reader.onload = function(e) {
+        const linhas = e.target.result.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+
+        if (linhas.length < 2) {
+          showAlert("CSV inválido ou sem dados.");
+          return;
+        }
+
+        tabelaAlunos.innerHTML = '';
+
+        for (let i = 1; i < linhas.length; i++) {
+          const colunas = linhas[i].split(',');
+
+          const nome = colunas[0] || '';
+          const matricula = colunas[1] || '';
+          const nascimento = colunas[2] || '';
+
+          const row = `
+            <tr>
+              <td>${nome}</td>
+              <td>${matricula}</td>
+              <td>${nascimento}</td>
+            </tr>
+          `;
+          tabelaAlunos.insertAdjacentHTML("beforeend", row);
+        }
+      };
+
+      reader.readAsText(file);
+    });
+
   </script>
 </body>
 </html>
