@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - NotaDez</title>
+  <link rel="stylesheet" href="styles/style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>NotaDez</h1>
+    <h2>Login do Docente</h2>
+    <form action="dashboard.html" method="post">
+      <div class="input-group">
+        <label for="email">E-mail</label>
+        <input type="email" id="email" name="email" required placeholder="seuemail@exemplo.com">
+      </div>
+
+      <div class="input-group">
+        <label for="senha">Senha</label>
+        <input type="password" id="senha" name="senha" required placeholder="Digite sua senha">
+      </div>
+
+      <button type="submit">Entrar</button>
+    </form>
+
+    <div class="links">
+      <a href="recuperacao-senha.html">Esqueci minha senha</a> |
+      <a href="cadastro.html">Criar conta</a>
+    </div>
+  </div>
+
+  <footer>
+    © 2025 PUC-Campinas - Todos os direitos reservados
+  </footer>
+  <script>
+  const form = document.querySelector("form");
+  form.addEventListener("submit", (e) => {
+    e.preventDefault(); 
+    window.location.href = "dashboard.html";  
+    });
+</script>
+
+</body>
+</html>

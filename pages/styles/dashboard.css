@@ -1,0 +1,234 @@
+/* ===== RESET E BASE ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Roboto, sans-serif;
+}
+
+body {
+  background-color: #002b5c;
+  color: #333;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== CABEÇALHO ===== */
+header {
+  background-color: #004aad;
+  color: white;
+  padding: 15px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+header h1 {
+  font-size: 1.6rem;
+  letter-spacing: 1px;
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 25px;
+}
+
+nav a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  transition: 0.2s;
+}
+
+nav a:hover {
+  text-decoration: underline;
+}
+
+/* ===== CONTEÚDO PRINCIPAL ===== */
+.dashboard {
+  flex: 1;
+  padding: 40px 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 35px;
+  background-color: #f9f9f9;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  margin-top: 25px;
+}
+
+/* ===== FORMULÁRIOS ===== */
+.form-section {
+  background-color: #ffffff;
+  padding: 25px 35px;
+  border-radius: 16px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+.form-section h2 {
+  color: #004aad;
+  margin-bottom: 15px;
+  font-size: 1.3rem;
+}
+
+.form-section form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.form-section input,
+.form-section select {
+  flex: 1 1 200px;
+  padding: 10px;
+  border: 1px solid #cbd5e0;
+  border-radius: 8px;
+  font-size: 15px;
+  transition: border-color 0.2s ease;
+}
+
+.form-section input:focus,
+.form-section select:focus {
+  border-color: #004aad;
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 74, 173, 0.2);
+}
+
+.form-section button {
+  background-color: #004aad;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 15px;
+  transition: background-color 0.3s;
+}
+
+.form-section button:hover {
+  background-color: #003780;
+}
+
+/* ===== LISTA DE DISCIPLINAS E TURMAS ===== */
+.list-section {
+  background-color: #ffffff;
+  padding: 25px 35px;
+  border-radius: 16px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+.list-section h2 {
+  color: #004aad;
+  margin-bottom: 15px;
+  font-size: 1.3rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background-color: #004aad;
+  color: white;
+  font-weight: 500;
+}
+
+td {
+  color: #333;
+}
+
+button.edit,
+button.delete {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button.edit {
+  background-color: #0077ff;
+  color: white;
+}
+
+button.edit:hover {
+  background-color: #005fcc;
+}
+
+button.delete {
+  background-color: #e53e3e;
+  color: white;
+}
+
+button.delete:hover {
+  background-color: #c53030;
+}
+
+/* ===== MODAL DE CONFIRMAÇÃO ===== */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 10;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 25px 30px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  max-width: 400px;
+}
+
+.modal-content h3 {
+  color: #004aad;
+  margin-bottom: 10px;
+}
+
+.modal-content p {
+  margin-bottom: 15px;
+  color: #333;
+}
+
+#fechar-modal {
+  background-color: #004aad;
+  color: #fff;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+#fechar-modal:hover {
+  background-color: #003780;
+}
+
+/* ===== RODAPÉ ===== */
+footer {
+  background-color: #004aad;
+  color: #fff;
+  text-align: center;
+  padding: 10px 0;
+  font-size: 14px;
+  margin-top: 25px;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+}
