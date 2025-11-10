@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - NotaDez</title>
+  <link rel="stylesheet" href="styles/dashboard.css">
+</head>
+<body>
+  <header>
+    <h1>NotaDez</h1>
+    <nav>
+      <ul>
+        <li><a href="#">Instituições</a></li>
+        <li><a href="#">Disciplinas</a></li>
+        <li><a href="#">Turmas</a></li>
+        <li><a href="login.html">Sair</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="dashboard">
+    <section class="form-section">
+      <h2>Gerenciar Instituição e Curso</h2>
+      <form id="form-instituicao">
+        <input type="text" placeholder="Nome da Instituição" required>
+        <input type="text" placeholder="Curso" required>
+        <button type="submit">Salvar</button>
+      </form>
+    </section>
+
+    <section class="form-section">
+      <h2>Cadastrar Disciplina</h2>
+      <form id="form-disciplina">
+        <input type="text" placeholder="Nome da disciplina" required>
+        <input type="text" placeholder="Sigla (ex: PI2)" required>
+        <input type="text" placeholder="Código da disciplina" required>
+        <input type="text" placeholder="Período (ex: 1º semestre)" required>
+        <button type="submit">Adicionar Disciplina</button>
+      </form>
+    </section>
+
+    <section class="form-section">
+      <h2>Criar Turma</h2>
+      <form id="form-turma">
+        <select required>
+          <option value="">Selecione a disciplina</option>
+          <option value="PI2">PI2</option>
+          <option value="Cálculo">Cálculo</option>
+        </select>
+        <input type="text" placeholder="Nome da turma (ex: Turma 1)" required>
+        <input type="text" placeholder="Dia e horário (ex: Terça, 19h)" required>
+        <button type="submit">Criar Turma</button>
+      </form>
+    </section>
+
+    <section class="list-section">
+      <h2>Disciplinas e Turmas Cadastradas</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Disciplina</th>
+            <th>Turma</th>
+            <th>Horário</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Engenharia de Software</td>
+            <td>Turma 1</td>
+            <td>Segunda - 19h</td>
+            <td>
+              <button class="edit">Editar</button>
+              <button class="delete">Excluir</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <!-- Modal de Confirmação -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <h3>Confirmação de Exclusão</h3>
+      <p>Um e-mail foi enviado para o docente com um link de confirmação.</p>
+      <p>Por favor, confirme a exclusão da turma acessando o link enviado.</p>
+      <button id="fechar-modal">OK</button>
+    </div>
+  </div>
+
+  <footer>
+    © 2025 PUC-Campinas - Todos os direitos reservados
+  </footer>
+
+  <!-- Script da Modal -->
+  <script>
+    const deleteButtons = document.querySelectorAll('.delete');
+    const modal = document.getElementById('modal');
+    const fecharModal = document.getElementById('fechar-modal');
+
+    deleteButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        modal.style.display = 'flex';
+      });
+    });
+
+    fecharModal.addEventListener('click', () => {
+      modal.style.display = 'none';
+    });
+
+    // Fecha a modal se clicar fora dela
+    window.addEventListener('click', (event) => {
+      if (event.target === modal) {
+        modal.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>
