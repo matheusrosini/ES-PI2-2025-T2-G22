@@ -1,6 +1,6 @@
 // Feito por Leonardo
 
-const db = require('./database/db');
+const db = require('../config/db');
 
 // Buscar todas as turmas
 exports.getAllTurmas = async (req, res) => {
