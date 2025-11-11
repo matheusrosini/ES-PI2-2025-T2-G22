@@ -8,6 +8,9 @@ const cursoRoutes = require("./routes/cursoRoutes");
 const disciplinaRoutes = require("./routes/disciplinaRoutes");
 const turmaRoutes = require('./routes/turmaRoutes');
 const alunoRoutes = require('./routes/alunoRoutes');
+const notaRoutes = require('./routes/notaRoutes');
+const componenteNotaRoutes = require('./routes/componenteNotaRoutes');
+const professorRoutes = require ('./routes/professorRoutes');
 
 
 const app = express();
@@ -19,6 +22,9 @@ app.use("/api/cursos", cursoRoutes);
 app.use("/api/disciplinas", disciplinaRoutes);
 app.use("/api/turmas", turmaRoutes);
 app.use("/api/alunos", alunoRoutes);
+app.use("/api/notas", notaRoutes);
+app.use("/api/componenteNotas", componenteNotaRoutes);
+app.use("/api/professores", professorRoutes);
 
 app.get("/", (req, res) => res.send("API ProjetoNotaDez — módulo Rosini"));
 
