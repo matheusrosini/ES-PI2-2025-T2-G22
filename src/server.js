@@ -1,3 +1,4 @@
+// src/server.js
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
@@ -16,7 +17,7 @@ const professorRoutes = require("./routes/professorRoutes");
 
 // Cria o app
 const app = express();
-app.use(cors()); // <== ADICIONE ISSO
+app.use(cors());
 app.use(express.json());
 
 // Usa as rotas
@@ -35,11 +36,10 @@ app.get("/", (req, res) => {
     res.send("✅ API ProjetoNotaDez — módulo Rosini ONLINE!");
 });
 
-// Porta dinâmica (Railway define automaticamente)
+// Porta
 const PORT = process.env.PORT || 8080;
 
-// Inicia o servidor
+// Inicia o servidor (sem definir "0.0.0.0")
 app.listen(PORT, () => {
     console.log(`🚀 Servidor rodando na porta ${PORT}`);
 });
-
