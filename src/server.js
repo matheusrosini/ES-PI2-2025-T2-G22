@@ -1,3 +1,4 @@
+// src/server.js
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
@@ -14,6 +15,7 @@ const notaRoutes = require("./routes/notaRoutes");
 const componenteNotaRoutes = require("./routes/componenteNotaRoutes");
 const professorRoutes = require("./routes/professorRoutes");
 
+// Cria o app
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -31,12 +33,14 @@ app.use("/api/professores", professorRoutes);
 
 // Rota padrão para teste
 app.get("/", (req, res) => {
-    res.status(200).send("✅ API ProjetoNotaDez — módulo Rosini ONLINE!");
+    res.send("✅ API ProjetoNotaDez — módulo Rosini ONLINE!");
 });
 
+// Porta e host
 const PORT = process.env.PORT || 8080;
+const HOST = "0.0.0.0"; // Essencial para Railway
 
-// 🚀 Correção: escuta em 0.0.0.0 para funcionar no Railway
-app.listen(PORT, "0.0.0.0", () => {
-    console.log(`🚀 Servidor rodando na porta ${PORT}`);
+// Inicia o servidor
+app.listen(PORT, HOST, () => {
+    console.log(`🚀 Servidor rodando na porta ${PORT} e host ${HOST}`);
 });
