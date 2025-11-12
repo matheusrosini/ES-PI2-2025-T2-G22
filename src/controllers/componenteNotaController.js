@@ -9,7 +9,7 @@ exports.getAllComponentes = async (req, res) => {
       SELECT c.id, c.nome, c.sigla, c.descricao, d.nome AS disciplina
       FROM componente_nota c
       LEFT JOIN disciplina d ON c.disciplina_id = d.id
-    `);
+    `);d
     res.json(rows);
   } catch (error) {
     res.status(500).json({ message: 'Erro ao buscar componentes de nota', error });
