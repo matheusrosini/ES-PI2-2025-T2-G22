@@ -1,3 +1,5 @@
+<!-- Matheus Henrique Portugal Narducci-->
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -22,13 +24,13 @@
           <th>Capacidade</th>
         </tr>
       </thead>
-      <tbody>
-        <!-- As turmas vão aparecer aqui -->
-      </tbody>
+      <tbody></tbody>
     </table>
   </div>
 
-  <!-- Importacao de launos-->
+  <br>
+
+  <!-- Importação de Alunos -->
   <div class="container">
     <h2>Alunos da Turma</h2>
     <button id="importCsvBtn">Importar CSV</button>
@@ -75,7 +77,7 @@
     </div>
   </div>
 
-  <!-- Uma caixa de alerta personalizada -->
+  <!-- Alerta customizado -->
   <div id="alertBox" class="alert-box">
     <div class="alert-content">
       <p id="alertMessage"></p>
@@ -86,23 +88,42 @@
   <script>
     const modal = document.getElementById('modalTurma');
     const novaTurmaBtn = document.getElementById('novaTurmaBtn');
-    const tabelaTurmas = document.getElementById('tabela-turmas').getElementsByTagName('tbody')[0];
+    const tabelaTurmas = document.querySelector('#tabela-turmas tbody');
+
+    const csvInput = document.getElementById('csvInput');
+    const importCsvBtn = document.getElementById('importCsvBtn');
+    const tabelaAlunos = document.querySelector('#tabela-alunos tbody');
+
     const alertBox = document.getElementById('alertBox');
     const alertMessage = document.getElementById('alertMessage');
     const closeAlertBtn = document.getElementById('closeAlertBtn');
 
-    // Mostra modal
-    novaTurmaBtn.addEventListener('click', () => {
-      modal.style.display = 'block';
+    let alertOpen = false;
+
+    function showAlert(message) {
+      alertMessage.textContent = message;
+      alertBox.style.display = 'flex';
+      alertOpen = true;
+
+      document.body.style.pointerEvents = 'none';
+      alertBox.style.pointerEvents = 'auto';
+    }
+
+    closeAlertBtn.addEventListener('click', () => {
+      alertOpen = false;
+      alertBox.style.display = 'none';
+      document.body.style.pointerEvents = 'auto';
     });
 
-    // Fecha modal
+    novaTurmaBtn.addEventListener('click', () => {
+      if (!alertOpen) modal.style.display = 'block';
+    });
+
     function fecharModal() {
       modal.style.display = 'none';
       limparCampos();
     }
 
-    // Limpa os campos
     function limparCampos() {
       document.getElementById('nomeTurma').value = '';
       document.getElementById('anoSerie').value = '';
@@ -111,21 +132,6 @@
       document.getElementById('capacidadeTurma').value = '';
     }
 
-    // Coloquei um alerta diferente ao inves do padrao se usar apenas alert()
-    function showAlert(message) {
-      alertMessage.textContent = message;
-      alertBox.style.display = 'flex';
-      document.body.style.pointerEvents = 'none';
-      alertBox.style.pointerEvents = 'auto';
-    }
-
-    // Fecha o alerta
-    closeAlertBtn.addEventListener('click', () => {
-      alertBox.style.display = 'none';
-      document.body.style.pointerEvents = 'auto';
-    });
-
-    // Função para conseguir salvar a turma
     function salvarTurma() {
       const nome = document.getElementById('nomeTurma').value;
       const ano = document.getElementById('anoSerie').value;
@@ -151,17 +157,17 @@
       fecharModal();
     }
 
+    document.getElementById('salvarTurmaBtn').addEventListener('click', salvarTurma);
+    document.getElementById('fecharModalBtn').addEventListener('click', fecharModal);
 
     window.onclick = function(event) {
-      if (event.target === modal) fecharModal();
+      if (event.target === modal && !alertOpen) fecharModal();
     };
-    document.getElementById('fecharModalBtn').addEventListener('click', fecharModal);
-    document.getElementById('salvarTurmaBtn').addEventListener('click', salvarTurma);
 
-
-     <!-- Importar CSV dos alunos-->
-
-
+  
+    //     importei o CSV
+   
+    
     importCsvBtn.addEventListener('click', () => {
       if (!alertOpen) csvInput.click();
     });
