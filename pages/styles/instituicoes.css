@@ -1,0 +1,165 @@
+/* Luis Felipe Moura - RA: 25010218 */
+/* Estilo padronizado com o Dashboard */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Roboto, sans-serif;
+}
+
+body {
+  display: flex;
+  background-color: #f0f4fa;
+  color: #333;
+  height: 100vh;
+}
+
+/* ===== Sidebar ===== */
+.sidebar {
+  width: 220px;
+  background-color: #002b5c;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 25px 0;
+  position: fixed;
+  height: 100%;
+}
+
+.sidebar h1 {
+  margin-bottom: 40px;
+  font-size: 1.6rem;
+}
+
+.sidebar ul {
+  list-style: none;
+  width: 100%;
+}
+
+.sidebar li {
+  width: 100%;
+}
+
+.sidebar a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: white;
+  text-decoration: none;
+  padding: 12px 20px;
+  transition: background 0.3s;
+}
+
+.sidebar a:hover {
+  background-color: #004aad;
+}
+
+/* ===== Conteúdo principal ===== */
+.main-content {
+  flex: 1;
+  padding: 40px;
+  margin-left: 220px;
+  overflow-y: auto;
+}
+
+.main-content h2 {
+  color: #004aad;
+  margin-bottom: 25px;
+}
+
+/* ===== Formulário ===== */
+.form-section {
+  background: #fff;
+  border-radius: 10px;
+  padding: 25px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.1);
+  margin-bottom: 30px;
+}
+
+.form-section h3 {
+  margin-bottom: 20px;
+  color: #004aad;
+}
+
+form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+input, select {
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  flex: 1 1 45%;
+}
+
+button {
+  background-color: #004aad;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background-color: #003b8e;
+}
+
+/* ===== Tabela ===== */
+.list-section {
+  background: #fff;
+  border-radius: 10px;
+  padding: 25px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.1);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+th {
+  background-color: #f0f4fa;
+  color: #004aad;
+}
+
+tr:hover {
+  background-color: #f9fbff;
+}
+
+.edit {
+  background-color: #007bff;
+}
+
+.delete {
+  background-color: #c0392b;
+}
+
+.edit, .delete {
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-right: 5px;
+}
+
+/* ===== Rodapé ===== */
+footer {
+  position: fixed;
+  bottom: 10px;
+  right: 20px;
+  font-size: 13px;
+  color: #555;
+}

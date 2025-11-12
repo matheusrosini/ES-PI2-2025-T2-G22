@@ -1,0 +1,154 @@
+<!-- Luis Felipe Moura: RA 25010218 -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro de Instituições - NotaDez</title>
+  <link rel="stylesheet" href="styles/instituicoes.css">
+</head>
+<body>
+
+  <!-- Sidebar fixa à esquerda -->
+  <aside class="sidebar">
+    <h2>NotaDez</h2>
+    <nav>
+      <ul>
+        <li><a href="dashboard.html">🏠 Dashboard</a></li>
+        <li><a href="alunos.html">👨‍🎓 Alunos</a></li>
+        <li class="active"><a href="#">🏫 Instituições</a></li>
+        <li><a href="disciplinas.html">📚 Disciplinas</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Conteúdo principal -->
+  <main class="main-content">
+    <header>
+      <h1>Cadastro de Instituições</h1>
+      <button id="addInstituicaoBtn">+ Nova Instituição</button>
+    </header>
+
+    <!-- Formulário de cadastro/edição -->
+    <section id="formSection" class="hidden">
+      <h2 id="formTitle">Nova Instituição</h2>
+      <form id="instituicaoForm">
+        <label for="nome">Nome da Instituição</label>
+        <input type="text" id="nome" required>
+
+        <label for="cnpj">CNPJ</label>
+        <input type="text" id="cnpj" placeholder="00.000.000/0000-00" required>
+
+        <label for="endereco">Endereço</label>
+        <input type="text" id="endereco" required>
+
+        <div class="form-buttons">
+          <button type="submit">Salvar</button>
+          <button type="button" id="cancelarBtn" class="cancelar">Cancelar</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Lista de instituições -->
+    <section class="tabela-section">
+      <h2>Instituições Cadastradas</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>CNPJ</th>
+            <th>Endereço</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="instituicoesTable">
+          <!-- As instituições serão inseridas dinamicamente via JS -->
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <script>
+    // Seletores principais
+    const formSection = document.getElementById('formSection');
+    const instituicaoForm = document.getElementById('instituicaoForm');
+    const addBtn = document.getElementById('addInstituicaoBtn');
+    const cancelBtn = document.getElementById('cancelarBtn');
+    const table = document.getElementById('instituicoesTable');
+    const formTitle = document.getElementById('formTitle');
+
+    let instituicoes = [];
+    let editIndex = null;
+
+    // Mostrar formulário
+    addBtn.addEventListener('click', () => {
+      formSection.classList.remove('hidden');
+      formTitle.textContent = "Nova Instituição";
+      instituicaoForm.reset();
+      editIndex = null;
+    });
+
+    // Cancelar formulário
+    cancelBtn.addEventListener('click', () => {
+      formSection.classList.add('hidden');
+      instituicaoForm.reset();
+    });
+
+    // Enviar formulário (criar/editar)
+    instituicaoForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const nome = document.getElementById('nome').value.trim();
+      const cnpj = document.getElementById('cnpj').value.trim();
+      const endereco = document.getElementById('endereco').value.trim();
+
+      if (editIndex === null) {
+        instituicoes.push({ nome, cnpj, endereco });
+      } else {
+        instituicoes[editIndex] = { nome, cnpj, endereco };
+      }
+
+      atualizarTabela();
+      instituicaoForm.reset();
+      formSection.classList.add('hidden');
+    });
+
+    // Atualizar tabela
+    function atualizarTabela() {
+      table.innerHTML = "";
+      instituicoes.forEach((inst, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${inst.nome}</td>
+          <td>${inst.cnpj}</td>
+          <td>${inst.endereco}</td>
+          <td>
+            <button class="edit" onclick="editar(${index})">✏️</button>
+            <button class="delete" onclick="remover(${index})">🗑️</button>
+          </td>
+        `;
+        table.appendChild(row);
+      });
+    }
+
+    // Editar instituição
+    function editar(index) {
+      const inst = instituicoes[index];
+      document.getElementById('nome').value = inst.nome;
+      document.getElementById('cnpj').value = inst.cnpj;
+      document.getElementById('endereco').value = inst.endereco;
+      formSection.classList.remove('hidden');
+      formTitle.textContent = "Editar Instituição";
+      editIndex = index;
+    }
+
+    // Remover instituição
+    function remover(index) {
+      instituicoes.splice(index, 1);
+      atualizarTabela();
+    }
+
+    window.editar = editar;
+    window.remover = remover;
+  </script>
+</body>
+</html>
