@@ -1,20 +1,21 @@
+// src/config/db.js
 const mysql = require("mysql2");
 require("dotenv").config();
 
-// 🔧 Cria um pool de conexões — mais seguro e confiável para deploys (como Railway)
+// Cria um pool de conexões — mais estável para uso em produção (Railway)
 const pool = mysql.createPool({
     host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    port: process.env.DB_PORT,
-    ssl: { rejectUnauthorized: false }, // aceita certificado autoassinado
+    ssl: { rejectUnauthorized: false }, // Railway exige SSL
     waitForConnections: true,
     connectionLimit: 10,
-    queueLimit: 0
+    queueLimit: 0,
 });
 
-// 🔍 Testa a conexão inicial
+// Testa a conexão inicial
 pool.getConnection((err, connection) => {
     if (err) {
         console.error("❌ Erro ao conectar ao MySQL:", err.message);
