@@ -1,0 +1,234 @@
+/* ==============================
+   ESTILO GERAL DA PÁGINA DE ALUNOS
+=================================*/
+/* Luis Felipe Moura: RA 25010218 */ 
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f5f7fa;
+  color: #333;
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ==============================
+   SIDEBAR (MANTÉM O PADRÃO DO DASHBOARD)
+=================================*/
+.sidebar {
+  background-color: #003780;
+  width: 240px;
+  color: #fff;
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+}
+
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar h1 {
+  text-align: center;
+  margin-bottom: 40px;
+  font-size: 24px;
+  color: #fff;
+}
+
+.sidebar ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 16px;
+  display: block;
+  padding: 10px;
+  border-radius: 6px;
+  transition: background 0.3s;
+}
+
+.sidebar a:hover,
+.sidebar a.active {
+  background-color: #004aad;
+}
+
+.logout a {
+  display: block;
+  text-align: center;
+  background-color: #004aad;
+  padding: 10px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: white;
+  transition: 0.3s;
+}
+
+.logout a:hover {
+  background-color: #0058d4;
+}
+
+/* ==============================
+   CONTEÚDO PRINCIPAL
+=================================*/
+main.alunos {
+  flex-grow: 1;
+  margin-left: 240px;
+  padding: 40px;
+  overflow-y: auto;
+}
+
+main.alunos h2 {
+  color: #003780;
+  margin-bottom: 20px;
+}
+
+/* ==============================
+   FORMULÁRIOS E AÇÕES
+=================================*/
+.form-section {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  margin-bottom: 30px;
+}
+
+.form-section h3 {
+  color: #003780;
+  margin-bottom: 15px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+input[type="text"],
+input[type="file"],
+select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+button {
+  background-color: #003780;
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
+  font-weight: 500;
+}
+
+button:hover {
+  background-color: #0058d4;
+}
+
+/* ==============================
+   TABELA DE ALUNOS
+=================================*/
+.table-section {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.table-section h3 {
+  color: #003780;
+  margin-bottom: 15px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+table th, table td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+table th {
+  background-color: #003780;
+  color: white;
+  font-weight: 600;
+}
+
+table tr:hover {
+  background-color: #f0f4ff;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* ==============================
+   BOTÕES ESPECIAIS
+=================================*/
+.import-btn {
+  background-color: #004aad;
+}
+
+.import-btn:hover {
+  background-color: #0058d4;
+}
+
+.delete-btn {
+  background-color: #b30000;
+}
+
+.delete-btn:hover {
+  background-color: #d11a1a;
+}
+
+/* ==============================
+   SCROLLBAR PERSONALIZADA
+=================================*/
+main.alunos::-webkit-scrollbar {
+  width: 8px;
+}
+
+main.alunos::-webkit-scrollbar-thumb {
+  background-color: #004aad;
+  border-radius: 10px;
+}
+
+/* ==============================
+   RESPONSIVIDADE
+=================================*/
+@media (max-width: 768px) {
+  .sidebar {
+    width: 200px;
+  }
+
+  main.alunos {
+    margin-left: 200px;
+    padding: 20px;
+  }
+
+  table th, table td {
+    font-size: 14px;
+  }
+}

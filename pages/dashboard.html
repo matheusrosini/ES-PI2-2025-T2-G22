@@ -1,3 +1,5 @@
+<!-- Luis Felipe Moura: RA 25010218 -->
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -5,57 +7,88 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard - NotaDez</title>
   <link rel="stylesheet" href="styles/dashboard.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
-  <header>
+  <div class="sidebar">
     <h1>NotaDez</h1>
     <nav>
       <ul>
-        <li><a href="#">Instituições</a></li>
-        <li><a href="#">Disciplinas</a></li>
-        <li><a href="#">Turmas</a></li>
-        <li><a href="login.html">Sair</a></li>
+        <li><a href="#"><i data-lucide="school"></i> Instituições</a></li>
+        <li><a href="#"><i data-lucide="book-open"></i> Disciplinas</a></li>
+        <li><a href="#"><i data-lucide="users"></i> Turmas</a></li>
+        <li><a href="login.html"><i data-lucide="log-out"></i> Sair</a></li>
       </ul>
     </nav>
-  </header>
+  </div>
 
   <main class="dashboard">
+    <!-- Seção 1 -->
     <section class="form-section">
-      <h2>Gerenciar Instituição e Curso</h2>
-      <form id="form-instituicao">
-        <input type="text" placeholder="Nome da Instituição" required>
-        <input type="text" placeholder="Curso" required>
-        <button type="submit">Salvar</button>
-      </form>
+      <div class="section-header">
+        <h2><i data-lucide="building"></i> Gerenciar Instituição e Curso</h2>
+        <span class="toggle">▼</span>
+      </div>
+      <div class="section-content">
+        <form id="form-instituicao">
+          <input type="text" placeholder="Nome da Instituição" required>
+          <input type="text" placeholder="Curso" required>
+          <button type="submit">Salvar</button>
+        </form>
+      </div>
     </section>
 
+    <!-- Seção 2 -->
     <section class="form-section">
-      <h2>Cadastrar Disciplina</h2>
-      <form id="form-disciplina">
-        <input type="text" placeholder="Nome da disciplina" required>
-        <input type="text" placeholder="Sigla (ex: PI2)" required>
-        <input type="text" placeholder="Código da disciplina" required>
-        <input type="text" placeholder="Período (ex: 1º semestre)" required>
-        <button type="submit">Adicionar Disciplina</button>
-      </form>
+      <div class="section-header">
+        <h2><i data-lucide="book"></i> Cadastrar Disciplina</h2>
+        <span class="toggle">▼</span>
+      </div>
+      <div class="section-content">
+        <form id="form-disciplina">
+          <input type="text" placeholder="Nome da disciplina" required>
+          <input type="text" placeholder="Sigla (ex: PI2)" required>
+          <input type="text" placeholder="Código da disciplina" required>
+          <select required>
+            <option value="">Período</option>
+            <option value="Matutino">Matutino</option>
+            <option value="Verspertino">Verspertino</option>
+            <option value="Noturno">Noturno</option>
+            <option value="Integral">Integral</option>
+          </select>
+          <button type="submit">Adicionar Disciplina</button>
+        </form>
+      </div>
     </section>
 
+    <!-- Seção 3 -->
     <section class="form-section">
-      <h2>Criar Turma</h2>
-      <form id="form-turma">
-        <select required>
-          <option value="">Selecione a disciplina</option>
-          <option value="PI2">PI2</option>
-          <option value="Cálculo">Cálculo</option>
-        </select>
-        <input type="text" placeholder="Nome da turma (ex: Turma 1)" required>
-        <input type="text" placeholder="Dia e horário (ex: Terça, 19h)" required>
-        <button type="submit">Criar Turma</button>
-      </form>
+      <div class="section-header">
+        <h2><i data-lucide="users"></i> Criar Turma</h2>
+        <span class="toggle">▼</span>
+      </div>
+      <div class="section-content">
+        <form id="form-turma">
+          <select required>
+            <option value="">Selecione a disciplina</option>
+
+          </select>
+          <input type="text" placeholder="Nome da turma (ex: Turma 1)" required>
+          <select required>
+            <option value="">Período</option>
+            <option value="Matutino">Matutino</option>
+            <option value="Verspertino">Verspertino</option>
+            <option value="Noturno">Noturno</option>
+            <option value="Integral">Integral</option>
+          </select>
+          <button type="submit">Criar Turma</button>
+        </form>
+      </div>
     </section>
 
+    <!-- Sempre aberta -->
     <section class="list-section">
-      <h2>Disciplinas e Turmas Cadastradas</h2>
+      <h2><i data-lucide="clipboard-list"></i> Disciplinas e Turmas Cadastradas</h2>
       <table>
         <thead>
           <tr>
@@ -80,12 +113,12 @@
     </section>
   </main>
 
-  <!-- Modal de Confirmação -->
+  <!-- Modal -->
   <div id="modal" class="modal">
     <div class="modal-content">
       <h3>Confirmação de Exclusão</h3>
-      <p>Um e-mail foi enviado para o docente com um link de confirmação.</p>
-      <p>Por favor, confirme a exclusão da turma acessando o link enviado.</p>
+      <p>Um e-mail foi enviado com o link de confirmação.</p>
+      <p>Confirme a exclusão da turma acessando o link enviado.</p>
       <button id="fechar-modal">OK</button>
     </div>
   </div>
@@ -94,8 +127,9 @@
     © 2025 PUC-Campinas - Todos os direitos reservados
   </footer>
 
-  <!-- Script da Modal -->
   <script>
+    lucide.createIcons();
+
     const deleteButtons = document.querySelectorAll('.delete');
     const modal = document.getElementById('modal');
     const fecharModal = document.getElementById('fechar-modal');
@@ -110,11 +144,30 @@
       modal.style.display = 'none';
     });
 
-    // Fecha a modal se clicar fora dela
     window.addEventListener('click', (event) => {
       if (event.target === modal) {
         modal.style.display = 'none';
       }
+    });
+
+    // Acordeão
+    const sectionHeaders = document.querySelectorAll('.section-header');
+
+    sectionHeaders.forEach(header => {
+      header.addEventListener('click', () => {
+        const section = header.parentElement;
+        const isOpen = section.classList.contains('open');
+        
+        document.querySelectorAll('.form-section').forEach(sec => {
+          sec.classList.remove('open');
+          sec.querySelector('.section-header').classList.remove('active');
+        });
+        
+        if (!isOpen) {
+          section.classList.add('open');
+          header.classList.add('active');
+        }
+      });
     });
   </script>
 </body>
