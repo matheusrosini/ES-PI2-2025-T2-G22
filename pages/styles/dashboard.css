@@ -1,4 +1,4 @@
-/* ===== RESET E BASE ===== */
+/* Luis Felipe Moura: RA 25010218 */ 
 * {
   margin: 0;
   padding: 0;
@@ -7,123 +7,156 @@
 }
 
 body {
-  background-color: #002b5c;
-  color: #333;
-  min-height: 100vh;
   display: flex;
-  flex-direction: column;
+  background-color: #f0f4fa;
+  color: #333;
+  height: 100vh;
 }
 
-/* ===== CABEÇALHO ===== */
-header {
+/* ====== Sidebar ====== */
+.sidebar {
+  width: 220px;
+  background-color: #002b5c;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 25px 0;
+}
+
+.sidebar h1 {
+  margin-bottom: 40px;
+  font-size: 1.6rem;
+}
+
+.sidebar ul {
+  list-style: none;
+  width: 100%;
+}
+
+.sidebar li {
+  width: 100%;
+}
+
+.sidebar a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: white;
+  text-decoration: none;
+  padding: 12px 20px;
+  transition: background 0.3s;
+}
+
+.sidebar a:hover {
+  background-color: #004aad;
+}
+
+/* ====== Dashboard ====== */
+.dashboard {
+  flex: 1;
+  padding: 40px;
+  overflow-y: auto;
+}
+
+/* ====== Seções Expansíveis ====== */
+.form-section {
+  background: #f9f9ff;
+  margin-bottom: 25px;
+  border-radius: 10px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.section-header {
   background-color: #004aad;
   color: white;
-  padding: 15px 40px;
+  padding: 15px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  user-select: none;
 }
 
-header h1 {
-  font-size: 1.6rem;
-  letter-spacing: 1px;
+.section-header:hover {
+  background-color: #003b8e;
 }
 
-nav ul {
-  list-style: none;
+.section-header h2 {
   display: flex;
-  gap: 25px;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: 1.1rem;
 }
 
-nav a {
-  color: white;
-  text-decoration: none;
-  font-weight: 500;
-  transition: 0.2s;
+.section-header .toggle {
+  font-size: 1.2rem;
+  transition: transform 0.3s;
 }
 
-nav a:hover {
-  text-decoration: underline;
+.section-header.active .toggle {
+  transform: rotate(-180deg);
 }
 
-/* ===== CONTEÚDO PRINCIPAL ===== */
-.dashboard {
-  flex: 1;
-  padding: 40px 60px;
+.section-content {
+  display: none;
+  padding: 20px;
+  background-color: #fff;
+  border-top: 1px solid #ddd;
+  animation: fadeIn 0.3s ease;
+}
+
+.form-section.open .section-content {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ====== Formulários ====== */
+form {
   display: flex;
   flex-direction: column;
-  gap: 35px;
-  background-color: #f9f9f9;
-  border-top-left-radius: 20px;
-  border-top-right-radius: 20px;
-  margin-top: 25px;
-}
-
-/* ===== FORMULÁRIOS ===== */
-.form-section {
-  background-color: #ffffff;
-  padding: 25px 35px;
-  border-radius: 16px;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-}
-
-.form-section h2 {
-  color: #004aad;
-  margin-bottom: 15px;
-  font-size: 1.3rem;
-}
-
-.form-section form {
-  display: flex;
-  flex-wrap: wrap;
   gap: 15px;
 }
 
-.form-section input,
-.form-section select {
-  flex: 1 1 200px;
+input, select {
   padding: 10px;
-  border: 1px solid #cbd5e0;
-  border-radius: 8px;
-  font-size: 15px;
-  transition: border-color 0.2s ease;
+  border-radius: 6px;
+  border: 1px solid #ccc;
 }
 
-.form-section input:focus,
-.form-section select:focus {
-  border-color: #004aad;
-  outline: none;
-  box-shadow: 0 0 5px rgba(0, 74, 173, 0.2);
-}
-
-.form-section button {
+button {
   background-color: #004aad;
   color: white;
   border: none;
-  border-radius: 8px;
-  padding: 10px 20px;
+  padding: 10px;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 15px;
-  transition: background-color 0.3s;
 }
 
-.form-section button:hover {
-  background-color: #003780;
+button:hover {
+  background-color: #003b8e;
 }
 
-/* ===== LISTA DE DISCIPLINAS E TURMAS ===== */
+/* ====== Tabela ====== */
 .list-section {
-  background-color: #ffffff;
-  padding: 25px 35px;
-  border-radius: 16px;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  background-color: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.1);
 }
 
 .list-section h2 {
   color: #004aad;
   margin-bottom: 15px;
-  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 table {
@@ -132,103 +165,61 @@ table {
 }
 
 th, td {
-  padding: 12px;
-  text-align: left;
+  padding: 10px;
   border-bottom: 1px solid #ddd;
 }
 
 th {
-  background-color: #004aad;
+  background-color: #f0f4fa;
+  color: #004aad;
+  text-align: left;
+}
+
+.edit {
+  background-color: #007bff;
+}
+
+.delete {
+  background-color: #c0392b;
+}
+
+.edit, .delete {
   color: white;
-  font-weight: 500;
-}
-
-td {
-  color: #333;
-}
-
-button.edit,
-button.delete {
-  padding: 6px 14px;
   border: none;
+  padding: 6px 12px;
   border-radius: 6px;
-  font-size: 14px;
   cursor: pointer;
-  transition: 0.2s;
+  margin-right: 5px;
 }
 
-button.edit {
-  background-color: #0077ff;
-  color: white;
-}
-
-button.edit:hover {
-  background-color: #005fcc;
-}
-
-button.delete {
-  background-color: #e53e3e;
-  color: white;
-}
-
-button.delete:hover {
-  background-color: #c53030;
-}
-
-/* ===== MODAL DE CONFIRMAÇÃO ===== */
+/* ====== Modal ====== */
 .modal {
   display: none;
   position: fixed;
-  z-index: 10;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
   justify-content: center;
   align-items: center;
 }
 
 .modal-content {
-  background-color: #fff;
-  padding: 25px 30px;
-  border-radius: 12px;
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
   text-align: center;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-  max-width: 400px;
+  width: 360px;
 }
 
-.modal-content h3 {
-  color: #004aad;
-  margin-bottom: 10px;
+.modal-content button {
+  margin-top: 10px;
 }
 
-.modal-content p {
-  margin-bottom: 15px;
-  color: #333;
-}
-
-#fechar-modal {
-  background-color: #004aad;
-  color: #fff;
-  border: none;
-  padding: 8px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-#fechar-modal:hover {
-  background-color: #003780;
-}
-
-/* ===== RODAPÉ ===== */
+/* ====== Rodapé ====== */
 footer {
-  background-color: #004aad;
-  color: #fff;
-  text-align: center;
-  padding: 10px 0;
-  font-size: 14px;
-  margin-top: 25px;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+  position: fixed;
+  bottom: 10px;
+  right: 20px;
+  font-size: 13px;
+  color: #555;
 }

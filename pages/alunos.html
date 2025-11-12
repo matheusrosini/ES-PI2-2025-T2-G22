@@ -1,0 +1,194 @@
+<!-- Luis Felipe Moura - RA 25010218 -->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Gerenciar Alunos - NotaDez</title>
+  <link rel="stylesheet" href="styles/alunos.css">
+</head>
+<body>
+
+  <!-- SIDEBAR (menu lateral fixo) -->
+  <aside class="sidebar">
+    <div class="sidebar-content">
+      <h1>NotaDez</h1>
+      <ul>
+        <li><a href="dashboard.html">Instituições</a></li>
+        <li><a href="dashboard.html">Disciplinas</a></li>
+        <li><a href="dashboard.html">Turmas</a></li>
+        <li><a href="alunos.html" class="active">Alunos</a></li>
+      </ul>
+    </div>
+    <div class="logout">
+      <a href="login.html">Sair</a>
+    </div>
+  </aside>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main class="alunos">
+    
+    <!-- TÍTULO DA PÁGINA -->
+    <h2>Gerenciamento de Alunos</h2>
+
+    <!-- FORMULÁRIO DE CADASTRO DE ALUNO -->
+    <section class="form-section">
+      <h3>Cadastrar novo aluno</h3>
+      <form id="form-cadastro">
+        <!-- Campo de matrícula do aluno -->
+        <input type="text" id="matricula" placeholder="Matrícula do aluno" required>
+        <!-- Campo do nome do aluno -->
+        <input type="text" id="nome" placeholder="Nome completo" required>
+        <!-- Botão de envio -->
+        <button type="submit">Adicionar Aluno</button>
+      </form>
+    </section>
+
+    <!-- IMPORTAÇÃO DE ALUNOS (CSV/JSON) -->
+    <section class="form-section">
+      <h3>Importar alunos (CSV / JSON)</h3>
+      <form id="form-importar">
+        <!-- Campo para escolher o arquivo -->
+        <input type="file" id="arquivo" accept=".csv, .json" required>
+        <!-- Botão para importar -->
+        <button type="submit" class="import-btn">Importar Arquivo</button>
+      </form>
+    </section>
+
+    <!-- TABELA DE ALUNOS CADASTRADOS -->
+    <section class="table-section">
+      <h3>Alunos Cadastrados</h3>
+      <table id="tabela-alunos">
+        <thead>
+          <tr>
+            <th>Matrícula</th>
+            <th>Nome</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Exemplo inicial de alunos -->
+          <tr>
+            <td>11111</td>
+            <td>Abel Antimônio</td>
+            <td class="actions">
+              <button class="edit-btn">Editar</button>
+              <button class="delete-btn">Excluir</button>
+            </td>
+          </tr>
+          <tr>
+            <td>11112</td>
+            <td>Bianca Nióbio</td>
+            <td class="actions">
+              <button class="edit-btn">Editar</button>
+              <button class="delete-btn">Excluir</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <!-- SCRIPT DE FUNCIONAMENTO -->
+  <script>
+    // Seleciona o formulário de cadastro e a tabela
+    const formCadastro = document.getElementById('form-cadastro');
+    const tabela = document.getElementById('tabela-alunos').querySelector('tbody');
+
+    // Adiciona evento de envio do formulário de cadastro
+    formCadastro.addEventListener('submit', (e) => {
+      e.preventDefault(); // impede o reload da página
+      const matricula = document.getElementById('matricula').value;
+      const nome = document.getElementById('nome').value;
+
+      // Cria nova linha na tabela com os dados informados
+      const novaLinha = document.createElement('tr');
+      novaLinha.innerHTML = `
+        <td>${matricula}</td>
+        <td>${nome}</td>
+        <td class="actions">
+          <button class="edit-btn">Editar</button>
+          <button class="delete-btn">Excluir</button>
+        </td>
+      `;
+      tabela.appendChild(novaLinha);
+
+      // Limpa os campos
+      formCadastro.reset();
+    });
+
+    // Função para excluir aluno ao clicar em "Excluir"
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('delete-btn')) {
+        e.target.closest('tr').remove(); // remove a linha da tabela
+      }
+    });
+
+    // Importação de arquivos CSV ou JSON
+    const formImportar = document.getElementById('form-importar');
+
+    formImportar.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const arquivo = document.getElementById('arquivo').files[0];
+
+      if (!arquivo) {
+        alert('Selecione um arquivo para importar!');
+        return;
+      }
+
+      const leitor = new FileReader();
+
+      // Se o arquivo for CSV
+      if (arquivo.name.endsWith('.csv')) {
+        leitor.onload = function(event) {
+          const linhas = event.target.result.split('\n');
+          linhas.forEach(linha => {
+            const [matricula, nome] = linha.split(',');
+            if (matricula && nome) {
+              const novaLinha = document.createElement('tr');
+              novaLinha.innerHTML = `
+                <td>${matricula.trim()}</td>
+                <td>${nome.trim()}</td>
+                <td class="actions">
+                  <button class="edit-btn">Editar</button>
+                  <button class="delete-btn">Excluir</button>
+                </td>
+              `;
+              tabela.appendChild(novaLinha);
+            }
+          });
+        };
+        leitor.readAsText(arquivo);
+      }
+
+      // Se o arquivo for JSON
+      if (arquivo.name.endsWith('.json')) {
+        leitor.onload = function(event) {
+          const alunos = JSON.parse(event.target.result);
+          alunos.forEach(a => {
+            const matricula = a.matricula || a.id || a.codigo || a.RA;
+            const nome = a.nome || a.fullName || a.completeName || a.name;
+
+            if (matricula && nome) {
+              const novaLinha = document.createElement('tr');
+              novaLinha.innerHTML = `
+                <td>${matricula}</td>
+                <td>${nome}</td>
+                <td class="actions">
+                  <button class="edit-btn">Editar</button>
+                  <button class="delete-btn">Excluir</button>
+                </td>
+              `;
+              tabela.appendChild(novaLinha);
+            }
+          });
+        };
+        leitor.readAsText(arquivo);
+      }
+
+      // Limpa o campo do arquivo após importar
+      formImportar.reset();
+    });
+  </script>
+
+</body>
+</html>

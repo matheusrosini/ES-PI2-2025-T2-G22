@@ -1,4 +1,4 @@
-/* ====== RESET E BASE ====== */
+/* Luis Felipe Moura: RA 25010218 */ 
 * {
   margin: 0;
   padding: 0;
@@ -6,7 +6,6 @@
   font-family: "Segoe UI", Roboto, sans-serif;
 }
 
-/* ====== CORPO ====== */
 body {
   height: 100vh;
   background: linear-gradient(135deg, #002147, #003980, #004aad);
@@ -17,7 +16,6 @@ body {
   overflow: hidden;
 }
 
-/* Efeito sutil de brilho flutuante no fundo */
 body::before {
   content: "";
   position: absolute;
@@ -34,7 +32,6 @@ body::before {
   to { transform: rotate(360deg); }
 }
 
-/* ====== CONTAINER ====== */
 .container {
   background-color: #ffffff;
   width: 420px;
@@ -52,7 +49,6 @@ body::before {
   box-shadow: 0 0 30px rgba(0, 74, 173, 0.4);
 }
 
-/* ====== TÍTULOS ====== */
 .container h1 {
   color: #004aad;
   margin-bottom: 5px;
@@ -66,7 +62,6 @@ body::before {
   margin-bottom: 25px;
 }
 
-/* ====== FORMULÁRIO ====== */
 form {
   display: flex;
   flex-direction: column;
@@ -99,7 +94,6 @@ input:focus {
   box-shadow: 0 0 6px rgba(0, 74, 173, 0.3);
 }
 
-/* ====== BOTÕES ====== */
 button {
   background-color: #004aad;
   color: white;
@@ -117,7 +111,6 @@ button:hover {
   transform: scale(1.02);
 }
 
-/* ====== LINKS ====== */
 .links {
   margin-top: 15px;
 }
@@ -133,7 +126,6 @@ button:hover {
   text-decoration: underline;
 }
 
-/* ====== RODAPÉ ====== */
 footer {
   position: absolute;
   bottom: 15px;
