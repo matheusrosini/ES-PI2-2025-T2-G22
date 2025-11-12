@@ -1,4 +1,6 @@
 /* Matheus Henrique Portugal Narducci */
+/* Padronização igual Instituições / Disciplinas / Dashboard */
+
 * {
   margin: 0;
   padding: 0;
@@ -13,7 +15,7 @@ body {
   height: 100vh;
 }
 
-/* ====== Sidebar ====== */
+/* ===== Sidebar ===== */
 .sidebar {
   width: 220px;
   background-color: #002b5c;
@@ -22,6 +24,8 @@ body {
   flex-direction: column;
   align-items: center;
   padding: 25px 0;
+  position: fixed;
+  height: 100%;
 }
 
 .sidebar h1 {
@@ -48,95 +52,83 @@ body {
   transition: background 0.3s;
 }
 
-.sidebar a:hover {
+.sidebar a:hover,
+.sidebar a.active {
   background-color: #004aad;
 }
 
-/* ====== Dashboard ====== */
-.dashboard {
+/* ===== Main Content ===== */
+.main-content {
   flex: 1;
   padding: 40px;
+  margin-left: 220px;
   overflow-y: auto;
 }
 
-/* ====== Seções Expansíveis ====== */
-.form-section {
-  background: #f9f9ff;
+.main-content h2 {
+  color: #004aad;
   margin-bottom: 25px;
-  border-radius: 10px;
-  box-shadow: 0 1px 6px rgba(0,0,0,0.1);
-  overflow: hidden;
-}
-
-.section-header {
-  background-color: #004aad;
-  color: white;
-  padding: 15px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-  user-select: none;
-}
-
-.section-header:hover {
-  background-color: #003b8e;
-}
-
-.section-header h2 {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 0;
-  font-size: 1.1rem;
 }
 
-.section-header .toggle {
-  font-size: 1.2rem;
-  transition: transform 0.3s;
+/* ===== Form Section ===== */
+.form-section {
+  background: #fff;
+  border-radius: 10px;
+  padding: 25px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.1);
+  margin-bottom: 30px;
 }
 
-.section-header.active .toggle {
-  transform: rotate(-180deg);
+.form-section h3 {
+  color: #004aad;
+  margin-bottom: 20px;
 }
 
-.section-content {
-  display: none;
-  padding: 20px;
-  background-color: #fff;
-  border-top: 1px solid #ddd;
-  animation: fadeIn 0.3s ease;
-}
-
-.form-section.open .section-content {
-  display: block;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-5px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* ====== Formulários ====== */
 form {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: 15px;
 }
 
-label {
-  font-weight: 600;
-}
-
-input, select {
+select, input {
   padding: 10px;
   border-radius: 6px;
   border: 1px solid #ccc;
-  width: 100%;
+  flex: 1 1 45%;
 }
 
-/* ====== Tabela de Notas ====== */
+button {
+  background-color: #004aad;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
 
+button:hover {
+  background-color: #003780;
+}
+
+/* ===== Table ===== */
+.list-section {
+  background: #fff;
+  border-radius: 10px;
+  padding: 25px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.1);
+}
+
+.list-section h3 {
+  color: #004aad;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
 table {
   width: 100%;
@@ -144,85 +136,50 @@ table {
 }
 
 th, td {
-  padding: 10px;
+  padding: 12px 15px;
   border-bottom: 1px solid #ddd;
 }
 
 th {
   background-color: #f0f4fa;
   color: #004aad;
-  text-align: left;
 }
 
-input[type="number"],
-input[type="text"] {
+input[type="number"] {
   width: 100%;
-  padding: 6px;
-  border-radius: 4px;
+  padding: 8px;
+  border-radius: 6px;
   border: 1px solid #ccc;
 }
 
-/* ====== Botões ====== */
-.edit {
+/* ===== Buttons ===== */
+.button-group {
+  margin-top: 25px;
+  display: flex;
+  gap: 15px;
+}
+
+.save {
   background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  margin-right: 10px;
 }
 
-.edit:hover {
-  background-color: #0056b3;
+.save:hover {
+  background-color: #005bb8;
 }
 
-.delete {
+.export {
   background-color: #c0392b;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
-  cursor: pointer;
 }
 
-.delete:hover {
-  background-color: #a93226;
+.export:hover {
+  background-color: #a82820;
 }
 
-/* ====== Rodapé ====== */
+/* ===== Footer ===== */
 footer {
   position: fixed;
   bottom: 10px;
   right: 20px;
   font-size: 13px;
   color: #555;
-}
-
-button {
-  background-color: #004aad;
-  color: white;
-  border: none;
-  padding: 10px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #003b8e;
-}
-
-.list-section {
-  background-color: white;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 1px 6px rgba(0,0,0,0.1);
-}
-
-.list-section h2 {
-  color: #004aad;
-  margin-bottom: 15px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
 }
