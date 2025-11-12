@@ -4,8 +4,6 @@
   "description": "Projeto NotaDez para o Projeto Integrado II",
   "main": "src/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "node src/server.js",
     "start": "node src/server.js"
   },
   "repository": {
