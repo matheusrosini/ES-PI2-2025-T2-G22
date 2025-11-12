@@ -3,10 +3,10 @@ const router = express.Router();
 const controller = require("../controllers/instituicaoController");
 
 // Rotas de instituições
-router.get("/", controller.getAll);
-router.post("/", controller.create);
-router.get("/:id", controller.getById);
-router.put("/:id", controller.update);
-router.delete("/:id", controller.remove);
+router.get("/", controller.getAllInstituicoes);
+router.post("/", controller.createInstituicao);
+router.get("/:id", controller.getInstituicaoById);
+router.put("/:id", controller.updateInstituicao);
+router.delete("/:id", controller.deleteInstituicao);
 
 module.exports = router;

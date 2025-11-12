@@ -3,10 +3,10 @@ const router = express.Router();
 const controller = require("../controllers/disciplinaController");
 
 // Rotas de disciplinas
-router.get("/", controller.getAll);
-router.post("/", controller.create);
-router.get("/:id", controller.getById);
-router.put("/:id", controller.update);
-router.delete("/:id", controller.remove);
+router.get("/", controller.getAllDisciplinas);
+router.post("/", controller.createDisciplina);
+router.get("/:id", controller.getDisciplinaById);
+router.put("/:id", controller.updateDisciplina);
+router.delete("/:id", controller.deleteDisciplina);
 
 module.exports = router;
