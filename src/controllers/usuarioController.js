@@ -1,4 +1,4 @@
-// src/controllers/userController.js
+// src/controllers/usuarioController.js
 
 exports.getAll = (req, res) => {
   res.send("Retornando todos os usuários 🚀");
