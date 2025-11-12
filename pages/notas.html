@@ -1,0 +1,85 @@
+<!-- Matheus Henrique Portugal Narducci -->
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles/notas.css">
+    <title>Cadastro de Notas</title>
+</head>
+<body>
+    <div class="sidebar">
+    <h1>NotaDez</h1>
+      <nav>
+        <ul>
+          <li><a href="instituicoes.html"><i data-lucide="school"></i> Instituições</a></li>
+          <li><a href="disciplinas.html"><i data-lucide="book-open"></i> Disciplinas</a></li>
+          <li><a href="turmas.html"><i data-lucide="users"></i> Turmas</a></li>
+          <li><a href="notas.html"><i data-lucide="clipboard"></i> Notas</a></li>
+          <li><a href="login.html"><i data-lucide="log-out"></i> Sair</a></li>
+        </ul>
+      </nav>
+  </div>
+
+    <div class="container mt-4">
+  <h2>Lançamento de Notas</h2>
+
+  <div class="form-group">
+    <label for="disciplina">Disciplina:</label>
+    <select id="disciplina" class="form-control">
+      <option>Selecione</option>
+      <!-- opções dinâmicas -->
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="turma">Turma:</label>
+    <select id="turma" class="form-control">
+      <option>Selecione</option>
+      <!-- opções dinâmicas -->
+    </select>
+  </div>
+
+  <section class="list-section">
+      <h2><i data-lucide="clipboard-list"></i> Notas Lançadas</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Aluno</th>
+            <th>P1</th>
+            <th>P2</th>
+            <th>P3</th>
+            <th>Média</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>
+              <button class="edit">Editar</button>
+              <button class="delete">Excluir</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+  <div class="button-group">
+    <button class="edit">Salvar Notas</button>
+    <button class="delete">Exportar CSV</button>
+</div>
+
+
+
+</div>
+
+    
+</body>
+</html>
+
+
+
