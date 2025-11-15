@@ -1,3 +1,7 @@
 node_modules
 .idea
+<<<<<<< HEAD
 .env
+=======
+.vercel
+>>>>>>> b7c1003f8933a11778f29ac19107864035826099

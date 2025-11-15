@@ -13,6 +13,10 @@
   "author": "Matheus Rosini Borges de Salles, Matheus Henrique Portugal Narducci, Luis Felipe Moura, Leonardo Dionel Lima Silva",
   "license": "ISC",
   "dependencies": {
+<<<<<<< HEAD
+=======
+    "bcrypt": "^6.0.0",
+>>>>>>> b7c1003f8933a11778f29ac19107864035826099
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",

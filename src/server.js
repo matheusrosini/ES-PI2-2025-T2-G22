@@ -1,10 +1,8 @@
 // Feito por Matheus Rosini e Leonardo
 
-// src/server.js
-require("dotenv").config(); // deve vir antes de tudo que usa variáveis de ambiente
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const db = require("./config/db");
 
 // Importação das rotas
 const userRoutes = require("./routes/usuarioRoutes");
@@ -17,12 +15,11 @@ const componenteNotaRoutes = require("./routes/componenteNotaRoutes");
 const loginRoutes = require("./routes/loginRoutes");
 const authRoutes = require('./routes/authRoutes');
 
-// Cria o app Express
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Usa as rotas
+// Rotas
 app.use("/api/usuarios", userRoutes);
 app.use("/api/instituicoes", instituicaoRoutes);
 app.use("/api/disciplinas", disciplinaRoutes);
@@ -33,17 +30,14 @@ app.use("/api/componenteNotas", componenteNotaRoutes);
 app.use("/api/login", loginRoutes);
 app.use("/api/auth", authRoutes)
 
-
-// Rota padrão para ver se o servidor está online
+// Rota raiz
 app.get("/", (req, res) => {
     res.send("✅ API ProjetoNotaDez — módulo Rosini ONLINE!");
 });
 
-// Porta e host
-const PORT = process.env.PORT || 8080;
-const HOST = "0.0.0.0"; // necessário para Railway
+// ❌ Remover app.listen para Vercel
+// ❌ const PORT = process.env.PORT || 8080;
+// ❌ app.listen(PORT, "0.0.0.0", () => { ... });
 
-// Inicializa o servidor
-app.listen(PORT, HOST, () => {
-    console.log(`🚀 Servidor rodando na porta ${PORT} e host ${HOST}`);
-});
+// ✅ Exporta o app para Vercel
+module.exports = app;
