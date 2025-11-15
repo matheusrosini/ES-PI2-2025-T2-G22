@@ -12,7 +12,6 @@ const turmaRoutes = require("./routes/turmaRoutes");
 const alunoRoutes = require("./routes/alunoRoutes");
 const notaRoutes = require("./routes/notaRoutes");
 const componenteNotaRoutes = require("./routes/componenteNotaRoutes");
-const loginRoutes = require("./routes/loginRoutes");
 const authRoutes = require('./routes/authRoutes');
 
 const app = express();
@@ -27,7 +26,6 @@ app.use("/api/turmas", turmaRoutes);
 app.use("/api/alunos", alunoRoutes);
 app.use("/api/notas", notaRoutes);
 app.use("/api/componenteNotas", componenteNotaRoutes);
-app.use("/api/login", loginRoutes);
 app.use("/api/auth", authRoutes)
 
 // Rota raiz
