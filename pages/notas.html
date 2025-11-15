@@ -1,4 +1,3 @@
-<!-- Matheus Henrique Portugal Narducci -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -6,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lançamento de Notas - NotaDez</title>
 
-    <!-- CSS -->
+    <!-- CSS EXTERNO -->
     <link rel="stylesheet" href="styles/notas.css">
 
     <!-- Ícones -->
@@ -34,60 +33,65 @@
     <!-- ===== Conteúdo Principal ===== -->
     <main class="main-content">
 
-        <h2><i data-lucide="clipboard-list"></i> Lançamento de Notas</h2>
+        <h2 class="titulo-notas"><i data-lucide="clipboard-list"></i> Lançamento de Notas</h2>
 
-        <!-- ===== Seleção de disciplina e turma ===== -->
+        <!-- Seleção -->
         <section class="form-section">
-            <h3>Selecione a disciplina e a turma</h3>
+            <h3>Selecione Instituição, disciplina e turma</h3>
 
-            <form>
-                <select required>
-                    <option value="">Selecione a disciplina</option>
-                </select>
+            <form id="filtroForm" onsubmit="return false;">
+                <div class="linha-filtros">
 
-                <select required>
-                    <option value="">Selecione a turma</option>
-                </select>
+                    <div class="campo">
+                        <label>Instituição</label>
+                        <select id="selectInstituicao" class="input full">
+                            <option value="">Selecione a instituição</option>
+                        </select>
+                    </div>
 
-                <button type="button">Carregar alunos</button>
+                    <div class="campo">
+                        <label>Disciplina</label>
+                        <select id="selectDisciplina" class="input full">
+                            <option value="">Selecione a disciplina</option>
+                        </select>
+                    </div>
+
+                    <div class="campo">
+                        <label>Turma</label>
+                        <select id="selectTurma" class="input full">
+                            <option value="">Selecione a turma</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="linha-botao">
+                    <button id="btnCarregarAlunos" type="button" class="btn">Carregar alunos</button>
+                </div>
             </form>
         </section>
 
-         <div class="formula-container">
-    <label for="formulaMedia">Fórmula da Média:</label>
-    <input type="text" id="formulaMedia" value="(P1 + P2 + P3) / 3">
-    <small>Exemplo: (P1 + P2 + P3) / 3</small>
-  </div>
+        <!-- Fórmula -->
+        <div class="formula-container">
+            <label for="formulaMedia">Fórmula da Média:</label>
+            <input type="text" id="formulaMedia">
+            <small>Exemplo: (P1 + P2 + P3) / 3 — você pode editar.</small>
+        </div>
 
-        <!-- ===== Tabela de notas ===== -->
+        <!-- Tabela -->
         <section class="list-section">
             <h3><i data-lucide="list"></i> Notas Lançadas</h3>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>Aluno</th>
-                        <th>P1</th>
-                        <th>P2</th>
-                        <th>P3</th>
-                        <th>Média</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Exemplo de aluno</td>
-                        <td><input type="number" step="0.01" min="0" max="10"></td>
-                        <td><input type="number" step="0.01" min="0" max="10"></td>
-                        <td><input type="number" step="0.01" min="0" max="10"></td>
-                        <td>—</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div id="tableWrapper"></div>
+
+            <div id="nenhumaTabela" class="muted">
+                Nenhuma tabela carregada. Selecione instituição, disciplina e turma.
+            </div>
         </section>
 
         <div class="button-group">
-            <button class="save">Salvar Notas</button>
-            <button class="export">Exportar CSV</button>
+            <button id="btnSalvarNotas" class="btn save">Salvar Notas</button>
+            <button id="btnExportCsv" class="btn export">Exportar CSV</button>
         </div>
 
     </main>
@@ -96,7 +100,12 @@
         © 2025 PUC-Campinas - Todos os direitos reservados
     </footer>
 
+<<<<<<< Updated upstream
    <script type="module" src="scripts/notas.js"></script>
     
+=======
+    <!-- Script externo -->
+    <script src="scripts/notas.js" defer></script>
+>>>>>>> Stashed changes
 </body>
 </html>

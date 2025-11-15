@@ -1,4 +1,4 @@
-<!-- Matheus Henrique Portugal Narducci - com Sidebar integrado -->
+<!-- Matheus Henrique Portugal Narducci -->
 
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -6,11 +6,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Lista de Turmas - NotaDez</title>
-
-  <!-- Seu CSS principal -->
   <link rel="stylesheet" href="styles/turmas.css">
-
-  <!-- Icones -->
   <script src="https://unpkg.com/lucide@latest" defer></script>
 </head>
 <body>
@@ -30,34 +26,82 @@
     </nav>
   </div>
 
-  <!-- ===== MAIN CONTENT (dashboard area) ===== -->
+  <!-- ===== area do dashboard ===== -->
   <main class="dashboard">
-    <!-- Container: Lista de Turmas -->
-    <div class="container">
-      <h1>
-        Lista de Turmas
-        <div style="display:flex; gap:10px; align-items:center;">
-          <button id="novaTurmaBtn" class="btn">Adicionar Turma</button>
-        </div>
-      </h1>
 
-      <table id="tabela-turmas">
-        <thead>
-          <tr>
-            <th>Nome da Turma</th>
-            <th>Ano/Série</th>
-            <th>Turno</th>
-            <th>Professor(a)</th>
-            <th>Capacidade</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+  <!-- FILTRO ANTES DA LISTA -->
+  <div class="container" id="filtro-container">
+    <h1>Filtrar Turmas</h1>
 
-      <p id="semTurmasMsg" class="muted" style="margin-top:12px; display:none;">Nenhuma turma cadastrada — clique em "Adicionar Turma".</p>
+    <div class="form-row" style="margin-top: 12px; display: flex; gap: 20px;">
+      
+      <div style="flex:1">
+        <label>Instituição</label>
+        <select id="selectInstituicao" class="input full">
+          <option value="">Selecione...</option>
+          <option>FATEC</option>
+          <option>USP</option>
+          <option>UNESP</option>
+          <option>UNIP</option>
+        </select>
+      </div>
+
+      <div style="flex:1">
+        <label>Curso</label>
+        <select id="selectCurso" class="input full">
+          <option value="">Selecione...</option>
+          <option>Engenharia de Software</option>
+          <option>Sistemas de Informação</option>
+          <option>Análise e Desenvolvimento</option>
+        </select>
+      </div>
+
+      <div style="flex:1">
+        <label>Disciplina</label>
+        <select id="selectDisciplina" class="input full">
+          <option value="">Selecione...</option>
+          <option>POO</option>
+          <option>Banco de Dados</option>
+          <option>Estruturas de Dados</option>
+        </select>
+      </div>
+
     </div>
-  </main>
+
+    <button id="btnAplicarFiltro" class="btn" style="margin-top: 16px;">
+      Aplicar
+    </button>
+  </div>
+
+  <!-- Container: Lista de Turmas (ESCONDIDO no início) -->
+  <div class="container" id="lista-container" style="display:none;">
+    <h1>
+      Lista de Turmas
+      <div style="display:flex; gap:10px; align-items:center;">
+        <button id="novaTurmaBtn" class="btn">Adicionar Turma</button>
+      </div>
+    </h1>
+
+    <table id="tabela-turmas">
+      <thead>
+        <tr>
+          <th>Nome da Turma</th>
+          <th>Código da Turma</th>
+          <th>Turno</th>
+          <th>Disciplina</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <p id="semTurmasMsg" class="muted" style="margin-top:12px; display:none;">
+      Nenhuma turma cadastrada — clique em "Adicionar Turma".
+    </p>
+  </div>
+
+</main>
+
 
   <!-- Modal de cadastro e de editar turma -->
   <div class="modal" id="modalTurma">
@@ -74,8 +118,8 @@
         </div>
 
         <div>
-          <label>Ano/Série</label>
-          <input id="anoSerie" class="input small" type="text" placeholder="Ex: 1º Ano/2025">
+          <label>Código Turma</label>
+          <input id="codigoTurma" class="input small" type="text" placeholder="Ex: BD-10/100">
         </div>
 
         <div>
@@ -88,14 +132,11 @@
         </div>
 
         <div>
-          <label>Professor(a)</label>
-          <input id="professorTurma" class="input small" type="text" placeholder="Nome do Professor(a)">
+          <label>Disciplina</label>
+          <input id="disciplinaTurma" class="input small" type="text" placeholder="Nome da Disciplina">
         </div>
 
-        <div>
-          <label>Capacidade</label>
-          <input id="capacidadeTurma" class="input small" type="number" placeholder="Ex: 40" min="1">
-        </div>
+        
       </div>
 
       <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:16px;">
