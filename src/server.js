@@ -33,9 +33,5 @@ app.get("/", (req, res) => {
     res.send("✅ API ProjetoNotaDez — módulo Rosini ONLINE!");
 });
 
-// ❌ Remover app.listen para Vercel
-// ❌ const PORT = process.env.PORT || 8080;
-// ❌ app.listen(PORT, "0.0.0.0", () => { ... });
-
 // ✅ Exporta o app para Vercel
 module.exports = app;
