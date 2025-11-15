@@ -9,10 +9,10 @@ const authController = require('../controllers/authController');
 router.post(
   '/register',
   [
-    body('nome').notEmpty(),
-    body('email').isEmail(),
+    body('nome').notEmpty().withMessage('Nome obrigatório'),
+    body('email').isEmail().withMessage('Email inválido'),
     body('telefone').optional().isString(),
-    body('senha').isLength({ min: 6 })
+    body('senha').isLength({ min: 6 }).withMessage('Senha precisa ter ao menos 6 caracteres')
   ],
   authController.register   
 );

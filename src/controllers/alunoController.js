@@ -1,6 +1,8 @@
 // Feito por Leonardo
 
 const db = require('../config/db');
+const csv = require("csv-parser");
+const stream = require("stream");
 
 // Buscar todos os alunos
 exports.getAllAlunos = async (req, res) => {
@@ -78,5 +80,66 @@ exports.deleteAluno = async (req, res) => {
     res.json({ message: 'Aluno removido com sucesso!' });
   } catch (error) {
     res.status(500).json({ message: 'Erro ao remover aluno', error });
+  }
+};
+
+// Importar CSV
+exports.importarCSV = async (req, res) => {
+  try {
+    const turmaId = req.params.turmaId;
+
+    if (!req.file) {
+      return res.status(400).json({ message: "Nenhum arquivo enviado" });
+    }
+
+    const buffer = req.file.buffer;
+    const results = [];
+    const readable = new stream.Readable();
+    readable._read = () => {};
+    readable.push(buffer);
+    readable.push(null);
+
+    readable
+      .pipe(csv())
+      .on("data", (row) => {
+        const keys = Object.keys(row).map(k => k.replace(/\ufeff/g, ""));
+
+        const matricula = row[keys[0]];
+        const nome = row[keys[1]];
+
+        if (matricula && nome) {
+          results.push({ matricula, nome });
+        }
+      })
+      .on("end", async () => {
+        let inseridos = 0;
+
+        for (const aluno of results) {
+          const [existente] = await db.query(
+            "SELECT id FROM aluno WHERE matricula = ? AND turma_id = ?",
+            [aluno.matricula, turmaId]
+          );
+
+          if (existente.length === 0) {
+            await db.query(
+              "INSERT INTO aluno (matricula, nome, turma_id) VALUES (?, ?, ?)",
+              [aluno.matricula, aluno.nome, turmaId]
+            );
+            inseridos++;
+          }
+        }
+
+        res.json({
+          message: "Importação concluída",
+          totalProcessado: results.length,
+          inseridos
+        });
+      });
+
+  } catch (error) {
+    res.status(500).json({
+      message: "Erro ao importar CSV",
+      error: error.message
+    });
   }
 };
