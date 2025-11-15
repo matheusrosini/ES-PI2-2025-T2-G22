@@ -1,5 +1,5 @@
-<<<<<<< Updated upstream
-// turmas.js
+
+// Matheus Henrique Portugal Narducci
 
 lucide.createIcons();
 
@@ -54,7 +54,7 @@ document.addEventListener('click', (e) => {
     e.target.closest('tr').remove();
   }
 });
-=======
+
     // Matheus Henrique Portugal Narducci
     
     let turmas = []; // { id, nome, codigoTurma, turno, disciplina, alunos: [ {id,nome,matricula,nascimento} ] }
@@ -432,4 +432,4 @@ document.addEventListener('click', (e) => {
     window.addEventListener('load', () => {
       if (window.lucide && lucide.createIcons) lucide.createIcons();
     });
->>>>>>> Stashed changes
+

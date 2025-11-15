@@ -1,4 +1,4 @@
-<<<<<<< Updated upstream
+
 // notas.js
 lucide.createIcons();
 
@@ -118,7 +118,7 @@ btnExportar.addEventListener('click', () => {
   a.click();
   URL.revokeObjectURL(url);
 });
-=======
+
 // Matheus Henrique Portugal Narducci
 (function () {
   // ativar ícones lucide
@@ -445,4 +445,4 @@ btnExportar.addEventListener('click', () => {
   });
 
 })();
->>>>>>> Stashed changes
+
