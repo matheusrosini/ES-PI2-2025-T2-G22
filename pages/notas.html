@@ -96,49 +96,7 @@
         © 2025 PUC-Campinas - Todos os direitos reservados
     </footer>
 
-    <script>
-  lucide.createIcons();
-
-  // Seleciona todos os campos de nota
-  const notasInputs = document.querySelectorAll('tbody input[type="number"]');
-
-  // Função para calcular média de uma linha
-  function calcularMedia(linha) {
-    const notas = linha.querySelectorAll('input[type="number"]');
-    let soma = 0;
-    let quantidade = 0;
-
-    notas.forEach(input => {
-      const valor = parseFloat(input.value);
-      if (!isNaN(valor)) {
-        soma += valor;
-        quantidade++;
-      }
-    });
-
-    const mediaCell = linha.querySelector('td:last-child');
-    if (quantidade > 0) {
-      const media = soma / quantidade;
-      mediaCell.textContent = media.toFixed(2);
-    } else {
-      mediaCell.textContent = '—';
-    }
-  }
-
-  // Adiciona evento para recalcular média ao digitar
-  notasInputs.forEach(input => {
-    input.addEventListener('input', () => {
-      const linha = input.closest('tr');
-      calcularMedia(linha);
-    });
-  });
-
-  // (opcional) recalcular todas ao carregar a página
-  document.querySelectorAll('tbody tr').forEach(tr => calcularMedia(tr));
-</script>
-
+   <script type="module" src="scripts/notas.js"></script>
     
-
-
 </body>
 </html>

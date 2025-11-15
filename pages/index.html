@@ -33,34 +33,6 @@
     </div>
   </div>
 
-  <script type="module">
-    import { login } from './auth.js';
-
-    const form = document.getElementById('loginForm');
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const email = form.email.value.trim();
-      const senha = form.senha.value.trim();
-
-      try {
-        // chama função do auth.js
-        const { user, token } = await login(email, senha);
-
-        // armazena token e ID do usuário
-        localStorage.setItem('usuarioId', user.id);
-        localStorage.setItem('token', token);
-
-        alert("Login efetuado com sucesso!");
-        window.location.href = "dashboard.html";
-
-      } catch (err) {
-        // exibe mensagem de erro do backend
-        console.error(err);
-        alert(err.message || "Erro ao tentar logar. Tente novamente.");
-      }
-    });
-  </script>
+   <script type="module" src="script/main.js"></script>
 </body>
 </html>

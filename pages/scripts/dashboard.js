@@ -1,99 +1,90 @@
-const API_URL = "https://es-pi2-2025-t2-g22-production-b5bc.up.railway.app/api";
+// dashboard.js
+import { getInstituicoes, addInstituicao, getDisciplinas, addDisciplina, addTurma } from './api.js';
 
-// ======================
-// TESTE API
-// ======================
-async function testarAPI() {
+// ---- SEÇÃO 1: Instituição e Curso ----
+const formInstituicao = document.getElementById('form-instituicao');
+formInstituicao.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const [nomeInput, cursoInput] = formInstituicao.querySelectorAll('input');
+  const nome = nomeInput.value.trim();
+  const curso = cursoInput.value.trim();
+
+  if (!nome || !curso) return alert('Preencha todos os campos!');
+
   try {
-    const resposta = await fetch(`${API_URL}/usuarios`);
-    console.log("STATUS DA API:", resposta.status);
-  } catch (erro) {
-    console.error("Erro ao conectar:", erro);
+    await addInstituicao({ nome, curso });
+    alert('Instituição adicionada com sucesso!');
+    formInstituicao.reset();
+  } catch (err) {
+    console.error(err);
+    alert('Erro ao adicionar instituição.');
   }
-}
-testarAPI();
-
-// ======================
-// FORMULÁRIO DE INSTITUIÇÃO
-// ======================
-document.getElementById("form-instituicao").addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  // Pegando pela ordem EXATA do seu HTML
-  const nome = e.target[0].value;
-  const curso = e.target[1].value;
-
-  const data = { nome, curso };
-
-  const resposta = await fetch(`${API_URL}/instituicoes`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  });
-
-  alert(resposta.ok ? "Instituição cadastrada!" : "Erro ao cadastrar.");
 });
 
-// ======================
-// FORMULÁRIO DE DISCIPLINA
-// ======================
-document.getElementById("form-disciplina").addEventListener("submit", async (e) => {
+// ---- SEÇÃO 2: Disciplina ----
+const formDisciplina = document.getElementById('form-disciplina');
+formDisciplina.addEventListener('submit', async (e) => {
   e.preventDefault();
+  const inputs = formDisciplina.querySelectorAll('input, select');
+  const disciplina = {
+    nome: inputs[0].value.trim(),
+    sigla: inputs[1].value.trim(),
+    codigo: inputs[2].value.trim(),
+    periodo: inputs[3].value
+  };
 
-  const nome = e.target[0].value;
-  const sigla = e.target[1].value;
-  const codigo = e.target[2].value;
-  const periodo = e.target[3].value;
+  if (!disciplina.nome || !disciplina.sigla || !disciplina.codigo || !disciplina.periodo) return alert('Preencha todos os campos!');
 
-  const data = { nome, sigla, codigo, periodo };
-
-  const resposta = await fetch(`${API_URL}/disciplinas`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  });
-
-  alert(resposta.ok ? "Disciplina cadastrada!" : "Erro ao cadastrar.");
+  try {
+    await addDisciplina(disciplina);
+    alert('Disciplina cadastrada com sucesso!');
+    formDisciplina.reset();
+  } catch (err) {
+    console.error(err);
+    alert('Erro ao cadastrar disciplina.');
+  }
 });
 
-lucide.createIcons();
+// ---- SEÇÃO 3: Turma ----
+const formTurma = document.getElementById('form-turma');
+formTurma.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const selects = formTurma.querySelectorAll('select');
+  const inputTurma = formTurma.querySelector('input');
+  const turma = {
+    disciplina: selects[0].value,
+    nome: inputTurma.value.trim(),
+    periodo: selects[1].value
+  };
 
-    const deleteButtons = document.querySelectorAll('.delete');
-    const modal = document.getElementById('modal');
-    const fecharModal = document.getElementById('fechar-modal');
+  if (!turma.disciplina || !turma.nome || !turma.periodo) return alert('Preencha todos os campos!');
 
-    deleteButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        modal.style.display = 'flex';
-      });
-    });
+  try {
+    await addTurma(turma);
+    alert('Turma criada com sucesso!');
+    formTurma.reset();
+  } catch (err) {
+    console.error(err);
+    alert('Erro ao criar turma.');
+  }
+});
 
-    fecharModal.addEventListener('click', () => {
-      modal.style.display = 'none';
-    });
+// ---- TOGGLE SECTIONS ----
+document.querySelectorAll('.section-header .toggle').forEach(toggle => {
+  toggle.addEventListener('click', () => {
+    const section = toggle.closest('.form-section');
+    const content = section.querySelector('.section-content');
+    content.style.display = content.style.display === 'none' ? 'block' : 'none';
+  });
+});
 
-    window.addEventListener('click', (event) => {
-      if (event.target === modal) {
-        modal.style.display = 'none';
-      }
-    });
-
-    // Acordeão
-    const sectionHeaders = document.querySelectorAll('.section-header');
-
-    sectionHeaders.forEach(header => {
-      header.addEventListener('click', () => {
-        const section = header.parentElement;
-        const isOpen = section.classList.contains('open');
-        
-        document.querySelectorAll('.form-section').forEach(sec => {
-          sec.classList.remove('open');
-          sec.querySelector('.section-header').classList.remove('active');
-        });
-        
-        if (!isOpen) {
-          section.classList.add('open');
-          header.classList.add('active');
-        }
-      });
-    });
+// ---- MODAL ----
+const modal = document.getElementById('modal');
+document.querySelectorAll('.delete').forEach(btn => {
+  btn.addEventListener('click', () => {
+    modal.style.display = 'flex';
+  });
+});
+document.getElementById('fechar-modal').addEventListener('click', () => {
+  modal.style.display = 'none';
+});

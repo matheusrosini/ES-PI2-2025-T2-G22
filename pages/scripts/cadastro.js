@@ -1,25 +1,28 @@
-import { register } from './api.js';
+// cadastro.js
+import { register } from './auth.js';
 
 const form = document.getElementById('cadastroForm');
 
 form.addEventListener('submit', async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const nome = form.elements['nome'].value.trim();
-    const email = form.elements['email'].value.trim();
-    const telefone = form.elements['telefone'].value.trim();
-    const senha = form.elements['senha'].value.trim();
+  const nome = form.nome.value.trim();
+  const email = form.email.value.trim();
+  const telefone = form.telefone.value.trim();
+  const senha = form.senha.value.trim();
 
-    if (!nome || !email || !telefone || !senha) {
-        return alert('Nome, e-mail, telefone e senha são obrigatórios!');
-    }
+  try {
+    // chama função de registro do auth.js
+    const { user, token } = await register({ nome, email, telefone, senha });
 
-    try {
-        const response = await register(nome, email, senha, telefone);
-        alert('Conta criada com sucesso!');
-        window.location.href = 'index.html';
-    } catch (error) {
-        console.error('Erro ao criar usuário:', error);
-        alert(`Erro ao criar conta: ${error.message}`);
-    }
+    // armazena token e ID do usuário
+    localStorage.setItem('usuarioId', user.id);
+    localStorage.setItem('token', token);
+
+    alert("Conta criada com sucesso!");
+    window.location.href = "dashboard.html";
+  } catch (err) {
+    console.error(err);
+    alert(err.message || "Erro ao criar conta. Tente novamente.");
+  }
 });
