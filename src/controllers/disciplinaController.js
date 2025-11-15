@@ -1,3 +1,6 @@
+// Feito por Leonardo
+
+
 const db = require('../config/db');
 
 // Buscar todas as disciplinas
