@@ -1,3 +1,5 @@
+//Feita por Matheus Rosini
+
 // src/config/db.js
 const mysql = require("mysql2");
 require("dotenv").config();
