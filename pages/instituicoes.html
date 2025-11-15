@@ -6,11 +6,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gerenciar Instituições - NotaDez</title>
-
-  <!-- CSS -->
   <link rel="stylesheet" href="styles/instituicoes.css">
-
-  <!-- Ícones Lucide -->
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
@@ -43,9 +39,6 @@
 
       <form id="form-instituicao">
         <input type="text" placeholder="Nome da instituição" required>
-        <input type="text" placeholder="CNPJ" required>
-        <input type="text" placeholder="Endereço completo" required>
-
         <button type="submit">Cadastrar Instituição</button>
       </form>
     </section>
@@ -53,33 +46,28 @@
     <!-- ===== Lista ===== -->
     <section class="list-section">
       <h3><i data-lucide="list"></i> Instituições cadastradas</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Nome</th>
-            <th>CNPJ</th>
-            <th>Endereço</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          <tr>
-              <button class="edit">Editar</button>
-              <button class="delete">Excluir</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
+          <tbody>
+            <!-- Instituição de exemplo -->
+            <tr>
+              <td>PUC-Campinas</td>
+              <td>
+                <button class="edit">Editar</button>
+                <button class="delete">Excluir</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
 
   </main>
-
-  <footer>
-    © 2025 PUC-Campinas - Todos os direitos reservados
-  </footer>
-
   <script type="module" src="scripts/instituicoes.js"></script>
 
 </body>

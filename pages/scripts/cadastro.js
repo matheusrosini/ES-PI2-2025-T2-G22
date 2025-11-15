@@ -11,8 +11,8 @@ form.addEventListener('submit', async (e) => {
     const telefone = form.elements['telefone'].value.trim();
     const senha = form.elements['senha'].value.trim();
 
-    if (!nome || !email || !senha) {
-        return alert('Nome, e-mail e senha são obrigatórios!');
+    if (!nome || !email || !telefone || !senha) {
+        return alert('Nome, e-mail, telefone e senha são obrigatórios!');
     }
 
     try {
@@ -25,6 +25,7 @@ form.addEventListener('submit', async (e) => {
 
         alert('Conta criada com sucesso!');
         window.location.href = 'login.html';
+
     } catch (error) {
         console.error('Erro ao criar usuário:', error);
         alert(`Erro ao criar conta: ${error.message}`);
