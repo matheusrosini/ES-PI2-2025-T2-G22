@@ -1,7 +1,4 @@
-<<<<<<< Updated upstream
 
-=======
->>>>>>> Stashed changes
     // Matheus Henrique Portugal Narducci
     
     let turmas = []; // { id, nome, codigoTurma, turno, disciplina, alunos: [ {id,nome,matricula,nascimento} ] }
@@ -379,7 +376,3 @@
     window.addEventListener('load', () => {
       if (window.lucide && lucide.createIcons) lucide.createIcons();
     });
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
