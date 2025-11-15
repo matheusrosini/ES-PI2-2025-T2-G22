@@ -1,5 +1,4 @@
-// cadastro.js
-import { apiPost } from './api.js';
+import { register } from './api.js';
 
 const form = document.getElementById('cadastroForm');
 
@@ -16,16 +15,9 @@ form.addEventListener('submit', async (e) => {
     }
 
     try {
-        const response = await apiPost('/usuarios', {
-            nome,
-            email,
-            telefone,
-            senha
-        });
-
+        const response = await register(nome, email, senha, telefone);
         alert('Conta criada com sucesso!');
         window.location.href = 'index.html';
-
     } catch (error) {
         console.error('Erro ao criar usuário:', error);
         alert(`Erro ao criar conta: ${error.message}`);

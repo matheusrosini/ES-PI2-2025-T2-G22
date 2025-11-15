@@ -1,51 +1,48 @@
-const API_URL = "https://es-pi2-2025-t2-g22-production-b5bc.up.railway.app/api";
+import { login, register } from './api.js';
 
-/**
- * Faz login do usuário
- * @param {string} email
- * @param {string} senha
- * @returns {Promise<Object>} Retorna objeto { user, token } ou erro
- */
-export async function login(email, senha) {
-  try {
-    const res = await fetch(`${API_URL}/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, senha })
-    });
+document.addEventListener('DOMContentLoaded', () => {
+    const formLogin = document.getElementById('form-login');
+    const formCadastro = document.getElementById('form-cadastro');
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || data.message);
-    return data;
+    // LOGIN
+    if (formLogin) {
+        formLogin.addEventListener('submit', async e => {
+            e.preventDefault();
+            const email = formLogin.elements['email'].value.trim();
+            const senha = formLogin.elements['senha'].value.trim();
 
-  } catch (err) {
-    console.error("Erro no login:", err.message);
-    throw err;
-  }
-}
+            if (!email || !senha) return alert('Email e senha são obrigatórios!');
 
-/**
- * Faz registro do usuário
- * @param {string} nome
- * @param {string} email
- * @param {string} senha
- * @param {string} telefone
- * @returns {Promise<Object>} Retorna mensagem de sucesso ou erro
- */
-export async function register(nome, email, senha, telefone = "") {
-  try {
-    const res = await fetch(`${API_URL}/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nome, email, senha, telefone })
-    });
+            try {
+                const data = await login(email, senha);
+                alert(`Bem-vindo, ${data.user.nome}!`);
+                // Aqui você pode salvar token no localStorage
+                localStorage.setItem('token', data.token);
+                window.location.href = 'index.html';
+            } catch (error) {
+                alert(`Erro no login: ${error.message}`);
+            }
+        });
+    }
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || data.message);
-    return data;
+    // CADASTRO
+    if (formCadastro) {
+        formCadastro.addEventListener('submit', async e => {
+            e.preventDefault();
+            const nome = formCadastro.elements['nome'].value.trim();
+            const email = formCadastro.elements['email'].value.trim();
+            const senha = formCadastro.elements['senha'].value.trim();
+            const telefone = formCadastro.elements['telefone'].value.trim();
 
-  } catch (err) {
-    console.error("Erro no registro:", err.message);
-    throw err;
-  }
-}
+            if (!nome || !email || !senha) return alert('Nome, email e senha são obrigatórios!');
+
+            try {
+                const data = await register(nome, email, senha, telefone);
+                alert(data.message || 'Conta criada com sucesso!');
+                window.location.href = 'index.html';
+            } catch (error) {
+                alert(`Erro no registro: ${error.message}`);
+            }
+        });
+    }
+});

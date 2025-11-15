@@ -8,6 +8,7 @@ async function handleResponse(response) {
     return response.json();
 }
 
+// ==== CRUD genérico ====
 export async function apiGet(path) {
     const response = await fetch(`${API_URL}${path}`);
     return handleResponse(response);
@@ -32,8 +33,27 @@ export async function apiPut(path, data) {
 }
 
 export async function apiDelete(path) {
-    const response = await fetch(`${API_URL}${path}`, {
-        method: "DELETE"
-    });
+    const response = await fetch(`${API_URL}${path}`, { method: "DELETE" });
     return handleResponse(response);
+}
+
+// ==== Auth ====
+export async function login(email, senha) {
+    try {
+        const res = await apiPost('/auth/login', { email, senha });
+        return res; // { user, token }
+    } catch (err) {
+        console.error('Erro no login:', err.message);
+        throw err;
+    }
+}
+
+export async function register(nome, email, senha, telefone = "") {
+    try {
+        const res = await apiPost('/auth/register', { nome, email, senha, telefone });
+        return res; // mensagem de sucesso
+    } catch (err) {
+        console.error('Erro no registro:', err.message);
+        throw err;
+    }
 }

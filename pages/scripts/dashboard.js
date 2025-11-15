@@ -55,3 +55,45 @@ document.getElementById("form-disciplina").addEventListener("submit", async (e) 
 
   alert(resposta.ok ? "Disciplina cadastrada!" : "Erro ao cadastrar.");
 });
+
+lucide.createIcons();
+
+    const deleteButtons = document.querySelectorAll('.delete');
+    const modal = document.getElementById('modal');
+    const fecharModal = document.getElementById('fechar-modal');
+
+    deleteButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        modal.style.display = 'flex';
+      });
+    });
+
+    fecharModal.addEventListener('click', () => {
+      modal.style.display = 'none';
+    });
+
+    window.addEventListener('click', (event) => {
+      if (event.target === modal) {
+        modal.style.display = 'none';
+      }
+    });
+
+    // Acordeão
+    const sectionHeaders = document.querySelectorAll('.section-header');
+
+    sectionHeaders.forEach(header => {
+      header.addEventListener('click', () => {
+        const section = header.parentElement;
+        const isOpen = section.classList.contains('open');
+        
+        document.querySelectorAll('.form-section').forEach(sec => {
+          sec.classList.remove('open');
+          sec.querySelector('.section-header').classList.remove('active');
+        });
+        
+        if (!isOpen) {
+          section.classList.add('open');
+          header.classList.add('active');
+        }
+      });
+    });
