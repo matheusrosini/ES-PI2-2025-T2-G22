@@ -1,4 +1,7 @@
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 // Matheus Henrique Portugal Narducci
 (function () {
   // ativar ícones lucide
@@ -325,4 +328,7 @@
   });
 
 })();
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
