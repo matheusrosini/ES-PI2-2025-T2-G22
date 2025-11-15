@@ -1,81 +1,75 @@
 <!-- Luis Felipe Moura: RA 25010218 -->
- 
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NotaDez - Início</title>
-
-  <link rel="stylesheet" href="styles/main.css">
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <title>Login - NotaDez</title>
+  <link rel="stylesheet" href="styles/style.css">
 </head>
-
 <body>
+  <div class="container">
+    <h1>NotaDez</h1>
+    <h2>Login do Docente</h2>
 
-  <!-- NAVBAR SUPERIOR -->
-  <header class="navbar">
-    <h1 class="logo">NotaDez</h1>
-
-    <nav>
-      <ul>
-        <li><a href="home.html" class="active">Início</a></li>
-        <li><a href="login.html">Login</a></li>
-        <li><a href="cadastro.html">Cadastro</a></li>
-      </ul>
-    </nav>
-  </header>
-
-  <!-- CONTEÚDO ÚNICO DA HOME -->
-  <div class="home-wrapper">
-
-      <!-- HERO CENTRAL -->
-      <div class="hero">
-        <h2>Sistema Acadêmico Completo</h2>
-        <p>Gerencie instituições, disciplinas, turmas, alunos e notas com facilidade.</p>
-
-        <a href="login.html" class="btn-primary">Acessar Sistema</a>
+    <form id="loginForm">
+      <div class="input-group">
+        <label for="email">E-mail</label>
+        <input type="email" id="email" name="email" required placeholder="seuemail@exemplo.com">
       </div>
 
-      <!-- CARDS ABAIXO DO HERO -->
-        <div class="cards">
-        <div class="card">
-            <i data-lucide="school"></i>
-            <span class="card-title">Instituições</span>
-            <p class="card-desc">Gerencie suas instituições cadastradas</p>
-        </div>
+      <div class="input-group">
+        <label for="senha">Senha</label>
+        <input type="password" id="senha" name="senha" required placeholder="Digite sua senha">
+      </div>
 
-        <div class="card">
-            <i data-lucide="book-open"></i>
-            <span class="card-title">Disciplinas</span>
-            <p class="card-desc">Controle e organize disciplinas</p>
-        </div>
+      <button type="submit">Entrar</button>
+    </form>
 
-        <div class="card">
-            <i data-lucide="users"></i>
-            <span class="card-title">Turmas</span>
-            <p class="card-desc">Administre suas turmas com facilidade</p>
-        </div>
-
-        <div class="card">
-            <i data-lucide="file-text"></i>
-            <span class="card-title">Exportações</span>
-            <p class="card-desc">Baixe notas em CSV ou JSON</p>
-        </div>
-
-        <div class="card">
-            <i data-lucide="pencil"></i>
-            <span class="card-title">Notas</span>
-            <p class="card-desc">Lance notas e calcule médias automaticamente</p>
-        </div>
-        </div>
-
-
+    <div class="links">
+      <a href="recuperacao-senha.html">Esqueci minha senha</a> |
+      <a href="cadastro.html">Criar conta</a>
+    </div>
   </div>
 
-  <script>
-    lucide.createIcons();
-  </script>
+  <footer>
+    © 2025 PUC-Campinas - Todos os direitos reservados
+  </footer>
 
+  <script type="module">
+    const API_URL = "https://es-pi2-2025-t2-g22-production-b5bc.up.railway.app/api";
+
+    const form = document.getElementById('loginForm');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const email = form.email.value.trim();
+      const senha = form.senha.value.trim();
+
+      try {
+        const res = await fetch(`${API_URL}/usuario/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, senha })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          alert(data.error || data.message);
+          return;
+        }
+
+        alert("Login efetuado com sucesso!");
+        localStorage.setItem("usuarioId", data.usuario.id);
+        window.location.href = "dashboard.html";
+
+      } catch (err) {
+        console.error(err);
+        alert("Erro ao tentar logar. Tente novamente.");
+      }
+    });
+  </script>
 </body>
 </html>
