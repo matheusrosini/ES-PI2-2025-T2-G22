@@ -1,4 +1,5 @@
-const API_URL = "https://es-pi2-2025-t2-g22-production-b5bc.up.railway.app/api";
+const API_URL = "https://es-pi2-2025-t2-g22-production-b5bc.up.railway.app/api/auth";
+
 
 /**
  * Faz login do usuário
