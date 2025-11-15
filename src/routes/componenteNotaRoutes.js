@@ -1,22 +1,17 @@
-// Feito por Leonardo
-
 const express = require("express");
 const router = express.Router();
 const componenteNotaController = require("../controllers/componenteNotaController");
 
-// Rota para listar todas as componente de nota
-router.get('/', componenteNotaController.getAllComponentes);
+// Listar componentes por disciplina
+router.get("/disciplina/:disciplinaId", componenteNotaController.getByDisciplina);
 
-// Rota para buscar uma componente de nota pelo ID
-router.get('/:id', componenteNotaController.getComponenteById);
+// Criar componente
+router.post("/", componenteNotaController.create);
 
-// Rota para criar uma nova componente de nota
-router.post('/', componenteNotaController.createComponente);
+// Atualizar componente
+router.put("/:id", componenteNotaController.update);
 
-// Rota para atualizar uma componente de nota existente
-router.put('/:id', componenteNotaController.updateComponente);
-
-// Rota para deletar uma componente de nota
-router.delete('/:id', componenteNotaController.deleteComponente);
+// Deletar componente
+router.delete("/:id", componenteNotaController.delete);
 
 module.exports = router;
