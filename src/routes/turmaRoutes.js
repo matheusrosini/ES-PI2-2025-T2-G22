@@ -1,4 +1,4 @@
-// Feito por Leonardo
+// Feito por Leonardo e Matheus Rosini
 
 const express = require('express');
 const router = express.Router();

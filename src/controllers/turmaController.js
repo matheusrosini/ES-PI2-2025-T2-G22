@@ -1,4 +1,4 @@
-// Feito por Leonardo
+// Feito por Leonardo e Matheus Rosini
 
 const db = require('../config/db');
 

@@ -1,4 +1,5 @@
 // Feito por Matheus Rosini
+
 const db = require('../config/db');
 
 // Buscar todas as instituições
