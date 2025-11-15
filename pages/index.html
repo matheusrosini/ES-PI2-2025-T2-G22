@@ -32,10 +32,12 @@
       <a href="cadastro.html">Criar conta</a>
     </div>
   </div>
+
   <script type="module">
-    const API_URL = "https://es-pi2-2025-t2-g22-production-b5bc.up.railway.app/api";
+    import { login } from './auth.js';
 
     const form = document.getElementById('loginForm');
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
@@ -43,26 +45,20 @@
       const senha = form.senha.value.trim();
 
       try {
-        const res = await fetch(`${API_URL}/usuario/login`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, senha })
-        });
+        // chama função do auth.js
+        const { user, token } = await login(email, senha);
 
-        const data = await res.json();
-
-        if (!res.ok) {
-          alert(data.error || data.message);
-          return;
-        }
+        // armazena token e ID do usuário
+        localStorage.setItem('usuarioId', user.id);
+        localStorage.setItem('token', token);
 
         alert("Login efetuado com sucesso!");
-        localStorage.setItem("usuarioId", data.usuario.id);
         window.location.href = "dashboard.html";
 
       } catch (err) {
+        // exibe mensagem de erro do backend
         console.error(err);
-        alert("Erro ao tentar logar. Tente novamente.");
+        alert(err.message || "Erro ao tentar logar. Tente novamente.");
       }
     });
   </script>
