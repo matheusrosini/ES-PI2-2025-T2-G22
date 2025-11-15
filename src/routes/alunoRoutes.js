@@ -1,10 +1,8 @@
-// Feito por Leonardo
+// Feito por Leonardo e Matheus Rosini
 
 const express = require('express');
 const router = express.Router();
 const alunoController = require('../controllers/alunoController');
-const uploadCSV = require("../middlewares/uploadCSV");
-const authMiddleware = require("../middlewares/authmiddleware");
 
 // Rota para listar todos os alunos
 router.get('/', alunoController.getAllAlunos);
@@ -21,12 +19,5 @@ router.put('/:id', alunoController.updateAluno);
 // Rota para deletar um aluno
 router.delete('/:id', alunoController.deleteAluno);
 
-// Rota para importar alunos via CSV
-router.post(
-  "/importar-csv/:turmaId",
-  authMiddleware,
-  uploadCSV.single("arquivo"),
-  alunoController.importarCSV
-);
 
 module.exports = router;
