@@ -1,14 +1,16 @@
-// Feito por Matheus Rosini
-
 const express = require("express");
 const router = express.Router();
-const controller = require("../controllers/usuarioController");
+const usuarioController = require("../controllers/usuarioController");
 
-// Rotas de usuários
-router.get("/", controller.getAllUsuarios);
-router.post("/", controller.createUsuarios);
-router.get("/:id", controller.getUsuariosById);
-router.put("/:id", controller.updateUsuarios);
-router.delete("/:id", controller.removeUsuarios);
+// ===== CRUD Usuário =====
+router.get("/", usuarioController.getAllUsuarios);
+router.get("/:id", usuarioController.getUsuariosById);
+router.post("/", usuarioController.createUsuarios);
+router.put("/:id", usuarioController.updateUsuarios);
+router.delete("/:id", usuarioController.removeUsuarios);
+
+// ===== LOGIN e REGISTRO =====
+router.post("/login", usuarioController.login);
+router.post("/register", usuarioController.register);
 
 module.exports = router;

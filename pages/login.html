@@ -12,6 +12,7 @@
   <div class="container">
     <h1>NotaDez</h1>
     <h2>Login do Docente</h2>
+
     <form id="loginForm">
       <div class="input-group">
         <label for="email">E-mail</label>
@@ -36,7 +37,39 @@
     © 2025 PUC-Campinas - Todos os direitos reservados
   </footer>
 
-  <script src="/scripts/login.js"></script>
+  <script type="module">
+    const API_URL = "https://es-pi2-2025-t2-g22-production-b5bc.up.railway.app/api";
 
+    const form = document.getElementById('loginForm');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const email = form.email.value.trim();
+      const senha = form.senha.value.trim();
+
+      try {
+        const res = await fetch(`${API_URL}/usuario/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, senha })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          alert(data.error || data.message);
+          return;
+        }
+
+        alert("Login efetuado com sucesso!");
+        localStorage.setItem("usuarioId", data.usuario.id);
+        window.location.href = "dashboard.html";
+
+      } catch (err) {
+        console.error(err);
+        alert("Erro ao tentar logar. Tente novamente.");
+      }
+    });
+  </script>
 </body>
 </html>
