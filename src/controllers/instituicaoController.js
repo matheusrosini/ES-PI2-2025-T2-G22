@@ -1,13 +1,10 @@
+// Feito por Matheus Rosini
 const db = require('../config/db');
 
 // Buscar todas as instituições
 exports.getAllInstituicoes = async (req, res) => {
     try {
-        const [rows] = await db.query(`
-      SELECT i.id, i.nome, u.nome AS usuario
-      FROM instituicao i
-      LEFT JOIN usuario u ON i.usuario_id = u.id
-    `);
+        const [rows] = await db.query('SELECT * FROM instituicao');
         res.json(rows);
     } catch (error) {
         res.status(500).json({ message: 'Erro ao buscar instituições', error });
@@ -30,13 +27,14 @@ exports.getInstituicaoById = async (req, res) => {
 // Criar nova instituição
 exports.createInstituicao = async (req, res) => {
     try {
-        const { nome, usuario_id } = req.body;
-        if (!nome) return res.status(400).json({ message: 'Nome é obrigatório' });
+        const { nome, cnpj, endereco, usuario_id } = req.body;
+        if (!nome || !cnpj || !endereco)
+            return res.status(400).json({ message: 'Todos os campos são obrigatórios' });
 
-        await db.query('INSERT INTO instituicao (nome, usuario_id) VALUES (?, ?)', [
-            nome,
-            usuario_id,
-        ]);
+        await db.query(
+            'INSERT INTO instituicao (nome, cnpj, endereco, usuario_id) VALUES (?, ?, ?, ?)',
+            [nome, cnpj, endereco, usuario_id]
+        );
 
         res.status(201).json({ message: 'Instituição criada com sucesso!' });
     } catch (error) {
@@ -48,13 +46,17 @@ exports.createInstituicao = async (req, res) => {
 exports.updateInstituicao = async (req, res) => {
     try {
         const { id } = req.params;
-        const { nome, usuario_id } = req.body;
+        const { nome, cnpj, endereco, usuario_id } = req.body;
+        if (!nome || !cnpj || !endereco)
+            return res.status(400).json({ message: 'Todos os campos são obrigatórios' });
 
-        await db.query('UPDATE instituicao SET nome = ?, usuario_id = ? WHERE id = ?', [
-            nome,
-            usuario_id,
-            id,
-        ]);
+        const [result] = await db.query(
+            'UPDATE instituicao SET nome = ?, cnpj = ?, endereco = ?, usuario_id = ? WHERE id = ?',
+            [nome, cnpj, endereco, usuario_id, id]
+        );
+
+        if (result.affectedRows === 0)
+            return res.status(404).json({ message: 'Instituição não encontrada' });
 
         res.json({ message: 'Instituição atualizada com sucesso!' });
     } catch (error) {

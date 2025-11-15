@@ -1,3 +1,5 @@
+// Feito por Matheus Rosini
+
 // src/server.js
 require("dotenv").config(); // deve vir antes de tudo que usa variáveis de ambiente
 const express = require("express");
@@ -14,6 +16,7 @@ const alunoRoutes = require("./routes/alunoRoutes");
 const notaRoutes = require("./routes/notaRoutes");
 const componenteNotaRoutes = require("./routes/componenteNotaRoutes");
 const professorRoutes = require("./routes/professorRoutes");
+const loginRoutes = require("./routes/loginRoutes");
 
 // Cria o app Express
 const app = express();
@@ -30,6 +33,8 @@ app.use("/api/alunos", alunoRoutes);
 app.use("/api/notas", notaRoutes);
 app.use("/api/componenteNotas", componenteNotaRoutes);
 app.use("/api/professores", professorRoutes);
+app.use("/api/login", loginRoutes);
+
 
 // Rota padrão para ver se o servidor está online
 app.get("/", (req, res) => {

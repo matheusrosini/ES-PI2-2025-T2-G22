@@ -12,7 +12,7 @@
   <div class="container">
     <h1>NotaDez</h1>
     <h2>Login do Docente</h2>
-    <form action="dashboard.html" method="post">
+    <form id="loginForm">
       <div class="input-group">
         <label for="email">E-mail</label>
         <input type="email" id="email" name="email" required placeholder="seuemail@exemplo.com">
@@ -35,13 +35,8 @@
   <footer>
     © 2025 PUC-Campinas - Todos os direitos reservados
   </footer>
-  <script>
-  const form = document.querySelector("form");
-  form.addEventListener("submit", (e) => {
-    e.preventDefault(); 
-    window.location.href = "dashboard.html";  
-    });
-</script>
+
+  <script src="/scripts/login.js"></script>
 
 </body>
 </html>

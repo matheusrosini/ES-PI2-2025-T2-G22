@@ -1,3 +1,5 @@
+// Feito por Matheus Rosini
+
 const db = require('../config/db');
 
 // Buscar todos os usuários
