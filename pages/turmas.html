@@ -1,0 +1,581 @@
+<!-- Matheus Henrique Portugal Narducci - com Sidebar integrado -->
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lista de Turmas - NotaDez</title>
+
+  <!-- Seu CSS principal -->
+  <link rel="stylesheet" href="styles/turmas.css">
+
+  <!-- Icones -->
+  <script src="https://unpkg.com/lucide@latest" defer></script>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h1>NotaDez</h1>
+    <nav>
+      <ul>
+        <li><a href="instituicoes.html"><i data-lucide="school"></i> Instituições</a></li>
+        <li><a href="disciplinas.html"><i data-lucide="book-open"></i> Disciplinas</a></li>
+        <li><a href="turmas.html"><i data-lucide="users"></i> Turmas</a></li>
+        <li><a href="notas.html"><i data-lucide="pencil"></i> Notas</a></li>
+        <li><a href="dashboard.html"><i data-lucide="layout-dashboard"></i> Dashboard</a></li>
+        <li><a href="login.html"><i data-lucide="log-out"></i> Sair</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <!-- ===== MAIN CONTENT (dashboard area) ===== -->
+  <main class="dashboard">
+    <!-- Container: Lista de Turmas -->
+    <div class="container">
+      <h1>
+        Lista de Turmas
+        <div style="display:flex; gap:10px; align-items:center;">
+          <button id="novaTurmaBtn" class="btn">Adicionar Turma</button>
+        </div>
+      </h1>
+
+      <table id="tabela-turmas">
+        <thead>
+          <tr>
+            <th>Nome da Turma</th>
+            <th>Ano/Série</th>
+            <th>Turno</th>
+            <th>Professor(a)</th>
+            <th>Capacidade</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <p id="semTurmasMsg" class="muted" style="margin-top:12px; display:none;">Nenhuma turma cadastrada — clique em "Adicionar Turma".</p>
+    </div>
+  </main>
+
+  <!-- Modal de cadastro e de editar turma -->
+  <div class="modal" id="modalTurma">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTurmaTitle">Cadastrar Turma</h2>
+        <button class="close-x" id="closeModalTurma">&times;</button>
+      </div>
+
+      <div class="form-row">
+        <div style="flex:1">
+          <label>Nome da Turma</label>
+          <input id="nomeTurma" class="input full" type="text" placeholder="Ex: 1º Ano C">
+        </div>
+
+        <div>
+          <label>Ano/Série</label>
+          <input id="anoSerie" class="input small" type="text" placeholder="Ex: 1º Ano/2025">
+        </div>
+
+        <div>
+          <label>Turno</label>
+          <select id="turnoTurma" class="input small">
+            <option value="Manhã">Manhã</option>
+            <option value="Tarde">Tarde</option>
+            <option value="Noite">Noite</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Professor(a)</label>
+          <input id="professorTurma" class="input small" type="text" placeholder="Nome do Professor(a)">
+        </div>
+
+        <div>
+          <label>Capacidade</label>
+          <input id="capacidadeTurma" class="input small" type="number" placeholder="Ex: 40" min="1">
+        </div>
+      </div>
+
+      <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:16px;">
+        <button id="salvarTurmaBtn" class="btn">Salvar</button>
+        <button id="cancelarTurmaBtn" class="btn ghost">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de alunos -->
+  <div class="modal" id="modalDetalhes">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="detalhesTitle">Alunos - Turma</h2>
+        <button class="close-x" id="closeDetalhes">&times;</button>
+      </div>
+
+      <div style="display:flex; gap:10px; align-items:center; margin-bottom:12px;">
+        <label style="margin-right:6px;">Ações:</label>
+        <input type="file" id="csvInputModal" accept=".csv" style="display:none;">
+        <button id="importCsvModalBtn" class="btn small">Importar CSV</button>
+        <button id="addAlunoBtn" class="btn small secondary">Adicionar Aluno</button>
+        <div style="flex:1"></div>
+        <span class="muted" id="turmaCapacityInfo"></span>
+      </div>
+
+      <div id="addAlunoForm" style="display:none; margin-bottom:12px; border-top:1px dashed #e8f0ff; padding-top:12px;">
+        <div class="form-row">
+          <div style="flex:1">
+            <label>Nome</label>
+            <input type="text" id="alunoNome" class="input full" placeholder="Nome completo">
+          </div>
+          <div>
+            <label>Matrícula</label>
+            <input type="text" id="alunoMatricula" class="input small" placeholder="12345">
+          </div>
+          <div>
+            <label>Data de Nascimento</label>
+            <input type="date" id="alunoNascimento" class="input small">
+          </div>
+        </div>
+        <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:8px;">
+          <button id="salvarAlunoBtn" class="btn small">Adicionar</button>
+          <button id="cancelAddAlunoBtn" class="btn small ghost">Cancelar</button>
+        </div>
+      </div>
+
+      <div style="max-height:420px; overflow:auto;">
+        <table id="tabela-alunos-modal">
+          <thead>
+            <tr><th>Nome</th><th>Matrícula</th><th>Data de Nasc.</th><th>Ações</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal editar aluno -->
+  <div class="modal" id="modalEditarAluno">
+    <div class="modal-content mini-modal-content">
+      <div class="modal-header">
+        <h3>Editar Aluno</h3>
+        <button class="close-x" id="closeEditarAluno">&times;</button>
+      </div>
+
+      <div class="form-row" style="margin-top:8px;">
+        <div style="flex:1">
+          <label>Nome</label>
+          <input id="editNome" class="input full" type="text">
+        </div>
+        <div>
+          <label>Matrícula</label>
+          <input id="editMatricula" class="input small" type="text">
+        </div>
+        <div>
+          <label>Data de Nasc.</label>
+          <input id="editNascimento" class="input small" type="date">
+        </div>
+      </div>
+
+      <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:12px;">
+        <button id="salvarEdicaoAluno" class="btn small">Salvar</button>
+        <button id="cancelEditAluno" class="btn small ghost">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de confirmação -->
+  <div class="modal" id="modalConfirm">
+    <div class="modal-content">
+      <h3 id="confirmTitle">Confirmar ação</h3>
+      <p id="confirmMessage" class="muted" style="margin-top:8px;"></p>
+      <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:14px;">
+        <button id="confirmOk" class="btn danger">Confirmar</button>
+        <button id="confirmCancel" class="btn ghost">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Caixa de alerta -->
+  <div id="alertBox" class="alert-box">
+    <div class="alert-content">
+      <p id="alertMessage"></p>
+      <div style="display:flex; justify-content:center;">
+        <button id="closeAlertBtn" class="btn">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    let turmas = []; // { id, nome, ano, turno, capacidade, alunos: [ {id,nome,matricula,nascimento} ] }
+    let editingTurmaId = null;
+    let editingAluno = null; // {turmaId, alunoId}
+    let confirmCallback = null;
+
+    const tabelaTurmasBody = document.querySelector('#tabela-turmas tbody');
+    const semTurmasMsg = document.getElementById('semTurmasMsg');
+
+    /* ====== Helpers ====== */
+    function uid(prefix='id') {
+      return prefix + '_' + Math.random().toString(36).slice(2,9);
+    }
+    function showAlert(message) {
+      document.getElementById('alertMessage').textContent = message;
+      document.getElementById('alertBox').style.display = 'flex';
+      document.body.style.pointerEvents = 'none';
+      document.getElementById('alertBox').style.pointerEvents = 'auto';
+    }
+    document.getElementById('closeAlertBtn').addEventListener('click', () => {
+      document.getElementById('alertBox').style.display = 'none';
+      document.body.style.pointerEvents = 'auto';
+    });
+
+    /* Turmas */
+    function renderTurmas() {
+      tabelaTurmasBody.innerHTML = '';
+      if (turmas.length === 0) {
+        semTurmasMsg.style.display = 'block';
+      } else {
+        semTurmasMsg.style.display = 'none';
+      }
+
+      for (const t of turmas) {
+        const tr = document.createElement('tr');
+
+        tr.innerHTML = `
+          <td>${escapeHtml(t.nome)}</td>
+          <td>${escapeHtml(t.ano)}</td>
+          <td>${escapeHtml(t.turno)}</td>
+          <td>${escapeHtml(t.professor)}</td>
+          <td>${escapeHtml(t.capacidade)}</td>
+          <td></td>
+        `;
+
+        const actionsTd = tr.querySelector('td:last-child');
+        const detailsBtn = createBtn('Detalhes','small');
+        detailsBtn.addEventListener('click', () => openDetalhes(t.id));
+        const editBtn = createBtn('Editar','small');
+        editBtn.classList.add('secondary');
+        editBtn.addEventListener('click', () => openEditTurma(t.id));
+        const delBtn = createBtn('Excluir','small');
+        delBtn.classList.add('danger');
+        delBtn.addEventListener('click', () => confirmAction(`Excluir turma "${t.nome}"?`, () => deleteTurma(t.id)));
+
+        const div = document.createElement('div');
+        div.className = 'actions';
+        div.appendChild(detailsBtn);
+        div.appendChild(editBtn);
+        div.appendChild(delBtn);
+        actionsTd.appendChild(div);
+
+        tabelaTurmasBody.appendChild(tr);
+      }
+    }
+
+    function createBtn(text, size='') {
+      const b = document.createElement('button');
+      b.textContent = text;
+      b.className = 'btn';
+      if (size === 'small') b.classList.add('small');
+      return b;
+    }
+
+    function escapeHtml(s) {
+      if (s === undefined || s === null) return '';
+      return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    }
+
+    /* Modal de cadastro/edição de turma */
+    const modalTurma = document.getElementById('modalTurma');
+    const novaTurmaBtn = document.getElementById('novaTurmaBtn');
+    const closeModalTurma = document.getElementById('closeModalTurma');
+    const cancelarTurmaBtn = document.getElementById('cancelarTurmaBtn');
+    const salvarTurmaBtn = document.getElementById('salvarTurmaBtn');
+
+    novaTurmaBtn.addEventListener('click', () => {
+      editingTurmaId = null;
+      document.getElementById('modalTurmaTitle').textContent = 'Cadastrar Turma';
+      openModal(modalTurma);
+      limparCamposTurma();
+    });
+
+    closeModalTurma.addEventListener('click', () => closeModal(modalTurma));
+    cancelarTurmaBtn.addEventListener('click', () => closeModal(modalTurma));
+
+    function openEditTurma(id) {
+      const t = turmas.find(x => x.id === id);
+      if (!t) return showAlert('Turma não encontrada.');
+      editingTurmaId = id;
+      document.getElementById('modalTurmaTitle').textContent = 'Editar Turma';
+      document.getElementById('nomeTurma').value = t.nome;
+      document.getElementById('anoSerie').value = t.ano;
+      document.getElementById('turnoTurma').value = t.turno;
+      document.getElementById('professorTurma').value = t.professor;
+      document.getElementById('capacidadeTurma').value = t.capacidade;
+      openModal(modalTurma);
+    }
+
+    function limparCamposTurma() {
+      document.getElementById('nomeTurma').value = '';
+      document.getElementById('anoSerie').value = '';
+      document.getElementById('turnoTurma').value = 'Manhã';
+      document.getElementById('professorTurma').value = '';
+      document.getElementById('capacidadeTurma').value = '';
+    }
+
+    salvarTurmaBtn.addEventListener('click', () => {
+      const nome = document.getElementById('nomeTurma').value.trim();
+      const ano = document.getElementById('anoSerie').value.trim();
+      const turno = document.getElementById('turnoTurma').value;
+      const professor = document.getElementById('professorTurma').value.trim();
+      const capacidade = Number(document.getElementById('capacidadeTurma').value);
+
+      if (!nome || !ano || !turno || !professor || !capacidade) {
+        showAlert('⚠️ Preencha todos os campos da turma.');
+        return;
+      }
+
+      if (editingTurmaId) {
+        const t = turmas.find(x => x.id === editingTurmaId);
+        Object.assign(t, { nome, ano, turno, professor, capacidade });
+        showAlert('Turma atualizada.');
+      } else {
+        turmas.push({
+          id: uid('turma'),
+          nome, ano, turno, professor, capacidade,
+          alunos: []
+        });
+        showAlert('Turma cadastrada.');
+      }
+      closeModal(modalTurma);
+      renderTurmas();
+    });
+
+    function deleteTurma(id) {
+      turmas = turmas.filter(t => t.id !== id);
+      renderTurmas();
+      closeModal(document.getElementById('modalConfirm'));
+    }
+
+    /* Detalhes de alunos */
+    const modalDetalhes = document.getElementById('modalDetalhes');
+    const detalhesTitle = document.getElementById('detalhesTitle');
+    const closeDetalhes = document.getElementById('closeDetalhes');
+    const tabelaAlunosModal = document.querySelector('#tabela-alunos-modal tbody');
+    const importCsvModalBtn = document.getElementById('importCsvModalBtn');
+    const csvInputModal = document.getElementById('csvInputModal');
+    const addAlunoBtn = document.getElementById('addAlunoBtn');
+    const addAlunoForm = document.getElementById('addAlunoForm');
+    const salvarAlunoBtn = document.getElementById('salvarAlunoBtn');
+    const cancelAddAlunoBtn = document.getElementById('cancelAddAlunoBtn');
+    const turmaCapacityInfo = document.getElementById('turmaCapacityInfo');
+
+    closeDetalhes.addEventListener('click', () => closeModal(modalDetalhes));
+
+    function openDetalhes(turmaId) {
+      editingTurmaId = turmaId;
+      const t = turmas.find(x => x.id === turmaId);
+      if (!t) return showAlert('Turma não encontrada.');
+      detalhesTitle.textContent = `Alunos - ${t.nome}`;
+      turmaCapacityInfo.textContent = `Capacidade: ${t.alunos.length}/${t.capacidade}`;
+      renderAlunosModal(t);
+      closeAddAlunoForm();
+      openModal(modalDetalhes);
+    }
+
+    function renderAlunosModal(turma) {
+      tabelaAlunosModal.innerHTML = '';
+      if (!turma.alunos || turma.alunos.length === 0) {
+        tabelaAlunosModal.innerHTML = '<tr><td colspan="4" class="muted">Nenhum aluno. Importe via CSV ou adicione manualmente.</td></tr>';
+        turmaCapacityInfo.textContent = `Capacidade: 0/${turma.capacidade}`;
+        return;
+      }
+
+      turma.alunos.forEach(al => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${escapeHtml(al.nome)}</td>
+          <td>${escapeHtml(al.matricula)}</td>
+          <td>${escapeHtml(al.nascimento)}</td>
+          <td></td>
+        `;
+        const tdActions = tr.querySelector('td:last-child');
+        const editBtn = createBtn('Editar','small');
+        editBtn.classList.add('secondary');
+        editBtn.addEventListener('click', () => openEditAluno(turma.id, al.id));
+        const delBtn = createBtn('Excluir','small');
+        delBtn.classList.add('danger');
+        delBtn.addEventListener('click', () => confirmAction(`Excluir aluno "${al.nome}"?`, () => deleteAluno(turma.id, al.id)));
+
+        const d = document.createElement('div');
+        d.className = 'actions';
+        d.appendChild(editBtn);
+        d.appendChild(delBtn);
+        tdActions.appendChild(d);
+
+        tabelaAlunosModal.appendChild(tr);
+      });
+
+      turmaCapacityInfo.textContent = `Capacidade: ${turma.alunos.length}/${turma.capacidade}`;
+    }
+
+    importCsvModalBtn.addEventListener('click', () => csvInputModal.click());
+
+    csvInputModal.addEventListener('change', (ev) => {
+      const file = ev.target.files[0];
+      if (!file) return showAlert('Nenhum arquivo selecionado.');
+      const reader = new FileReader();
+      reader.onload = e => {
+        const raw = e.target.result;
+        const lines = raw.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+        if (lines.length < 1) return showAlert('CSV inválido.');
+        
+        const turma = turmas.find(t => t.id === editingTurmaId);
+        if (!turma) return showAlert('Turma não encontrada.');
+        let added = 0;
+        for (let i = 1; i < lines.length; i++) {
+          const cols = lines[i].split(',').map(c => c.trim());
+          if (!cols[0]) continue;
+          if (turma.alunos.length >= turma.capacidade) {
+            showAlert('Capacidade da turma atingida. Alguns alunos não foram adicionados.');
+            break;
+          }
+          turma.alunos.push({ id: uid('al'), nome: cols[0] || '', matricula: cols[1] || '', nascimento: cols[2] || '' });
+          added++;
+        }
+        renderAlunosModal(turma);
+        showAlert(`${added} aluno(s) importado(s).`);
+        csvInputModal.value = '';
+      };
+      reader.readAsText(file);
+    });
+
+    /* Para adicionar alunos manuamente, sem precisar importar sempre */
+    addAlunoBtn.addEventListener('click', openAddAlunoForm);
+    function openAddAlunoForm() {
+      addAlunoForm.style.display = 'block';
+    }
+    function closeAddAlunoForm() {
+      addAlunoForm.style.display = 'none';
+      document.getElementById('alunoNome').value = '';
+      document.getElementById('alunoMatricula').value = '';
+      document.getElementById('alunoNascimento').value = '';
+    }
+    cancelAddAlunoBtn.addEventListener('click', () => closeAddAlunoForm());
+
+    salvarAlunoBtn.addEventListener('click', () => {
+      const nome = document.getElementById('alunoNome').value.trim();
+      const matricula = document.getElementById('alunoMatricula').value.trim();
+      const nascimento = document.getElementById('alunoNascimento').value;
+      if (!nome || !matricula || !nascimento) return showAlert('Preencha todos os campos do aluno.');
+      const turma = turmas.find(t => t.id === editingTurmaId);
+      if (!turma) return showAlert('Turma não encontrada.');
+      if (turma.alunos.length >= turma.capacidade) return showAlert('Capacidade atingida. Remova alunos ou aumente a capacidade da turma.');
+      turma.alunos.push({ id: uid('al'), nome, matricula, nascimento });
+      renderAlunosModal(turma);
+      closeAddAlunoForm();
+      showAlert('Aluno adicionado.');
+    });
+
+    /* Para editar aluno */
+    const modalEditarAluno = document.getElementById('modalEditarAluno');
+    document.getElementById('closeEditarAluno').addEventListener('click', () => closeModal(modalEditarAluno));
+    document.getElementById('cancelEditAluno').addEventListener('click', () => closeModal(modalEditarAluno));
+    document.getElementById('salvarEdicaoAluno').addEventListener('click', () => {
+      const nome = document.getElementById('editNome').value.trim();
+      const matricula = document.getElementById('editMatricula').value.trim();
+      const nascimento = document.getElementById('editNascimento').value;
+      if (!nome || !matricula || !nascimento) return showAlert('Preencha todos os campos.');
+      const turma = turmas.find(t => t.id === editingAluno.turmaId);
+      if (!turma) return showAlert('Turma não encontrada.');
+      const al = turma.alunos.find(a => a.id === editingAluno.alunoId);
+      if (!al) return showAlert('Aluno não encontrado.');
+      Object.assign(al, { nome, matricula, nascimento });
+      renderAlunosModal(turma);
+      closeModal(modalEditarAluno);
+      showAlert('Aluno atualizado.');
+    });
+
+    function openEditAluno(turmaId, alunoId) {
+      editingAluno = { turmaId, alunoId };
+      const turma = turmas.find(t => t.id === turmaId);
+      const al = turma.alunos.find(a => a.id === alunoId);
+      document.getElementById('editNome').value = al.nome;
+      document.getElementById('editMatricula').value = al.matricula;
+      document.getElementById('editNascimento').value = al.nascimento;
+      openModal(modalEditarAluno);
+    }
+
+    function deleteAluno(turmaId, alunoId) {
+      const turma = turmas.find(t => t.id === turmaId);
+      turma.alunos = turma.alunos.filter(a => a.id !== alunoId);
+      renderAlunosModal(turma);
+      closeModal(document.getElementById('modalConfirm'));
+    }
+
+    /* Modal de confirmação  */
+    const modalConfirm = document.getElementById('modalConfirm');
+    const confirmTitle = document.getElementById('confirmTitle');
+    const confirmMessage = document.getElementById('confirmMessage');
+    const confirmOk = document.getElementById('confirmOk');
+    const confirmCancel = document.getElementById('confirmCancel');
+
+    function confirmAction(message, callback) {
+      confirmTitle.textContent = 'Confirmação';
+      confirmMessage.textContent = message;
+      confirmCallback = callback;
+      openModal(modalConfirm);
+    }
+    confirmOk.addEventListener('click', () => {
+      if (typeof confirmCallback === 'function') confirmCallback();
+      confirmCallback = null;
+    });
+    confirmCancel.addEventListener('click', () => {
+      confirmCallback = null;
+      closeModal(modalConfirm);
+    });
+
+    /* Abrir/fechar modal */
+    function openModal(el) {
+      el.classList.add('open');
+      el.style.display = 'flex';
+      document.body.style.pointerEvents = 'none';
+      el.style.pointerEvents = 'auto';
+    }
+    function closeModal(el) {
+      el.classList.remove('open');
+      el.style.display = 'none';
+      document.body.style.pointerEvents = 'auto';
+    }
+
+    // fechar modais clicando fora
+    window.addEventListener('click', (ev) => {
+      document.querySelectorAll('.modal.open').forEach(mod => {
+        if (ev.target === mod) closeModal(mod);
+      });
+    });
+
+    /* ====== Inicialização: exemplo de dados ====== */
+    turmas.push({
+      id: uid('turma'),
+      nome: 'Engenharia de Software - Turma 1',
+      ano: '2025',
+      turno: 'Noite',
+      professor: 'Prof. Luís',
+      capacidade: 40,
+      alunos: [
+        { id: uid('al'), nome: 'Ana Clara', matricula: '2025001', nascimento: '2005-03-21' },
+        { id: uid('al'), nome: 'Bruno Silva', matricula: '2025002', nascimento: '2004-11-02' }
+      ]
+    });
+
+    renderTurmas();
+
+    // ativa lucide icons depois que DOM carrega
+    window.addEventListener('load', () => {
+      if (window.lucide && lucide.createIcons) lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

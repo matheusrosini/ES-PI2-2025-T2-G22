@@ -1,218 +1,81 @@
-<!-- Matheus Henrique Portugal Narducci-->
-
+<!-- Luis Felipe Moura: RA 25010218 -->
+ 
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Lista de Turmas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NotaDez - Início</title>
+
   <link rel="stylesheet" href="styles/main.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
+
 <body>
-  <div class="container">
-    <h1>
-      Lista de Turmas
-      <button id="novaTurmaBtn">Adicionar Turma</button>
-    </h1>
 
-    <table id="tabela-turmas">
-      <thead>
-        <tr>
-          <th>Nome da Turma</th>
-          <th>Ano/Série</th>
-          <th>Turno</th>
-          <th>Professor(a)</th>
-          <th>Capacidade</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+  <!-- NAVBAR SUPERIOR -->
+  <header class="navbar">
+    <h1 class="logo">NotaDez</h1>
+
+    <nav>
+      <ul>
+        <li><a href="home.html" class="active">Início</a></li>
+        <li><a href="login.html">Login</a></li>
+        <li><a href="cadastro.html">Cadastro</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- CONTEÚDO ÚNICO DA HOME -->
+  <div class="home-wrapper">
+
+      <!-- HERO CENTRAL -->
+      <div class="hero">
+        <h2>Sistema Acadêmico Completo</h2>
+        <p>Gerencie instituições, disciplinas, turmas, alunos e notas com facilidade.</p>
+
+        <a href="login.html" class="btn-primary">Acessar Sistema</a>
+      </div>
+
+      <!-- CARDS ABAIXO DO HERO -->
+        <div class="cards">
+        <div class="card">
+            <i data-lucide="school"></i>
+            <span class="card-title">Instituições</span>
+            <p class="card-desc">Gerencie suas instituições cadastradas</p>
+        </div>
+
+        <div class="card">
+            <i data-lucide="book-open"></i>
+            <span class="card-title">Disciplinas</span>
+            <p class="card-desc">Controle e organize disciplinas</p>
+        </div>
+
+        <div class="card">
+            <i data-lucide="users"></i>
+            <span class="card-title">Turmas</span>
+            <p class="card-desc">Administre suas turmas com facilidade</p>
+        </div>
+
+        <div class="card">
+            <i data-lucide="file-text"></i>
+            <span class="card-title">Exportações</span>
+            <p class="card-desc">Baixe notas em CSV ou JSON</p>
+        </div>
+
+        <div class="card">
+            <i data-lucide="pencil"></i>
+            <span class="card-title">Notas</span>
+            <p class="card-desc">Lance notas e calcule médias automaticamente</p>
+        </div>
+        </div>
+
+
   </div>
 
-  <br>
-
-  <!-- Importação de Alunos -->
-  <div class="container">
-    <h2>Alunos da Turma</h2>
-    <button id="importCsvBtn">Importar CSV</button>
-    <input type="file" id="csvInput" accept=".csv" style="display:none">
-
-    <table id="tabela-alunos">
-      <thead>
-        <tr>
-          <th>Nome</th>
-          <th>Matrícula</th>
-          <th>Data de Nascimento</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-  
-  <!-- Modal de Cadastro -->
-  <div class="modal" id="modalTurma">
-    <div class="modal-content">
-      <h2>Cadastrar Turma</h2>
-      
-      <label>Nome da Turma</label>
-      <input type="text" id="nomeTurma" placeholder="Ex: 1º Ano C"/>
-
-      <label>Ano/Série</label>
-      <input type="text" id="anoSerie" placeholder="Ex: 1º Ano/2025"/>
-
-      <label>Turno</label>
-      <select id="turnoTurma">
-        <option value="manha">Manhã</option>
-        <option value="tarde">Tarde</option>
-        <option value="noite">Noite</option>
-      </select>
-      
-      <label>Professor(a)</label>
-      <input type="text" id="professorTurma" placeholder="Nome do Professor(a)"/>
-
-      <label>Capacidade</label>
-      <input type="number" id="capacidadeTurma" placeholder="Ex: 40"/>
-
-      <button id="salvarTurmaBtn">Salvar</button>
-      <button id="fecharModalBtn">Cancelar</button>
-    </div>
-  </div>
-
-  <!-- Alerta customizado -->
-  <div id="alertBox" class="alert-box">
-    <div class="alert-content">
-      <p id="alertMessage"></p>
-      <button id="closeAlertBtn">OK</button>
-    </div>
-  </div>
-  
   <script>
-    const modal = document.getElementById('modalTurma');
-    const novaTurmaBtn = document.getElementById('novaTurmaBtn');
-    const tabelaTurmas = document.querySelector('#tabela-turmas tbody');
-
-    const csvInput = document.getElementById('csvInput');
-    const importCsvBtn = document.getElementById('importCsvBtn');
-    const tabelaAlunos = document.querySelector('#tabela-alunos tbody');
-
-    const alertBox = document.getElementById('alertBox');
-    const alertMessage = document.getElementById('alertMessage');
-    const closeAlertBtn = document.getElementById('closeAlertBtn');
-
-    let alertOpen = false;
-
-    function showAlert(message) {
-      alertMessage.textContent = message;
-      alertBox.style.display = 'flex';
-      alertOpen = true;
-
-      document.body.style.pointerEvents = 'none';
-      alertBox.style.pointerEvents = 'auto';
-    }
-
-    closeAlertBtn.addEventListener('click', () => {
-      alertOpen = false;
-      alertBox.style.display = 'none';
-      document.body.style.pointerEvents = 'auto';
-    });
-
-    novaTurmaBtn.addEventListener('click', () => {
-      if (!alertOpen) modal.style.display = 'block';
-    });
-
-    function fecharModal() {
-      modal.style.display = 'none';
-      limparCampos();
-    }
-
-    function limparCampos() {
-      document.getElementById('nomeTurma').value = '';
-      document.getElementById('anoSerie').value = '';
-      document.getElementById('turnoTurma').value = 'manha';
-      document.getElementById('professorTurma').value = '';
-      document.getElementById('capacidadeTurma').value = '';
-    }
-
-    function salvarTurma() {
-      const nome = document.getElementById('nomeTurma').value;
-      const ano = document.getElementById('anoSerie').value;
-      const turno = document.getElementById('turnoTurma').value;
-      const professor = document.getElementById('professorTurma').value;
-      const capacidade = document.getElementById('capacidadeTurma').value;
-      
-      if (!nome || !ano || !turno || !professor || !capacidade) {
-        showAlert('⚠️ Por favor, preencha todos os campos.');
-        return;
-      }
-
-      const linha = `
-        <tr>
-          <td>${nome}</td>
-          <td>${ano}</td>
-          <td>${turno}</td>
-          <td>${professor}</td>
-          <td>${capacidade}</td>
-        </tr>
-      `;
-      tabelaTurmas.insertAdjacentHTML('beforeend', linha);
-      fecharModal();
-    }
-
-    document.getElementById('salvarTurmaBtn').addEventListener('click', salvarTurma);
-    document.getElementById('fecharModalBtn').addEventListener('click', fecharModal);
-
-    window.onclick = function(event) {
-      if (event.target === modal && !alertOpen) fecharModal();
-    };
-
-  
-    //     importei o CSV
-   
-    
-    importCsvBtn.addEventListener('click', () => {
-      if (!alertOpen) csvInput.click();
-    });
-
-    csvInput.addEventListener('change', (event) => {
-      const file = event.target.files[0];
-
-      if (!file) {
-        showAlert("Nenhum arquivo selecionado.");
-        return;
-      }
-
-      const reader = new FileReader();
-
-      reader.onload = function(e) {
-        const linhas = e.target.result.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-
-        if (linhas.length < 2) {
-          showAlert("CSV inválido ou sem dados.");
-          return;
-        }
-
-        tabelaAlunos.innerHTML = '';
-
-        for (let i = 1; i < linhas.length; i++) {
-          const colunas = linhas[i].split(',');
-
-          const nome = colunas[0] || '';
-          const matricula = colunas[1] || '';
-          const nascimento = colunas[2] || '';
-
-          const row = `
-            <tr>
-              <td>${nome}</td>
-              <td>${matricula}</td>
-              <td>${nascimento}</td>
-            </tr>
-          `;
-          tabelaAlunos.insertAdjacentHTML("beforeend", row);
-        }
-      };
-
-      reader.readAsText(file);
-    });
-
+    lucide.createIcons();
   </script>
+
 </body>
 </html>
