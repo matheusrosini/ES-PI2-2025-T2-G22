@@ -26,12 +26,15 @@ app.use("/api/turmas", turmaRoutes);
 app.use("/api/alunos", alunoRoutes);
 app.use("/api/notas", notaRoutes);
 app.use("/api/componenteNotas", componenteNotaRoutes);
-app.use("/api/auth", authRoutes)
+app.use("/api/auth", authRoutes);
 
 // Rota raiz
 app.get("/", (req, res) => {
-    res.send("✅ API ProjetoNotaDez — módulo Rosini ONLINE!");
+  res.send("✅ API ProjetoNotaDez — ONLINE (Railway)!");
 });
 
-// ✅ Exporta o app para Vercel
-module.exports = app;
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
+});

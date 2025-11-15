@@ -5,7 +5,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
 
-// ideal: mover segredo para process.env.JWT_SECRET
 const JWT_SECRET = process.env.JWT_SECRET;
 
 exports.register = async (req, res) => {

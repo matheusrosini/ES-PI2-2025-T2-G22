@@ -16,7 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const data = await login(email, senha);
                 alert(`Bem-vindo, ${data.user.nome}!`);
-                // Aqui você pode salvar token no localStorage
                 localStorage.setItem('token', data.token);
                 window.location.href = 'index.html';
             } catch (error) {
