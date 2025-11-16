@@ -1,8 +1,8 @@
+// Feito por Leonardo e Matheus Rosini
+
 const db = require("../config/db");
 
-/* =======================================================
-   1 — LISTAR ALUNOS + COMPONENTES + NOTAS
-======================================================= */
+//   1 — LISTAR ALUNOS + COMPONENTES + NOTAS
 exports.getNotasByTurmaEDisciplina = async (req, res) => {
     try {
         const { turmaId, disciplinaId } = req.params;

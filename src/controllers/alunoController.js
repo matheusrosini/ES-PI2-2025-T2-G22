@@ -1,4 +1,4 @@
-// Feito por Leonardo (corrigido)
+// Feito por Leonardo 
 
 // Conexão com o banco
 const db = require('../config/db');
@@ -6,9 +6,7 @@ const csv = require("csv-parser");
 const stream = require("stream");
 
 
-// ============================================================
 // 1 — LISTAR TODOS OS ALUNOS
-// ============================================================
 exports.getAllAlunos = async (req, res) => {
   try {
     const [rows] = await db.query('SELECT * FROM aluno');
@@ -20,9 +18,7 @@ exports.getAllAlunos = async (req, res) => {
 
 
 
-// ============================================================
-// 2 — BUSCAR ALUNOS POR TURMA  (FALTAVA NO SEU PROJETO)
-// ============================================================
+// 2 — BUSCAR ALUNOS POR TURMA
 exports.getAlunosByTurma = async (req, res) => {
   try {
     const { turmaId } = req.params;
@@ -40,9 +36,7 @@ exports.getAlunosByTurma = async (req, res) => {
 
 
 
-// ============================================================
 // 3 — BUSCAR ALUNO POR ID
-// ============================================================
 exports.getAlunoById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -60,9 +54,8 @@ exports.getAlunoById = async (req, res) => {
 
 
 
-// ============================================================
-// 4 — CRIAR NOVO ALUNO (CORRIGIDO: USA turmaId DA ROTA)
-// ============================================================
+
+// 4 — CRIAR NOVO ALUNO
 exports.createAluno = async (req, res) => {
   try {
     const { turmaId } = req.params;
@@ -89,9 +82,7 @@ exports.createAluno = async (req, res) => {
 
 
 
-// ============================================================
 // 5 — ATUALIZAR ALUNO
-// ============================================================
 exports.updateAluno = async (req, res) => {
   try {
     const { id } = req.params;
@@ -110,9 +101,7 @@ exports.updateAluno = async (req, res) => {
 
 
 
-// ============================================================
 // 6 — DELETAR ALUNO
-// ============================================================
 exports.deleteAluno = async (req, res) => {
   try {
     const { id } = req.params;
@@ -126,9 +115,7 @@ exports.deleteAluno = async (req, res) => {
 
 
 
-// ============================================================
 // 7 — IMPORTAR CSV
-// ============================================================
 exports.importarCSV = async (req, res) => {
   try {
     const { turmaId } = req.params;

@@ -1,3 +1,5 @@
+// Feito por Leonardo e Matheus Rosini
+
 const mysql = require("mysql2");
 require("dotenv").config();
 

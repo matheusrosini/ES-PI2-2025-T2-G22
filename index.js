@@ -1,3 +1,4 @@
+// Feito por Leonardo
 // index.js — usado somente em ambiente local
 
 require("dotenv").config();

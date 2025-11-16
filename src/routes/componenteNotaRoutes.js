@@ -1,3 +1,5 @@
+// Feito por Leonardo
+
 const express = require("express");
 const router = express.Router();
 const componenteNotaController = require("../controllers/componenteNotaController");

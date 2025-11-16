@@ -1,3 +1,5 @@
+// Feito por Leonardo e Matheus Rosini
+
 const API_URL = "https://es-pi2-2025-t2-g22-production-b5bc.up.railway.app/api";
 
 async function handleResponse(response) {

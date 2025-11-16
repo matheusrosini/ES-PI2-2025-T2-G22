@@ -1,3 +1,5 @@
+// Feito por Leonardo e Matheus Rosini
+
 import { login, register } from './api.js';
 
 document.addEventListener('DOMContentLoaded', () => {
