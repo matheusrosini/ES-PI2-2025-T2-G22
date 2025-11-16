@@ -14,7 +14,7 @@ if (SMTP_HOST && SMTP_PORT && SMTP_USER && SMTP_PASS) {
   transporter = nodemailer.createTransport({
     host: SMTP_HOST,
     port: Number(SMTP_PORT),
-    secure: false, // Porta 2525 NUNCA usa secure
+    secure: false, // Porta 2525 NUNCA usa secure = true
     auth: {
       user: SMTP_USER,
       pass: SMTP_PASS
@@ -29,8 +29,8 @@ if (SMTP_HOST && SMTP_PORT && SMTP_USER && SMTP_PASS) {
 
 async function sendMail({ to, subject, html, text }) {
   if (!transporter) {
-    console.warn("Mailer não configurado — logando e-mail no console.");
-    console.log({ to, subject, text, html });
+    console.warn("Mailer não configurado — logando email.");
+    console.log({ to, subject, html, text });
     return { simulated: true };
   }
 
