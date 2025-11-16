@@ -1,10 +1,14 @@
-// Feito por Leonardo
+// Feito por Leonardo (corrigido)
 
+// Conexão com o banco
 const db = require('../config/db');
 const csv = require("csv-parser");
 const stream = require("stream");
 
-// Buscar todos os alunos
+
+// ============================================================
+// 1 — LISTAR TODOS OS ALUNOS
+// ============================================================
 exports.getAllAlunos = async (req, res) => {
   try {
     const [rows] = await db.query('SELECT * FROM aluno');
@@ -14,7 +18,31 @@ exports.getAllAlunos = async (req, res) => {
   }
 };
 
-// Buscar um aluno por ID
+
+
+// ============================================================
+// 2 — BUSCAR ALUNOS POR TURMA  (FALTAVA NO SEU PROJETO)
+// ============================================================
+exports.getAlunosByTurma = async (req, res) => {
+  try {
+    const { turmaId } = req.params;
+
+    const [rows] = await db.query(
+      'SELECT * FROM aluno WHERE turma_id = ?',
+      [turmaId]
+    );
+
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ message: 'Erro ao buscar alunos da turma', error });
+  }
+};
+
+
+
+// ============================================================
+// 3 — BUSCAR ALUNO POR ID
+// ============================================================
 exports.getAlunoById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -30,10 +58,15 @@ exports.getAlunoById = async (req, res) => {
   }
 };
 
-// Criar um novo aluno
+
+
+// ============================================================
+// 4 — CRIAR NOVO ALUNO (CORRIGIDO: USA turmaId DA ROTA)
+// ============================================================
 exports.createAluno = async (req, res) => {
   try {
-    const { matricula, nome, turma_id } = req.body;
+    const { turmaId } = req.params;
+    const { matricula, nome } = req.body;
 
     if (!matricula || !nome) {
       return res.status(400).json({ message: 'Matrícula e nome são obrigatórios' });
@@ -41,7 +74,7 @@ exports.createAluno = async (req, res) => {
 
     await db.query(
       'INSERT INTO aluno (matricula, nome, turma_id) VALUES (?, ?, ?)',
-      [matricula, nome, turma_id]
+      [matricula, nome, turmaId]
     );
 
     res.status(201).json({ message: 'Aluno criado com sucesso!' });
@@ -54,7 +87,11 @@ exports.createAluno = async (req, res) => {
   }
 };
 
-// Atualizar aluno
+
+
+// ============================================================
+// 5 — ATUALIZAR ALUNO
+// ============================================================
 exports.updateAluno = async (req, res) => {
   try {
     const { id } = req.params;
@@ -71,7 +108,11 @@ exports.updateAluno = async (req, res) => {
   }
 };
 
-// Deletar aluno
+
+
+// ============================================================
+// 6 — DELETAR ALUNO
+// ============================================================
 exports.deleteAluno = async (req, res) => {
   try {
     const { id } = req.params;
@@ -83,29 +124,32 @@ exports.deleteAluno = async (req, res) => {
   }
 };
 
-// Importar CSV
+
+
+// ============================================================
+// 7 — IMPORTAR CSV
+// ============================================================
 exports.importarCSV = async (req, res) => {
   try {
-    const turmaId = req.params.turmaId;
+    const { turmaId } = req.params;
 
     if (!req.file) {
       return res.status(400).json({ message: "Nenhum arquivo enviado" });
     }
 
-    const buffer = req.file.buffer;
     const results = [];
     const readable = new stream.Readable();
+
     readable._read = () => {};
-    readable.push(buffer);
+    readable.push(req.file.buffer);
     readable.push(null);
 
     readable
       .pipe(csv())
-      .on("data", (row) => {
-        const keys = Object.keys(row).map(k => k.replace(/\ufeff/g, ""));
-
-        const matricula = row[keys[0]];
-        const nome = row[keys[1]];
+      .on("data", row => {
+        const cleanKeys = Object.keys(row).map(k => k.replace(/\ufeff/g, ""));
+        const matricula = row[cleanKeys[0]];
+        const nome = row[cleanKeys[1]];
 
         if (matricula && nome) {
           results.push({ matricula, nome });
@@ -143,3 +187,4 @@ exports.importarCSV = async (req, res) => {
     });
   }
 };
+
