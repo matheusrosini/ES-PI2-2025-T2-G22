@@ -1,48 +1,23 @@
-const nodemailer = require('nodemailer');
+const { Resend } = require("resend");
 
-const {
-  SMTP_HOST,
-  SMTP_PORT,
-  SMTP_USER,
-  SMTP_PASS,
-  FROM_EMAIL
-} = process.env;
-
-let transporter = null;
-
-if (SMTP_HOST && SMTP_PORT && SMTP_USER && SMTP_PASS) {
-  transporter = nodemailer.createTransport({
-    host: SMTP_HOST,
-    port: Number(SMTP_PORT),
-    secure: false, // Porta 2525 NUNCA usa secure = true
-    auth: {
-      user: SMTP_USER,
-      pass: SMTP_PASS
-    },
-    tls: {
-      rejectUnauthorized: false
-    }
-  });
-} else {
-  console.warn("Mailer: SMTP não configurado — emails não serão enviados.");
-}
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 async function sendMail({ to, subject, html, text }) {
-  if (!transporter) {
-    console.warn("Mailer não configurado — logando email.");
-    console.log({ to, subject, html, text });
-    return { simulated: true };
+  try {
+    const data = await resend.emails.send({
+      from: process.env.FROM_EMAIL, 
+      to,
+      subject,
+      html,
+      text
+    });
+
+    console.log("Email enviado:", data);
+    return data;
+  } catch (err) {
+    console.error("Erro ao enviar email:", err);
+    throw err;
   }
-
-  const info = await transporter.sendMail({
-    from: FROM_EMAIL || SMTP_USER,
-    to,
-    subject,
-    html,
-    text
-  });
-
-  return info;
 }
 
 module.exports = { sendMail };
