@@ -1,8 +1,9 @@
 import { login, register } from './api.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    const formLogin = document.getElementById('form-login');
-    const formCadastro = document.getElementById('form-cadastro');
+    // tentamos pegar pelo ID existente no HTML e também pelo ID antigo
+    const formLogin = document.getElementById('loginForm') || document.getElementById('form-login');
+    const formCadastro = document.getElementById('cadastroForm') || document.getElementById('form-cadastro');
 
     // LOGIN
     if (formLogin) {
@@ -17,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await login(email, senha);
                 alert(`Bem-vindo, ${data.user.nome}!`);
                 localStorage.setItem('token', data.token);
-                window.location.href = 'index.html';
+                window.location.href = 'dashboard.html';
             } catch (error) {
                 alert(`Erro no login: ${error.message}`);
             }
@@ -31,9 +32,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const nome = formCadastro.elements['nome'].value.trim();
             const email = formCadastro.elements['email'].value.trim();
             const senha = formCadastro.elements['senha'].value.trim();
-            const telefone = formCadastro.elements['telefone'].value.trim();
+            const telefone = formCadastro.elements['telefone'] ? formCadastro.elements['telefone'].value.trim() : '';
 
-            if (!nome || !email || !senha) return alert('Nome, email e senha são obrigatórios!');
+            if (!nome || !email || !senha)
+                return alert('Nome, email e senha são obrigatórios!');
 
             try {
                 const data = await register(nome, email, senha, telefone);

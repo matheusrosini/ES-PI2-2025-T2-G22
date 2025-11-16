@@ -1,28 +1,40 @@
 // cadastro.js
-import { register } from './auth.js';
+import { register } from './api.js';
 
 const form = document.getElementById('cadastroForm');
 
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
+if (form) {
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-  const nome = form.nome.value.trim();
-  const email = form.email.value.trim();
-  const telefone = form.telefone.value.trim();
-  const senha = form.senha.value.trim();
+    const nome = form.nome.value.trim();
+    const email = form.email.value.trim();
+    const telefone = form.telefone.value.trim();
+    const senha = form.senha.value.trim();
 
-  try {
-    // chama função de registro do auth.js
-    const { user, token } = await register({ nome, email, telefone, senha });
+    if (!nome || !email || !senha) {
+      alert('Nome, email e senha são obrigatórios.');
+      return;
+    }
 
-    // armazena token e ID do usuário
-    localStorage.setItem('usuarioId', user.id);
-    localStorage.setItem('token', token);
+    try {
+      // O endpoint /auth/register retorna provavelmente token e user,
+      // então mantemos a mesma expectativa.
+      const { user, token } = await register(nome, email, senha, telefone);
 
-    alert("Conta criada com sucesso!");
-    window.location.href = "dashboard.html";
-  } catch (err) {
-    console.error(err);
-    alert(err.message || "Erro ao criar conta. Tente novamente.");
-  }
-});
+      if (token) {
+        localStorage.setItem('usuarioId', user.id);
+        localStorage.setItem('token', token);
+        alert("Conta criada com sucesso!");
+        window.location.href = "dashboard.html";
+      } else {
+        // Caso o backend retorne apenas message, tratar genericamente:
+        alert('Conta criada com sucesso! Faça login para continuar.');
+        window.location.href = "index.html";
+      }
+    } catch (err) {
+      console.error('Erro no cadastro:', err);
+      alert(err.message || 'Erro ao criar conta. Tente novamente.');
+    }
+  });
+}
