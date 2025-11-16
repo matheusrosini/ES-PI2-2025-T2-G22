@@ -10,13 +10,17 @@ async function handleResponse(response) {
 
 // ==== CRUD genérico ====
 export async function apiGet(path) {
-    const response = await fetch(`${API_URL}${path}`);
+    const response = await fetch(`${API_URL}${path}`, {
+        method: "GET",
+        credentials: "include"
+    });
     return handleResponse(response);
 }
 
 export async function apiPost(path, data) {
     const response = await fetch(`${API_URL}${path}`, {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
     });
@@ -26,6 +30,7 @@ export async function apiPost(path, data) {
 export async function apiPut(path, data) {
     const response = await fetch(`${API_URL}${path}`, {
         method: "PUT",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
     });
@@ -33,15 +38,18 @@ export async function apiPut(path, data) {
 }
 
 export async function apiDelete(path) {
-    const response = await fetch(`${API_URL}${path}`, { method: "DELETE" });
+    const response = await fetch(`${API_URL}${path}`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" }
+    });
     return handleResponse(response);
 }
 
 // ==== Auth ====
 export async function login(email, senha) {
     try {
-        const res = await apiPost('/auth/login', { email, senha });
-        return res; // { user, token }
+        return await apiPost('/auth/login', { email, senha });
     } catch (err) {
         console.error('Erro no login:', err.message);
         throw err;
@@ -50,8 +58,7 @@ export async function login(email, senha) {
 
 export async function register(nome, email, senha, telefone = "") {
     try {
-        const res = await apiPost('/auth/register', { nome, email, senha, telefone });
-        return res; // mensagem de sucesso
+        return await apiPost('/auth/register', { nome, email, senha, telefone });
     } catch (err) {
         console.error('Erro no registro:', err.message);
         throw err;

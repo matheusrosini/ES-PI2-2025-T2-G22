@@ -5,39 +5,41 @@ const express = require("express");
 const cors = require("cors");
 
 // Importação das rotas
-const userRoutes = require("./routes/usuarioRoutes");
+const usuarioRoutes = require("./routes/usuarioRoutes");
 const instituicaoRoutes = require("./routes/instituicaoRoutes");
-const cursoRoutes = require("./routes/cursoRoutes");
-const disciplinaRoutes = require("./routes/disciplinaRoutes");
+const disciplinaRoutes = require("./routes/disciplinasRoutes");
 const turmaRoutes = require("./routes/turmaRoutes");
 const alunoRoutes = require("./routes/alunoRoutes");
 const notaRoutes = require("./routes/notaRoutes");
 const componenteNotaRoutes = require("./routes/componenteNotaRoutes");
-const professorRoutes = require("./routes/professorRoutes");
 const authRoutes = require("./routes/authRoutes");
 
 const app = express();
-app.use(cors());
+
+app.use(
+    cors({
+        origin: "https://es-pi-2-2025-t2-g22.vercel.app",
+        credentials: true,
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization"],
+    })
+);
+
+app.options("*", cors());
 app.use(express.json());
 
 // Rotas
-app.use("/api/usuarios", userRoutes);
+app.use("/api/usuarios", usuarioRoutes);
 app.use("/api/instituicoes", instituicaoRoutes);
-app.use("/api/cursos", cursoRoutes);
 app.use("/api/disciplinas", disciplinaRoutes);
 app.use("/api/turmas", turmaRoutes);
 app.use("/api/alunos", alunoRoutes);
 app.use("/api/notas", notaRoutes);
 app.use("/api/componenteNotas", componenteNotaRoutes);
-app.use("/api/professores", professorRoutes);
 app.use("/api/auth", authRoutes);
 
-// Rota raiz
 app.get("/", (req, res) => {
-    res.send("✅ API ProjetoNotaDez — módulo Rosini ONLINE!");
+    res.send("API ProjetoNotaDez ONLINE!");
 });
 
-// ❌ Removido app.listen, pois Vercel gerencia a porta automaticamente
-
-// ✅ Exporta o app para Vercel
 module.exports = app;
