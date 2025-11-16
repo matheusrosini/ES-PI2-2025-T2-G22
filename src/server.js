@@ -7,7 +7,7 @@ const cors = require("cors");
 // Importação das rotas
 const usuarioRoutes = require("./routes/usuarioRoutes");
 const instituicaoRoutes = require("./routes/instituicaoRoutes");
-const disciplinaRoutes = require("./routes/disciplinasRoutes");
+const disciplinaRoutes = require("./routes/disciplinaRoutes");
 const turmaRoutes = require("./routes/turmaRoutes");
 const alunoRoutes = require("./routes/alunoRoutes");
 const notaRoutes = require("./routes/notaRoutes");
