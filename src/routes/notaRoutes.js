@@ -1,22 +1,21 @@
-// Feito por Leonardo 
-
 const express = require("express");
 const router = express.Router();
 const notaController = require("../controllers/notaController");
 
-// Rota para listar todas as Notas
-router.get('/', notaController.getAllNotas);
+// LISTAR alunos + componentes + notas da turma
+router.get(
+  "/turma/:turmaId/disciplina/:disciplinaId",
+  notaController.getNotasByTurmaEDisciplina
+);
 
-// Rota para buscar uma Nota pelo ID
-router.get('/:id', notaController.getNotaById);
+// REGISTRAR / ATUALIZAR nota
+router.put("/registrar", notaController.registrarNota);
 
-// Rota para criar uma nova Nota
-router.post('/', notaController.createNota);
-
-// Rota para atualizar uma Nota existente
-router.put('/:id', notaController.updateNota);
-
-// Rota para deletar uma Nota
-router.delete('/:id', notaController.deleteNota);
+// CRUD básico
+router.get("/", notaController.getAllNotas);
+router.get("/:id", notaController.getNotaById);
+router.post("/", notaController.createNota);
+router.put("/:id", notaController.updateNota);
+router.delete("/:id", notaController.deleteNota);
 
 module.exports = router;

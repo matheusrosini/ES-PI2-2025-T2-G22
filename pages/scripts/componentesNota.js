@@ -6,13 +6,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function carregarComponentes() {
         try {
-            const componentes = await apiGet('/componentes');
+            const disciplinaId = document.body.dataset.disciplina; // ou outra forma
+            const componentes = await apiGet(`/componenteNotas/disciplina/${disciplinaId}`);
+
             tbody.innerHTML = componentes.map(c => `
                 <tr data-id="${c.id}">
                     <td>${c.nome}</td>
                     <td>${c.sigla}</td>
                     <td>${c.descricao || '-'}</td>
-                    <td>${c.disciplina_id}</td>
+
                     <td>
                         <button class="edit">Editar</button>
                         <button class="delete">Excluir</button>
