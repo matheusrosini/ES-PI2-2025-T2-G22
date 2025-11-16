@@ -14,10 +14,14 @@ if (SMTP_HOST && SMTP_PORT && SMTP_USER && SMTP_PASS) {
   transporter = nodemailer.createTransport({
     host: SMTP_HOST,
     port: Number(SMTP_PORT),
-    secure: Number(SMTP_PORT) === 465, // true for 465, false for other ports
     auth: {
       user: SMTP_USER,
       pass: SMTP_PASS
+    },
+    secure: false,          // obrigatoriamente FALSE para porta 587
+    requireTLS: true,       // obriga STARTTLS
+    tls: {
+      rejectUnauthorized: false   // necessário no Railway
     }
   });
 } else {
@@ -26,10 +30,10 @@ if (SMTP_HOST && SMTP_PORT && SMTP_USER && SMTP_PASS) {
 
 async function sendMail({ to, subject, html, text }) {
   if (!transporter) {
-    console.warn("Mailer não configurado — logando conteúdo do e-mail no console.");
-    console.log("E-mail simulado para:", to);
-    console.log("Assunto:", subject);
-    console.log("Texto:", text || html);
+    console.warn("Mailer não configurado — logando conteúdo do e-mail.");
+    console.log("TO:", to);
+    console.log("SUBJECT:", subject);
+    console.log("TEXT:", text || html);
     return { simulated: true };
   }
 
