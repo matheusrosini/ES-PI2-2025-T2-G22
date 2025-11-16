@@ -1,23 +1,17 @@
-// Feito por Leonardo e Matheus Rosini
-
 const express = require('express');
 const router = express.Router();
 const alunoController = require('../controllers/alunoController');
 
-// Rota para listar todos os alunos
-router.get('/', alunoController.getAllAlunos);
+// Listar alunos de uma turma
+router.get('/turma/:turmaId', alunoController.getAlunosByTurma);
 
-// Rota para buscar um aluno por ID
-router.get('/:id', alunoController.getAlunoById);
+// Criar aluno em uma turma
+router.post('/turma/:turmaId', alunoController.createAluno);
 
-// Rota para criar um novo aluno
-router.post('/', alunoController.createAluno);
-
-// Rota para atualizar um aluno existente
+// Atualizar aluno
 router.put('/:id', alunoController.updateAluno);
 
-// Rota para deletar um aluno
+// Remover aluno
 router.delete('/:id', alunoController.deleteAluno);
-
 
 module.exports = router;

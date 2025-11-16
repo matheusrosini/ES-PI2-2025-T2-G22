@@ -1,26 +1,22 @@
 const API_URL = "https://es-pi2-2025-t2-g22-production-b5bc.up.railway.app/api";
 
 async function handleResponse(response) {
+    const data = await response.json().catch(() => ({}));
     if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Erro na requisição: ${response.status}`);
+        throw new Error(data.message || `Erro na requisição: ${response.status}`);
     }
-    return response.json();
+    return data;
 }
 
 // ==== CRUD genérico ====
 export async function apiGet(path) {
-    const response = await fetch(`${API_URL}${path}`, {
-        method: "GET",
-        credentials: "include"
-    });
+    const response = await fetch(`${API_URL}${path}`);
     return handleResponse(response);
 }
 
 export async function apiPost(path, data) {
     const response = await fetch(`${API_URL}${path}`, {
         method: "POST",
-        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
     });
@@ -30,7 +26,6 @@ export async function apiPost(path, data) {
 export async function apiPut(path, data) {
     const response = await fetch(`${API_URL}${path}`, {
         method: "PUT",
-        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
     });
@@ -40,7 +35,6 @@ export async function apiPut(path, data) {
 export async function apiDelete(path) {
     const response = await fetch(`${API_URL}${path}`, {
         method: "DELETE",
-        credentials: "include",
         headers: { "Content-Type": "application/json" }
     });
     return handleResponse(response);
@@ -48,19 +42,9 @@ export async function apiDelete(path) {
 
 // ==== Auth ====
 export async function login(email, senha) {
-    try {
-        return await apiPost('/auth/login', { email, senha });
-    } catch (err) {
-        console.error('Erro no login:', err.message);
-        throw err;
-    }
+    return apiPost('/auth/login', { email, senha });
 }
 
 export async function register(nome, email, senha, telefone = "") {
-    try {
-        return await apiPost('/auth/register', { nome, email, senha, telefone });
-    } catch (err) {
-        console.error('Erro no registro:', err.message);
-        throw err;
-    }
+    return apiPost('/auth/register', { nome, email, senha, telefone });
 }
