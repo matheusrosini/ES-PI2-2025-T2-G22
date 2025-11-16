@@ -1,20 +1,20 @@
-// recuperacao-senha.js
+// Assumindo que apiPost existe em ./api.js
+import { apiPost } from './api.js';
 
 const form = document.getElementById('recuperacaoForm');
 
-form.addEventListener('submit', (e) => {
-  e.preventDefault();
+if (form) {
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = form.email.value.trim();
+    if (!email) return alert('Digite o e-mail cadastrado.');
 
-  const email = form.email.value.trim();
-
-  if (!email) {
-    alert('Digite um e-mail válido.');
-    return;
-  }
-
-  // Aqui você chamaria a API real de recuperação de senha
-  // Para fins de demonstração, só exibimos um alerta
-  alert(`Um link de recuperação foi enviado para ${email}.`);
-
-  form.reset();
-});
+    try {
+      const res = await apiPost('/auth/forgot-password', { email });
+      alert(res.message || 'Se o e-mail estiver cadastrado, você receberá instruções.');
+    } catch (err) {
+      console.error(err);
+      alert(err.message || 'Erro ao solicitar recuperação de senha.');
+    }
+  });
+}
