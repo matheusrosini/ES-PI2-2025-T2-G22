@@ -8,10 +8,10 @@ router.get(
   notaController.getNotasByTurmaEDisciplina
 );
 
-// REGISTRAR / ATUALIZAR nota
+// REGISTRAR / ATUALIZAR nota via PUT
 router.put("/registrar", notaController.registrarNota);
 
-// CRUD básico
+// CRUD
 router.get("/", notaController.getAllNotas);
 router.get("/:id", notaController.getNotaById);
 router.post("/", notaController.createNota);
