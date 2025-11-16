@@ -34,4 +34,11 @@ app.get("/", (req, res) => {
     res.send("API está funcionando!");
 });
 
+if (process.env.RAILWAY_ENVIRONMENT) {
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => {
+        console.log(`🚀 Servidor rodando no Railway na porta ${PORT}`);
+    });
+}
+
 module.exports = app;
