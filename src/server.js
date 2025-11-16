@@ -1,4 +1,4 @@
-// Feito por Matheus Rosini e Leonardo
+// Feito por Matheus Rosini
 
 require("dotenv").config();
 const express = require("express");
@@ -7,12 +7,14 @@ const cors = require("cors");
 // Importação das rotas
 const userRoutes = require("./routes/usuarioRoutes");
 const instituicaoRoutes = require("./routes/instituicaoRoutes");
+const cursoRoutes = require("./routes/cursoRoutes");
 const disciplinaRoutes = require("./routes/disciplinaRoutes");
 const turmaRoutes = require("./routes/turmaRoutes");
 const alunoRoutes = require("./routes/alunoRoutes");
 const notaRoutes = require("./routes/notaRoutes");
 const componenteNotaRoutes = require("./routes/componenteNotaRoutes");
-const authRoutes = require('./routes/authRoutes');
+const professorRoutes = require("./routes/professorRoutes");
+const authRoutes = require("./routes/authRoutes");
 
 const app = express();
 app.use(cors());
@@ -21,20 +23,21 @@ app.use(express.json());
 // Rotas
 app.use("/api/usuarios", userRoutes);
 app.use("/api/instituicoes", instituicaoRoutes);
+app.use("/api/cursos", cursoRoutes);
 app.use("/api/disciplinas", disciplinaRoutes);
 app.use("/api/turmas", turmaRoutes);
 app.use("/api/alunos", alunoRoutes);
 app.use("/api/notas", notaRoutes);
 app.use("/api/componenteNotas", componenteNotaRoutes);
+app.use("/api/professores", professorRoutes);
 app.use("/api/auth", authRoutes);
 
 // Rota raiz
 app.get("/", (req, res) => {
-  res.send("✅ API ProjetoNotaDez — ONLINE (Railway)!");
+    res.send("✅ API ProjetoNotaDez — módulo Rosini ONLINE!");
 });
 
-const PORT = process.env.PORT || 3000;
+// ❌ Removido app.listen, pois Vercel gerencia a porta automaticamente
 
-app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
-});
+// ✅ Exporta o app para Vercel
+module.exports = app;
