@@ -34,6 +34,10 @@ app.get("/", (req, res) => {
     res.send("API está funcionando!");
 });
 
+// Ignorar requisições para favicon.ico
+app.get('/favicon.ico', (req, res) => res.status(204).end());
+
+
 if (process.env.RAILWAY_ENVIRONMENT) {
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {
