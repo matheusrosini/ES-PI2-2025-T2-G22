@@ -210,3 +210,11 @@ input, select {
   from { opacity: 0; transform: translateY(-5px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+footer {
+  position: fixed;
+  bottom: 10px;
+  right: 20px;
+  font-size: 13px;
+  color: #555;
+}
