@@ -1,59 +1,61 @@
-// Feito por Leonardo e Matheus Rosini
+const db = require('../db');
 
-const db = require('../config/db');
-
-// Buscar todas as turmas
-exports.getAllTurmas = async (req, res) => {
-  try {
-    const [rows] = await db.query('SELECT * FROM turma');
-    res.json(rows);
-  } catch (error) {
-    res.status(500).json({ message: 'Erro ao buscar turmas', error });
-  }
+// GET /turma
+exports.getAllTurmas = (req, res) => {
+  const sql = `
+    SELECT t.*, d.nome AS disciplina_nome
+    FROM turma t
+    JOIN disciplina d ON d.id = t.disciplina_id
+  `;
+  db.query(sql, (err, result) => {
+    if (err) return res.status(500).json(err);
+    res.json(result);
+  });
 };
 
-// Buscar uma turma pelo ID
-exports.getTurmaById = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const [rows] = await db.query('SELECT * FROM turma WHERE id = ?', [id]);
-    if (rows.length === 0) return res.status(404).json({ message: 'Turma não encontrada' });
-    res.json(rows[0]);
-  } catch (error) {
-    res.status(500).json({ message: 'Erro ao buscar turma', error });
-  }
+// GET /turma/:id
+exports.getTurmaById = (req, res) => {
+  db.query("SELECT * FROM turma WHERE id = ?", [req.params.id], (err, result) => {
+    if (err) return res.status(500).json(err);
+    res.json(result[0]);
+  });
 };
 
-// Criar uma nova turma
-exports.createTurma = async (req, res) => {
-  try {
-    const { nome, ano, semestre } = req.body;
-    await db.query('INSERT INTO turma (nome, ano, semestre) VALUES (?, ?, ?)', [nome, ano, semestre]);
-    res.status(201).json({ message: 'Turma criada com sucesso!' });
-  } catch (error) {
-    res.status(500).json({ message: 'Erro ao criar turma', error });
-  }
+// POST /turma
+exports.createTurma = (req, res) => {
+  const { nome, codigo, periodo, disciplina_id } = req.body;
+
+  const sql = `
+    INSERT INTO turma (nome, codigo, periodo, disciplina_id)
+    VALUES (?, ?, ?, ?)
+  `;
+
+  db.query(sql, [nome, codigo, periodo, disciplina_id], (err, result) => {
+    if (err) return res.status(500).json(err);
+
+    res.json({ id: result.insertId, message: "Turma criada." });
+  });
 };
 
-// Atualizar turma
-exports.updateTurma = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { nome, ano, semestre } = req.body;
-    await db.query('UPDATE turma SET nome=?, ano=?, semestre=? WHERE id=?', [nome, ano, semestre, id]);
-    res.json({ message: 'Turma atualizada com sucesso!' });
-  } catch (error) {
-    res.status(500).json({ message: 'Erro ao atualizar turma', error });
-  }
+// PUT /turma/:id
+exports.updateTurma = (req, res) => {
+  const { nome, codigo, periodo, disciplina_id } = req.body;
+
+  const sql = `
+    UPDATE turma SET nome=?, codigo=?, periodo=?, disciplina_id=?
+    WHERE id=?
+  `;
+
+  db.query(sql, [nome, codigo, periodo, disciplina_id, req.params.id], (err) => {
+    if (err) return res.status(500).json(err);
+    res.json({ message: "Turma atualizada." });
+  });
 };
 
-// Deletar turma
-exports.deleteTurma = async (req, res) => {
-  try {
-    const { id } = req.params;
-    await db.query('DELETE FROM turma WHERE id=?', [id]);
-    res.json({ message: 'Turma removida com sucesso!' });
-  } catch (error) {
-    res.status(500).json({ message: 'Erro ao remover turma', error });
-  }
+// DELETE /turma/:id
+exports.deleteTurma = (req, res) => {
+  db.query("DELETE FROM turma WHERE id=?", [req.params.id], (err) => {
+    if (err) return res.status(500).json(err);
+    res.json({ message: "Turma excluída." });
+  });
 };
