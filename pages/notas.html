@@ -1,135 +1,139 @@
+<!-- Matheus Henrique Portugal Narducci -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>NotaDez — Lançamento de Notas</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lançamento de Notas - NotaDez</title>
 
-  <!-- CSS -->
-  <link rel="stylesheet" href="styles/notas.css">
-  <!-- Ícones (lucide) -->
-  <script src="https://unpkg.com/lucide@latest" defer></script>
+    <!-- CSS -->
+    <link rel="stylesheet" href="styles/notas.css">
+
+    <!-- Ícones -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
+
 <body>
-  <div class="sidebar">
-    <h1>NotaDez</h1>
-    <nav>
-      <ul>
-        <li><a href="dashboard.html"><i data-lucide="layout-dashboard"></i> Dashboard</a></li>
-        <li><a href="instituicoes.html"><i data-lucide="school"></i> Instituições</a></li>
-        <li><a href="disciplinas.html" class="active"><i data-lucide="book-open"></i> Disciplinas</a></li>
-        <li><a href="turmas.html"><i data-lucide="users"></i> Turmas</a></li>
-        <li><a href="notas.html"><i data-lucide="pencil"></i> Notas</a></li>
-        <li><a href="index.html"><i data-lucide="log-out"></i> Sair</a></li>
-      </ul>
-    </nav>
+
+    <!-- ===== Sidebar ===== -->
+    <div class="sidebar">
+        <h1>NotaDez</h1>
+
+        <nav>
+            <ul>
+                  <li><a href="dashboard.html"><i data-lucide="layout-dashboard"></i> Dashboard</a></li>
+                  <li><a href="instituicoes.html"><i data-lucide="school"></i> Instituições</a></li>
+                  <li><a href="disciplinas.html"><i data-lucide="book-open"></i> Disciplinas</a></li>
+                  <li><a href="turmas.html"><i data-lucide="users"></i> Turmas</a></li>
+                  <li><a href="notas.html"><i data-lucide="pencil"></i> Notas</a></li>
+                  <li><a href="index.html"><i data-lucide="log-out"></i> Sair</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- ===== Conteúdo Principal ===== -->
+    <main class="main-content">
+
+        <h2><i data-lucide="clipboard-list"></i> Lançamento de Notas</h2>
+
+        <!-- ===== Seleção de disciplina e turma ===== -->
+        <section class="form-section">
+            <h3>Selecione a disciplina e a turma</h3>
+
+            <form>
+                <select required>
+                    <option value="">Selecione a disciplina</option>
+                </select>
+
+                <select required>
+                    <option value="">Selecione a turma</option>
+                </select>
+
+                <button type="button">Carregar alunos</button>
+            </form>
+        </section>
+
+         <div class="formula-container">
+    <label for="formulaMedia">Fórmula da Média:</label>
+    <input type="text" id="formulaMedia" value="(P1 + P2 + P3) / 3">
+    <small>Exemplo: (P1 + P2 + P3) / 3</small>
   </div>
 
-  <main class="main-content">
-    <h2>Lançamento de Notas</h2>
+        <!-- ===== Tabela de notas ===== -->
+        <section class="list-section">
+            <h3><i data-lucide="list"></i> Notas Lançadas</h3>
 
-    <section class="form-section">
-      <h3>Selecione Instituição, Disciplina e Turma</h3>
-      <form id="filtroForm" onsubmit="return false;">
-        <div class="linha-filtros">
-          <div class="campo">
-            <label for="selectInstituicao">Instituição</label>
-            <select id="selectInstituicao"><option value="">Selecione a instituição</option></select>
-          </div>
-          <div class="campo">
-            <label for="selectDisciplina">Disciplina</label>
-            <select id="selectDisciplina"><option value="">Selecione a disciplina</option></select>
-          </div>
-          <div class="campo">
-            <label for="selectTurma">Turma</label>
-            <select id="selectTurma"><option value="">Selecione a turma</option></select>
-          </div>
-        </div>
-        <div class="linha-botao">
-          <button id="btnCarregarAlunos" type="button" class="btn">Carregar alunos</button>
-        </div>
-      </form>
-    </section>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Aluno</th>
+                        <th>P1</th>
+                        <th>P2</th>
+                        <th>P3</th>
+                        <th>Média</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Exemplo de aluno</td>
+                        <td><input type="number" step="0.01" min="0" max="10"></td>
+                        <td><input type="number" step="0.01" min="0" max="10"></td>
+                        <td><input type="number" step="0.01" min="0" max="10"></td>
+                        <td>—</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
 
-    <div class="formula-container">
-      <label for="formulaMedia">Fórmula da Média</label>
-      <input id="formulaMedia" type="text" placeholder="Ex: (P1 + P2 + P3) / 3" />
-      <small>Edite a fórmula se desejar. Use apenas siglas dos componentes.</small>
-    </div>
-
-    <!-- Container para controles extras (gerador pelo CSS/JS assume que existe) -->
-    <div id="notasExtras" class="extras">
-      <!-- JS irá preencher: Gerenciar Componentes, Modo de Edição, seletor de componente, toggle ajustar, export JSON -->
-    </div>
-
-    <!-- Tabela de notas -->
-    <section class="list-section">
-      <h3>Notas Lançadas</h3>
-      <div id="tableWrapper"></div>
-      <div id="nenhumaTabela" class="muted">Nenhuma tabela carregada. Selecione instituição, disciplina e turma.</div>
-    </section>
-
-    <div class="button-group">
-      <button id="btnSalvarNotas" class="btn save">Salvar Notas</button>
-      <button id="btnExportCsv" class="btn export">Exportar CSV</button>
-    </div>
-
-    <!-- Painel de Auditoria (inicialmente oculto) -->
-    <section id="painelAuditoria" class="auditoria oculto">
-      <h4>Painel de Auditoria</h4>
-      <ul id="listaAuditoria" class="lista-auditoria"></ul>
-    </section>
-
-  </main>
-
-  <footer>
-    © 2025 NotaDez - Todos os direitos reservados
-  </footer>
-
-  <!-- Modal para Gerenciar Componentes -->
-  <div id="compModal" class="modal oculto" aria-hidden="true">
-    <div class="modal-content">
-      <header class="modal-header">
-        <h3>Gerenciador de Componentes</h3>
-        <button id="closeCompModal" class="btn small">Fechar</button>
-      </header>
-
-      <div class="modal-body">
-        <div class="comp-form">
-          <input id="compNome" placeholder="Nome (ex: Prova 1)" />
-          <input id="compSigla" placeholder="Sigla (ex: P1)" />
-          <input id="compDesc" placeholder="Descrição (opcional)" />
-          <button id="btnAddComp" class="btn">Adicionar</button>
+        <div class="button-group">
+            <button class="save">Salvar Notas</button>
+            <button class="export">Exportar CSV</button>
         </div>
 
-        <table id="compTable" class="comp-table">
-          <thead><tr><th>Sigla</th><th>Nome</th><th>Descrição</th><th>Ações</th></tr></thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
+    </main>
+    <script>
+  lucide.createIcons();
 
-  <!-- Modal Universal -->
-<div id="appModal" class="modal oculto" aria-hidden="true">
-  <div class="modal-content" id="appModalContent">
-    <h3 id="appModalTitulo">Título</h3>
+  // Seleciona todos os campos de nota
+  const notasInputs = document.querySelectorAll('tbody input[type="number"]');
 
-    <p id="appModalMensagem"></p>
+  // Função para calcular média de uma linha
+  function calcularMedia(linha) {
+    const notas = linha.querySelectorAll('input[type="number"]');
+    let soma = 0;
+    let quantidade = 0;
 
-    <!-- Campo somente quando for prompt -->
-    <input id="appModalInput" class="oculto" type="text">
+    notas.forEach(input => {
+      const valor = parseFloat(input.value);
+      if (!isNaN(valor)) {
+        soma += valor;
+        quantidade++;
+      }
+    });
 
-    <div class="modal-buttons">
-      <button id="appModalCancel" class="btn cancel oculto">Cancelar</button>
-      <button id="appModalOk" class="btn ok">OK</button>
-    </div>
-  </div>
-</div>
+    const mediaCell = linha.querySelector('td:last-child');
+    if (quantidade > 0) {
+      const media = soma / quantidade;
+      mediaCell.textContent = media.toFixed(2);
+    } else {
+      mediaCell.textContent = '—';
+    }
+  }
 
-  
+  // Adiciona evento para recalcular média ao digitar
+  notasInputs.forEach(input => {
+    input.addEventListener('input', () => {
+      const linha = input.closest('tr');
+      calcularMedia(linha);
+    });
+  });
 
-  <!-- JS -->
-  <script type="module" src="scripts/notas.js"></script>
+  // (opcional) recalcular todas ao carregar a página
+  document.querySelectorAll('tbody tr').forEach(tr => calcularMedia(tr));
+</script>
+
+    
+
+
 </body>
 </html>
