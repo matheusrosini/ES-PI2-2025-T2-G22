@@ -3,6 +3,9 @@
 const express = require("express");
 const router = express.Router();
 const notaController = require("../controllers/notaController");
+const { requireAuth } = require('../middlewares/authmiddleware');
+
+router.use(requireAuth);
 
 // LISTAR alunos + componentes + notas da turma
 router.get(

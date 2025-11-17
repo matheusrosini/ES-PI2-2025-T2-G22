@@ -3,6 +3,9 @@
 const express = require("express");
 const router = express.Router();
 const controller = require("../controllers/instituicaoController");
+const { requireAuth } = require('../middlewares/authmiddleware');
+
+router.use(requireAuth);
 
 // Rotas de instituições
 router.get("/", controller.getAllInstituicoes);
