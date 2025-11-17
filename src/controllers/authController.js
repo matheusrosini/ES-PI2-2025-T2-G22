@@ -80,11 +80,12 @@ exports.login = async (req, res) => {
     const row = result.rows[0];
 
     const user = {
-      id: row[0],
-      nome: row[1],
-      email: row[2],
-      senhaHash: row[3]
+      id: row.ID,
+      nome: row.NOME,
+      email: row.EMAIL,
+      senhaHash: row.SENHA
     };
+
 
     const validPassword = await bcrypt.compare(senha, user.senhaHash);
     if (!validPassword) {
