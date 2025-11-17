@@ -1,41 +1,35 @@
-// Ativa os ícones Lucide (se existirem)
-if (window.lucide && lucide.createIcons) {
-  lucide.createIcons();
+import { addInstituicao, getInstituicoes } from "./api.js";
+
+const formInstituicao = document.getElementById("form-instituicao");
+
+formInstituicao.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const [nomeInput, cursoInput] = formInstituicao.querySelectorAll("input");
+  const nome = nomeInput.value.trim();
+  const curso = cursoInput.value.trim();
+
+  if (!nome || !curso) return alert("Preencha todos os campos!");
+
+  try {
+    const res = await addInstituicao({ nome, curso });
+    alert("Instituição adicionada com sucesso!");
+    formInstituicao.reset();
+    carregarInstituicoes();
+  } catch (err) {
+    console.error(err);
+    alert("Erro ao adicionar instituição.");
+  }
+});
+
+async function carregarInstituicoes() {
+  try {
+    const instituicoes = await getInstituicoes();
+    console.log("Instituições:", instituicoes);
+    // Aqui você pode renderizar na tabela do dashboard
+  } catch (err) {
+    console.error("Erro ao carregar instituições:", err);
+  }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  const formInstituicao = document.getElementById('form-instituicao');
-  const tabela = document.querySelector('.list-section tbody');
-
-  // 🟢 Adiciona nova instituição
-  formInstituicao.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const input = formInstituicao.querySelector('input');
-    const nome = input.value.trim();
-
-    if (!nome) {
-      alert('Digite o nome da instituição!');
-      return;
-    }
-
-    const novaLinha = document.createElement('tr');
-    novaLinha.innerHTML = `
-      <td>${nome}</td>
-      <td>
-        <button class="edit">Editar</button>
-        <button class="delete">Excluir</button>
-      </td>
-    `;
-    tabela.appendChild(novaLinha);
-    formInstituicao.reset();
-  });
-
-  // 🧨 Delegação de eventos para excluir (funciona para linhas novas e antigas)
-  tabela.addEventListener('click', (e) => {
-    if (e.target.classList.contains('delete')) {
-      if (confirm('Deseja realmente excluir esta instituição?')) {
-        e.target.closest('tr').remove();
-      }
-    }
-  });
-});
+// Inicializar
+carregarInstituicoes();
