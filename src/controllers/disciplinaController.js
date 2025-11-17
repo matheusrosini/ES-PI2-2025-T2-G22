@@ -21,7 +21,12 @@ exports.getAllDisciplinas = async (req, res) => {
     const usuario_id = req.user.id;
 
     const result = await db.query(
-      `SELECT d.ID, d.NOME, d.SIGLA, d.CODIGO, d.PERIODO,
+      `SELECT d.ID,
+       d.NOME, 
+       d.SIGLA, 
+       d.CODIGO, 
+       d.PERIODO,
+       d.INSTITUICAO_ID,
               i.NOME AS INSTITUICAO
        FROM DISCIPLINA d
        JOIN INSTITUICAO i ON d.INSTITUICAO_ID = i.ID

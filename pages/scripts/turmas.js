@@ -30,8 +30,8 @@ if (window.lucide && lucide.createIcons) lucide.createIcons();
 // helpers
 function showAlert(msg) { alert(msg); }
 function escapeHtml(s){ if (s == null) return ""; return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;"); }
-function openModal() { modalTurma.classList.add("show"); }
-function closeModal() { modalTurma.classList.remove("show"); }
+function openModal() { modalTurma.classList.add("open"); }
+function closeModal() { modalTurma.classList.remove("open"); }
 
 // load institutions
 async function carregarInstituicoes() {
