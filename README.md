@@ -24,13 +24,11 @@ O sistema também conta com autenticação via JWT, recuperação de senha por e
 ---
 
 ## 👥 Equipe — ES-PI2-2025-T2-G22
-Leonardo Dionel Lima Silva - RA: 25010092
----
-Luis Felipe Moura - RA: 25010218
----
-Matheus Henrique Portugal Narducci - RA: 25008976
----
-Matheus Rosini Borges de Salles - RA: 25015832
+- Leonardo Dionel Lima Silva - RA: 25010092
+- Luis Felipe Moura - RA: 25010218
+- Matheus Henrique Portugal Narducci - RA: 25008976
+- Matheus Rosini Borges de Salles - RA: 25015832
+
 ---
 
 ## 🛠 Tecnologias Utilizadas
@@ -57,28 +55,28 @@ Matheus Rosini Borges de Salles - RA: 25015832
 ---
 
 ## 📁 Estrutura do Projeto
-
+```
 ES-PI2-2025-T2-G22/
-├── pages/ # Interface frontend do sistema
-│ ├── alunos.html # Tela de gerenciamento de alunos
-│ ├── cursos.html # Tela de gerenciamento de cursos
-│ ├── disciplinas.html # Tela de disciplinas
-│ ├── index.html # Dashboard inicial
-│ ├── login.html # Tela de login
-│ ├── notas.html # Lançamento e consulta de notas
-│ ├── turma.html # Gerenciamento de turmas
-│ ├── usuarios.html # Gestão de contas de usuários
-│ ├── reset-password.html # Tela de redefinição de senha
+├── pages/            # Interface frontend do sistema
+│ ├── alunos.html     # Tela de gerenciamento de alunos
+│ ├── cursos.html     # Tela de gerenciamento de cursos
+│ ├── disciplinas.html   # Tela de disciplinas
+│ ├── index.html      # Dashboard inicial
+│ ├── login.html      # Tela de login
+│ ├── notas.html      # Lançamento e consulta de notas
+│ ├── turma.html      # Gerenciamento de turmas
+│ ├── usuarios.html   # Gestão de contas de usuários
+│ ├── reset-password.html     # Tela de redefinição de senha
 │ │
-│ ├── scripts/ # Lógica frontend (JS)
-│ │ ├── alunos.js # Funções e requisições de alunos
-│ │ ├── cursos.js # Funções e requisições de cursos
-│ │ ├── disciplinas.js # Funções de disciplinas
-│ │ ├── login.js # Autenticação no frontend
-│ │ ├── notas.js # Lançamento e edição de notas
-│ │ ├── turma.js # Controle de turmas
-│ │ ├── usuarios.js # Cadastro e edição de usuários
-│ │ └── reset-password.js # Requisição de redefinição por e-mail
+│ ├── scripts/     # Lógica frontend (JS)
+│ │ ├── alunos.js   # Funções e requisições de alunos
+│ │ ├── cursos.js   # Funções e requisições de cursos
+│ │ ├── disciplinas.js  # Funções de disciplinas
+│ │ ├── login.js    # Autenticação no frontend
+│ │ ├── notas.js    # Lançamento e edição de notas
+│ │ ├── turma.js    # Controle de turmas
+│ │ ├── usuarios.js    # Cadastro e edição de usuários
+│ │ └── reset-password.js    # Requisição de redefinição por e-mail
 │ │
 │ └── styles/ # Estilização das telas (CSS)
 │ ├── alunos.css
@@ -124,7 +122,7 @@ ES-PI2-2025-T2-G22/
 │
 ├── package.json # Dependências e scripts do projeto
 └── README.md # Documentação principal 
-
+```
 ---
 
 ## ⚙ Pré-requisitos
