@@ -1,9 +1,24 @@
-import {
-  addInstituicao,
-  getInstituicoes,
-  deleteInstituicao,
-  updateInstituicao
-} from "./api.js";
+import { apiGet, apiPost, apiPut, apiDelete } from "./api.js";
+
+const API_PATH = "/instituicoes";
+
+// Wrappers corretos
+async function addInstituicao(data) {
+  return apiPost(API_PATH, data);
+}
+
+async function getInstituicoes() {
+  return apiGet(API_PATH);
+}
+
+async function deleteInstituicao(id) {
+  return apiDelete(`${API_PATH}/${id}`);
+}
+
+async function updateInstituicao(id, data) {
+  return apiPut(`${API_PATH}/${id}`, data);
+}
+
 
 const formInstituicao = document.getElementById("form-instituicao");
 

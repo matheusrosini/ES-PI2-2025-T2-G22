@@ -11,7 +11,14 @@ module.exports = {
                 { usuario_id: userId }
             );
 
-            res.json(result.rows || []);
+            const rows = result.rows.map(r => ({
+                id: r.ID,
+                nome: r.NOME,
+                usuario_id: r.USUARIO_ID
+            }));
+
+            res.json(rows);
+
         } catch (error) {
             console.error("Erro ao listar instituições:", error);
             res.status(500).json({ message: "Erro ao listar instituições", error });
