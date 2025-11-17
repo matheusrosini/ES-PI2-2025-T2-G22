@@ -52,7 +52,18 @@ exports.login = async (req, res) => {
       expiresIn: '7d'
     });
 
-    res.json({ token, user: { id: user.id, nome: user.nome, email: user.email } });
+    // Configurar cookie
+    const isProd = process.env.NODE_ENV === 'production';
+    res.cookie('jwt', token, {
+      httpOnly: true,
+      secure: isProd,                       // true em produção (HTTPS)
+      sameSite: isProd ? 'none' : 'lax',    // 'none' se frontend em domínio diferente; em dev 'lax' funciona
+      maxAge: 7 * 24 * 60 * 60 * 1000       // 7 dias
+    });
+
+    // Retorna info do usuário (sem token no body, opcional retornar também)
+    res.json({ user: { id: user.id, nome: user.nome, email: user.email } });
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Erro no login', error: err.message });

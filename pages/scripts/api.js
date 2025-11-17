@@ -52,14 +52,14 @@ export async function register(nome, email, senha, telefone = "") {
     return apiPost('/auth/register', { nome, email, telefone, senha });
 }
 
-// ==== Funções específicas para entidades (NOVO) ====
-export async function getInstituicoes() { return apiGet('/instituicao'); }
-export async function addInstituicao(data) { return apiPost('/instituicao', data); }
+// Funções específicas para entidades
+export async function getInstituicoes() { return apiGet('/instituicoes'); }
+export async function addInstituicao(data) { return apiPost('/instituicoes', data); }
 
-export async function getDisciplinas() { return apiGet('/disciplina'); }
-export async function addDisciplina(data) { return apiPost('/disciplina', data); }
+export async function getDisciplinas() { return apiGet('/disciplinas'); }
+export async function addDisciplina(data) { return apiPost('/disciplinas', data); }
 
-export async function getTurmas() { return apiGet('/turma'); }
-export async function addTurma(data) { return apiPost('/turma', data); }
-export async function updateTurma(id, data) { return apiPut(`/turma/${id}`, data); }
-export async function deleteTurma(id) { return apiDelete(`/turma/${id}`); }
+export async function getTurmas() { return apiGet('/turmas'); }
+export async function addTurma(data) { return apiPost('/turmas', data); }
+export async function updateTurma(id, data) { return apiPut(`/turmas/${id}`, data); }
+export async function deleteTurma(id) { return apiDelete(`/turmas/${id}`); }

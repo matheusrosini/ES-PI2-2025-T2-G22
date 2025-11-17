@@ -1,6 +1,6 @@
-// ===============================
+// Feito por Leonardo e Matheus Rosini
+
 //  TURMAS - INTEGRAÇÃO COM API
-// ===============================
 
 import { apiGet, apiPost, apiPut, apiDelete } from "./api.js";
 
@@ -12,9 +12,8 @@ let editingTurmaId = null;
   lucide.createIcons();
 }
 
-/* ========================
-    CARREGAR TURMAS
-======================== */
+// CARREGAR TURMAS
+
 async function carregarTurmas() {
   try {
     turmas = await apiGet("/turma");
@@ -25,9 +24,7 @@ async function carregarTurmas() {
   }
 }
 
-/* ========================
-      RENDER DA TABELA
-======================== */
+// RENDER DA TABELA
 function renderTurmas() {
   tabelaTurmasBody.innerHTML = "";
 

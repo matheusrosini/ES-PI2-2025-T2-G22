@@ -12,16 +12,19 @@ const alunoRoutes = require("./routes/alunoRoutes");
 const notaRoutes = require("./routes/notaRoutes");
 const componenteNotaRoutes = require("./routes/componenteNotaRoutes");
 const authRoutes = require("./routes/authRoutes");
+const cookieParser = require('cookie-parser');
 
 const app = express();
 
 app.use(cors({
-    origin: "*",
+    origin: process.env.FRONT_URL,
     methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"]
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true
 }));
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.use("/api/usuarios", userRoutes);
 app.use("/api/instituicoes", instituicaoRoutes);
