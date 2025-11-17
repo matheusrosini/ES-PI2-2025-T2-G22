@@ -1,29 +1,29 @@
-// config/db.js
-const oracledb = require("oracledb");
-require("dotenv").config();
+import oracledb from "oracledb";
+import dotenv from "dotenv";
 
-try {
-  oracledb.initOracleClient({
-    libDir: process.env.ORACLE_CLIENT_PATH,
-  });
-  console.log("Oracle Client inicializado.");
-} catch (err) {
-  console.error("Erro ao iniciar Oracle Client:", err);
-}
+dotenv.config();
 
 oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
 
-module.exports = {
-  getConnection: async () => {
+// Inicializa o cliente Oracle
+try {
+    oracledb.initOracleClient({ libDir: process.env.ORACLE_LIB_PATH });
+    console.log("Oracle Client inicializado.");
+} catch (err) {
+    console.error("Erro ao inicializar Oracle Client:", err);
+}
+
+export async function getConnection() {
     try {
-      return await oracledb.getConnection({
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-        connectString: process.env.DB_CONNECT
-      });
-    } catch (err) {
-      console.error("Erro ao obter conexão Oracle:", err);
-      throw err;
+        const connection = await oracledb.getConnection({
+            user: process.env.ORACLE_USER,
+            password: process.env.ORACLE_PASSWORD,
+            connectString: process.env.ORACLE_CONNECTION_STRING
+        });
+
+        return connection;
+    } catch (error) {
+        console.error("Erro ao conectar ao OracleDB:", error);
+        throw error;
     }
-  }
-};
+}
