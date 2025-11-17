@@ -53,29 +53,31 @@ Matheus Rosini Borges de Salles - RA: 25015832
 
 ---
 
-## 📁 Estrutura Completa do Projeto
+## 📁 Estrutura do Projeto
 
 ES-PI2-2025-T2-G22/
-├── pages/
-│ ├── alunos.html
-│ ├── cursos.html
-│ ├── disciplinas.html
-│ ├── index.html
-│ ├── login.html
-│ ├── notas.html
-│ ├── turma.html
-│ ├── usuarios.html
-│ ├── reset-password.html
-│ ├── scripts/
-│ │ ├── alunos.js
-│ │ ├── cursos.js
-│ │ ├── disciplinas.js
-│ │ ├── login.js
-│ │ ├── notas.js
-│ │ ├── turma.js
-│ │ ├── usuarios.js
-│ │ └── reset-password.js
-│ └── styles/
+├── pages/ # Interface frontend do sistema
+│ ├── alunos.html # Tela de gerenciamento de alunos
+│ ├── cursos.html # Tela de gerenciamento de cursos
+│ ├── disciplinas.html # Tela de disciplinas
+│ ├── index.html # Dashboard inicial
+│ ├── login.html # Tela de login
+│ ├── notas.html # Lançamento e consulta de notas
+│ ├── turma.html # Gerenciamento de turmas
+│ ├── usuarios.html # Gestão de contas de usuários
+│ ├── reset-password.html # Tela de redefinição de senha
+│ │
+│ ├── scripts/ # Lógica frontend (JS)
+│ │ ├── alunos.js # Funções e requisições de alunos
+│ │ ├── cursos.js # Funções e requisições de cursos
+│ │ ├── disciplinas.js # Funções de disciplinas
+│ │ ├── login.js # Autenticação no frontend
+│ │ ├── notas.js # Lançamento e edição de notas
+│ │ ├── turma.js # Controle de turmas
+│ │ ├── usuarios.js # Cadastro e edição de usuários
+│ │ └── reset-password.js # Requisição de redefinição por e-mail
+│ │
+│ └── styles/ # Estilização das telas (CSS)
 │ ├── alunos.css
 │ ├── cursos.css
 │ ├── disciplinas.css
@@ -85,34 +87,40 @@ ES-PI2-2025-T2-G22/
 │ ├── usuarios.css
 │ └── reset-password.css
 │
-├── src/
-│ ├── server.js
-│ ├── config/
-│ │ ├── db.js
-│ │ └── email.js
-│ ├── controllers/
-│ │ ├── alunoController.js
-│ │ ├── cursoController.js
-│ │ ├── disciplinaController.js
-│ │ ├── notaController.js
-│ │ ├── turmaController.js
-│ │ └── usuarioController.js
-│ ├── middlewares/
-│ │ ├── authmiddleware.js
-│ │ └── uploadCSV.js
-│ ├── routes/
+├── src/ # Código do backend
+│ ├── server.js # Inicialização do servidor Express
+│ │
+│ ├── config/ # Configurações principais
+│ │ ├── db.js # Conexão com Oracle usando Oracle Wallet
+│ │ └── email.js # Serviço SMTP para recuperação de senha
+│ │
+│ ├── controllers/ # Regras de negócio e lógica das rotas
+│ │ ├── alunoController.js # CRUD de alunos
+│ │ ├── cursoController.js # CRUD de cursos
+│ │ ├── disciplinaController.js # CRUD de disciplinas
+│ │ ├── notaController.js # Lançamento e edição de notas
+│ │ ├── turmaController.js # Controle de turmas
+│ │ └── usuarioController.js # Autenticação e usuários
+│ │
+│ ├── middlewares/ # Middlewares usados no backend
+│ │ ├── authmiddleware.js # Verificação de token JWT
+│ │ └── uploadCSV.js # Upload e leitura de planilhas CSV
+│ │
+│ ├── routes/ # Rotas organizadas por módulo
 │ │ ├── alunoRoutes.js
 │ │ ├── cursoRoutes.js
 │ │ ├── disciplinaRoutes.js
 │ │ ├── notaRoutes.js
 │ │ ├── turmaRoutes.js
 │ │ └── usuarioRoutes.js
+│ │
 │ └── utils/
-│ └── mailer.js
+│ └── mailer.js # Função genérica para envio de e-mails
 │
-├── Wallet_MEUDB/ # Oracle Wallet
-├── package.json
-└── README.md
+├── Wallet_MEUDB/ # Oracle Wallet para conexão segura ao banco
+│
+├── package.json # Dependências e scripts do projeto
+└── README.md # Documentação principal 
 
 ---
 
