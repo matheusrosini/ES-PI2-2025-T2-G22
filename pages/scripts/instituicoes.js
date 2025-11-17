@@ -1,11 +1,13 @@
-// Ativa os ícones Lucide
-lucide.createIcons();
+// Ativa os ícones Lucide (se existirem)
+if (window.lucide && lucide.createIcons) {
+  lucide.createIcons();
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   const formInstituicao = document.getElementById('form-instituicao');
   const tabela = document.querySelector('.list-section tbody');
 
-  // Adiciona nova instituição na tabela
+  // 🟢 Adiciona nova instituição
   formInstituicao.addEventListener('submit', (e) => {
     e.preventDefault();
     const input = formInstituicao.querySelector('input');
@@ -25,24 +27,15 @@ document.addEventListener('DOMContentLoaded', () => {
       </td>
     `;
     tabela.appendChild(novaLinha);
-
-    // Evento para o botão de exclusão
-    novaLinha.querySelector('.delete').addEventListener('click', () => {
-      if (confirm('Deseja realmente excluir esta instituição?')) {
-        novaLinha.remove();
-      }
-    });
-
     formInstituicao.reset();
   });
 
-  // Eventos para botões de exclusão existentes
-  const deleteButtons = document.querySelectorAll('.delete');
-  deleteButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
+  // 🧨 Delegação de eventos para excluir (funciona para linhas novas e antigas)
+  tabela.addEventListener('click', (e) => {
+    if (e.target.classList.contains('delete')) {
       if (confirm('Deseja realmente excluir esta instituição?')) {
-        btn.closest('tr').remove();
+        e.target.closest('tr').remove();
       }
-    });
+    }
   });
 });

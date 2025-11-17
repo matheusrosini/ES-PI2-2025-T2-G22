@@ -2,22 +2,21 @@
 //  TURMAS - INTEGRAÇÃO COM API
 // ===============================
 
-const API_URL = "http://localhost:3000/turma"; // ajuste se sua porta for outra
+import { apiGet, apiPost, apiPut, apiDelete } from "./api.js";
 
 let turmas = [];
 let editingTurmaId = null;
 
 /* ========================
-    CARREGA TURMAS DO BACK
+    CARREGAR TURMAS
 ======================== */
 async function carregarTurmas() {
   try {
-    const resp = await fetch(API_URL);
-    turmas = await resp.json();
+    turmas = await apiGet("/turma");
     renderTurmas();
   } catch (err) {
     console.error("Erro ao carregar turmas:", err);
-    showAlert("Erro ao conectar ao servidor.");
+    showAlert("Erro ao carregar turmas.");
   }
 }
 
@@ -72,7 +71,7 @@ function renderTurmas() {
 }
 
 /* ========================
-  CADASTRAR / EDITAR TURMA
+  SALVAR (CRIAR / EDITAR)
 ======================== */
 salvarTurmaBtn.addEventListener("click", async () => {
   const nome = document.getElementById("nomeTurma").value.trim();
@@ -89,23 +88,15 @@ salvarTurmaBtn.addEventListener("click", async () => {
     nome,
     codigo,
     periodo,
-    disciplina_id: disciplina
+    disciplina_id: disciplina,
   };
 
   try {
     if (editingTurmaId) {
-      await fetch(`${API_URL}/${editingTurmaId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+      await apiPut(`/turma/${editingTurmaId}`, data);
       showAlert("Turma atualizada.");
     } else {
-      await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+      await apiPost("/turma", data);
       showAlert("Turma cadastrada.");
     }
 
@@ -123,18 +114,18 @@ salvarTurmaBtn.addEventListener("click", async () => {
 ======================== */
 async function excluirTurma(id) {
   try {
-    await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+    await apiDelete(`/turma/${id}`);
     carregarTurmas();
   } catch (err) {
     console.error(err);
-    showAlert("Erro ao excluir.");
+    showAlert("Erro ao excluir turma.");
   }
 }
 
 /* ========================
       EDITAR TURMA
 ======================== */
-async function openEditTurma(id) {
+function openEditTurma(id) {
   const t = turmas.find((x) => x.id === id);
   if (!t) return showAlert("Turma não encontrada.");
 
@@ -150,21 +141,16 @@ async function openEditTurma(id) {
 }
 
 /* ========================
-      DETALHES / ALUNOS
+    DETALHES / ALUNOS
 ======================== */
-// mantém o seu código original
-// só tiramos o uso de turmas locais e buscamos via API
-
 async function openDetalhes(id) {
   try {
-    const resp = await fetch(`http://localhost:3000/aluno/turma/${id}`);
-    const alunos = await resp.json();
+    const alunos = await apiGet(`/aluno/turma/${id}`);
 
     detalhesTitle.textContent = "Alunos";
     renderAlunosModal({ alunos, id });
 
     openModal(modalDetalhes);
-
   } catch (err) {
     console.error(err);
     showAlert("Erro ao carregar alunos.");

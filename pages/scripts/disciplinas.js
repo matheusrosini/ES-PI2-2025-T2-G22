@@ -1,21 +1,24 @@
-// Ativa os ícones Lucide
-lucide.createIcons();
+// Ativa os ícones Lucide (se existirem)
+if (window.lucide && lucide.createIcons) {
+  lucide.createIcons();
+}
 
-// Função para lidar com exclusão de disciplinas
 document.addEventListener('DOMContentLoaded', () => {
-  const deleteButtons = document.querySelectorAll('.delete');
-  deleteButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      alert('Confirmação de exclusão enviada por e-mail.');
-    });
-  });
-
   const formDisciplina = document.getElementById('form-disciplina');
   const tabela = document.querySelector('.list-section tbody');
 
-  // Adiciona nova disciplina na tabela
+  // 🟢 Delegação de eventos para excluir (funciona para linhas existentes + novas)
+  tabela.addEventListener('click', (e) => {
+    if (e.target.classList.contains('delete')) {
+      alert('Confirmação de exclusão enviada por e-mail.');
+      e.target.closest('tr').remove();
+    }
+  });
+
+  // 🟢 Adiciona nova disciplina
   formDisciplina.addEventListener('submit', (e) => {
     e.preventDefault();
+
     const inputs = formDisciplina.querySelectorAll('input');
     const values = Array.from(inputs).map(i => i.value.trim());
 
@@ -35,13 +38,8 @@ document.addEventListener('DOMContentLoaded', () => {
         <button class="delete">Excluir</button>
       </td>
     `;
-    tabela.appendChild(novaLinha);
 
-    // Reaplica o evento de exclusão ao novo botão
-    novaLinha.querySelector('.delete').addEventListener('click', () => {
-      alert('Confirmação de exclusão enviada por e-mail.');
-      novaLinha.remove();
-    });
+    tabela.appendChild(novaLinha);
 
     formDisciplina.reset();
   });

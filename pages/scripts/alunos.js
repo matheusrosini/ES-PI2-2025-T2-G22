@@ -2,11 +2,24 @@
 const formCadastro = document.getElementById('form-cadastro');
 const tabela = document.getElementById('tabela-alunos').querySelector('tbody');
 
-// Adiciona evento de envio do formulário de cadastro
+// 🟢 Delegação de eventos: excluir aluno
+tabela.addEventListener('click', (e) => {
+  if (e.target.classList.contains('delete-btn')) {
+    e.target.closest('tr').remove();
+  }
+});
+
+// 🟢 Adiciona aluno manualmente
 formCadastro.addEventListener('submit', (e) => {
   e.preventDefault();
-  const matricula = document.getElementById('matricula').value;
-  const nome = document.getElementById('nome').value;
+
+  const matricula = document.getElementById('matricula').value.trim();
+  const nome = document.getElementById('nome').value.trim();
+
+  if (!matricula || !nome) {
+    alert("Preencha todos os campos!");
+    return;
+  }
 
   const novaLinha = document.createElement('tr');
   novaLinha.innerHTML = `
@@ -21,14 +34,7 @@ formCadastro.addEventListener('submit', (e) => {
   formCadastro.reset();
 });
 
-// Função para excluir aluno ao clicar em "Excluir"
-document.addEventListener('click', (e) => {
-  if (e.target.classList.contains('delete-btn')) {
-    e.target.closest('tr').remove();
-  }
-});
-
-// Importação de arquivos CSV ou JSON
+// 🟢 Importação de CSV e JSON
 const formImportar = document.getElementById('form-importar');
 
 formImportar.addEventListener('submit', (e) => {
@@ -42,11 +48,18 @@ formImportar.addEventListener('submit', (e) => {
 
   const leitor = new FileReader();
 
-  if (arquivo.name.endsWith('.csv')) {
-    leitor.onload = function(event) {
-      const linhas = event.target.result.split('\n');
+  leitor.onload = function(event) {
+    const dados = event.target.result;
+
+    // ---------------- CSV ----------------
+    if (arquivo.name.endsWith('.csv')) {
+      const linhas = dados.split('\n');
+
       linhas.forEach(linha => {
+        if (!linha.trim()) return; // ignora linha vazia
+
         const [matricula, nome] = linha.split(',');
+
         if (matricula && nome) {
           const novaLinha = document.createElement('tr');
           novaLinha.innerHTML = `
@@ -60,16 +73,26 @@ formImportar.addEventListener('submit', (e) => {
           tabela.appendChild(novaLinha);
         }
       });
-    };
-    leitor.readAsText(arquivo);
-  }
+    }
 
-  if (arquivo.name.endsWith('.json')) {
-    leitor.onload = function(event) {
-      const alunos = JSON.parse(event.target.result);
+    // ---------------- JSON ----------------
+    if (arquivo.name.endsWith('.json')) {
+      let alunos;
+
+      try {
+        alunos = JSON.parse(dados);
+      } catch (e) {
+        alert("Arquivo JSON inválido!");
+        return;
+      }
+
       alunos.forEach(a => {
-        const matricula = a.matricula || a.id || a.codigo || a.RA;
-        const nome = a.nome || a.fullName || a.completeName || a.name;
+        // Fallbacks para diferentes formatos de JSON
+        const matricula =
+          a.matricula || a.id || a.codigo || a.RA || null;
+
+        const nome =
+          a.nome || a.fullName || a.completeName || a.name || null;
 
         if (matricula && nome) {
           const novaLinha = document.createElement('tr');
@@ -84,9 +107,9 @@ formImportar.addEventListener('submit', (e) => {
           tabela.appendChild(novaLinha);
         }
       });
-    };
-    leitor.readAsText(arquivo);
-  }
+    }
+  };
 
+  leitor.readAsText(arquivo);
   formImportar.reset();
 });
