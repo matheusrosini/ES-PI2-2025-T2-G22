@@ -1,3 +1,5 @@
+// Feito por Leonardo
+
 import { apiGet, apiPost, apiPut, apiDelete } from "./api.js";
 
 const API_PATH = "/instituicoes";

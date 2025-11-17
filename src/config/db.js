@@ -1,12 +1,11 @@
-// src/config/db.js
-// Versão segura e compatível — exporta execute() e getConnection()
+// Feito por Leonardo
 
 const oracledb = require("oracledb");
 require("dotenv").config();
 
 oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
 
-// Tenta inicializar o Oracle Client / Wallet (mantém seu comportamento anterior)
+// Tentativa de inicializar Oracle Client / Wallet
 try {
   oracledb.initOracleClient({
     libDir: process.env.ORACLE_CLIENT_PATH,
@@ -17,29 +16,23 @@ try {
   console.warn("Oracle Client NÃO carregou. Usando modo Thin.");
 }
 
-// Conexão (mantive o connectString como estava)
-const connectString = "(description=" +
+// Conexão padrão
+const connectString =
+  "(description=" +
   "(address=(protocol=tcps)(port=1522)(host=adb.sa-saopaulo-1.oraclecloud.com))" +
   "(connect_data=(service_name=g2b205040796624_meudb_high.adb.oraclecloud.com))" +
   "(security=(ssl_server_dn_match=yes))" +
   ")";
 
-// Função para obter conexão (mantida para compatibilidade)
 async function getConnection() {
-  try {
-    const conn = await oracledb.getConnection({
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      connectString
-    });
-    return conn;
-  } catch (err) {
-    console.error("Erro ao conectar ao Oracle (getConnection):", err);
-    throw err;
-  }
+  return await oracledb.getConnection({
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    connectString
+  });
 }
 
-// Função executora simples e segura (a ser usada pelos controllers)
+// --------- EXECUTE (usado por instituições, usuários, etc) ----------
 async function execute(sql, params = {}, options = { autoCommit: true }) {
   let conn;
   try {
@@ -50,18 +43,18 @@ async function execute(sql, params = {}, options = { autoCommit: true }) {
     console.error("Erro em execute():", err);
     throw err;
   } finally {
-    if (conn) {
-      try {
-        await conn.close();
-      } catch (closeErr) {
-        console.error("Erro ao fechar conexão:", closeErr);
-      }
-    }
+    if (conn) await conn.close();
   }
 }
 
-// Exporta ambas as funções para máxima compatibilidade
+// --------- QUERY (compatível com controllers antigos) ----------
+async function query(sql, params = {}) {
+  return execute(sql, params, { autoCommit: false });
+}
+
+// Exporta tudo necessário
 module.exports = {
   getConnection,
-  execute
+  execute,
+  query
 };

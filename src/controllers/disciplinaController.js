@@ -15,9 +15,11 @@ exports.getAllDisciplinas = async (req, res) => {
 
     res.json(result.rows);
   } catch (error) {
+    console.error("ERRO AO BUSCAR DISCIPLINAS:", error);
     res.status(500).json({ message: 'Erro ao buscar disciplinas', error });
   }
 };
+
 
 // Buscar disciplina por ID
 exports.getDisciplinaById = async (req, res) => {

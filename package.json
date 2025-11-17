@@ -4,6 +4,7 @@
   "description": "Projeto NotaDez para o Projeto Integrado II",
   "main": "src/server.js",
   "scripts": {
+    "dev": "node --watch src/server.js",
     "start": "node src/server.js"
   },
   "repository": {

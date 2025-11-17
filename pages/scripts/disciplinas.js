@@ -1,15 +1,26 @@
-// scripts/disciplinas.js
-// Integração com API para disciplinas
+// Feito por Leonardo
 
 import {
-  getDisciplinas,
-  addDisciplina,
-  apiPut,
-  apiDelete,
   apiGet,
-  // se o seu api.js exporta getInstituicoes, ótimo; caso não, usaremos apiGet('/instituicoes')
-  getInstituicoes
+  apiPost,
+  apiPut,
+  apiDelete
 } from "./api.js";
+
+// Funções da API específicas
+async function getInstituicoes() {
+  return apiGet("/instituicoes");
+}
+
+async function getDisciplinas() {
+  return apiGet("/disciplinas");
+}
+
+async function addDisciplina(data) {
+  return apiPost("/disciplinas", data);
+}
+
+
 
 // Ativa Lucide (ícones)
 if (window.lucide && lucide.createIcons) lucide.createIcons();
@@ -25,10 +36,11 @@ const inputCodigo = document.getElementById("disc-codigo");
 const inputPeriodo = document.getElementById("disc-periodo");
 const selectInstituicao = document.getElementById("disc-instituicao");
 
-// fallback para funções de API que talvez não existam exatamente com este nome
+// 
 const fetchInstituicoes = (typeof getInstituicoes === "function")
   ? getInstituicoes
-  : (path => apiGet("/instituicoes"));
+  : () => apiGet("/instituicoes");
+
 
 // Carrega inicialmente
 document.addEventListener("DOMContentLoaded", () => {

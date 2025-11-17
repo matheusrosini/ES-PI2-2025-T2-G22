@@ -15,9 +15,13 @@ const authRoutes = require("./routes/authRoutes");
 const app = express();
 
 app.use(cors({
-    origin: process.env.FRONT_URL,
+    origin: [
+        process.env.FRONT_URL,
+        "http://localhost:5500"
+    ],
     credentials: true
 }));
+
 
 app.use(express.json());
 app.use(cookieParser());
