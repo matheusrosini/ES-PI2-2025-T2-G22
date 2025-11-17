@@ -13,7 +13,9 @@ body {
   height: 100vh;
 }
 
-/* ===== SIDEBAR ===== */
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
 .sidebar {
   width: 220px;
   background-color: #002b5c;
@@ -52,12 +54,13 @@ body {
   transition: background 0.3s;
 }
 
-.sidebar a:hover,
-.sidebar a.active {
+.sidebar a:hover {
   background-color: #004aad;
 }
 
-/* ===== DASHBOARD WRAPPER ===== */
+/* ============================================================
+   ÁREA PRINCIPAL (WRAPPER)
+   ============================================================ */
 .dashboard {
   flex: 1;
   padding: 40px;
@@ -65,7 +68,9 @@ body {
   overflow-y: auto;
 }
 
-/* ===== CONTAINERS ===== */
+/* ============================================================
+   CONTAINERS
+   ============================================================ */
 .container {
   background: #fff;
   padding: 25px;
@@ -78,14 +83,34 @@ body {
 .container h1,
 .container h2 {
   color: #004aad;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
 }
 
-/* ===== BOTÕES ===== */
-button {
+/* ============================================================
+   INPUTS / SELECTS
+   ============================================================ */
+.input {
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  width: 100%;
+}
+
+.input.small {
+  width: 180px;
+}
+
+.input.full {
+  width: 100%;
+}
+
+/* ============================================================
+   BOTÕES (PADRÃO DO DASHBOARD)
+   ============================================================ */
+.btn {
   background-color: #004aad;
   color: white;
   border: none;
@@ -96,37 +121,44 @@ button {
   transition: 0.3s;
 }
 
-button:hover {
+.btn:hover {
   background-color: #003b8e;
 }
 
-button.edit {
+.btn.small {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+.btn.ghost {
+  background: transparent;
+  color: #004aad;
+  border: 1px solid #004aad;
+}
+
+.btn.ghost:hover {
+  background: #e9f0ff;
+}
+
+.btn.secondary {
   background-color: #007bff;
 }
 
-button.edit:hover {
+.btn.secondary:hover {
   background-color: #0068d6;
 }
 
-button.delete {
+.btn.danger {
   background-color: #c0392b;
 }
 
-button.delete:hover {
+.btn.danger:hover {
   background-color: #962d22;
 }
 
-/* ===== INPUTS E SELECTS ===== */
-input,
-select {
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  width: 100%;
-  margin-bottom: 14px;
-}
-
-/* ===== TABELAS ===== */
+/* ============================================================
+   TABELAS
+   ============================================================ */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -148,7 +180,9 @@ tbody tr:hover {
   background-color: #f7faff;
 }
 
-/* ===== MODAL ===== */
+/* ============================================================
+   MODAIS
+   ============================================================ */
 .modal {
   display: none;
   position: fixed;
@@ -172,6 +206,10 @@ tbody tr:hover {
   width: 100%;
 }
 
+.mini-modal-content {
+  max-width: 450px;
+}
+
 .modal-header {
   display: flex;
   justify-content: space-between;
@@ -186,12 +224,13 @@ tbody tr:hover {
   cursor: pointer;
 }
 
-/* ===== ALERTA ===== */
+/* ============================================================
+   ALERTA
+   ============================================================ */
 .alert-box {
   display: none;
   position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
+  inset: 0;
   background: rgba(0,0,0,0.45);
   justify-content: center;
   align-items: center;
@@ -205,11 +244,29 @@ tbody tr:hover {
   text-align: center;
 }
 
-/* ===== RODAPÉ ===== */
+/* ============================================================
+   UTILITÁRIOS
+   ============================================================ */
+.muted {
+  color: #777;
+  font-size: 13px;
+}
+
+/* ============================================================
+   RODAPÉ
+   ============================================================ */
 footer {
   position: fixed;
   bottom: 10px;
   right: 20px;
   font-size: 13px;
   color: #555;
+}
+
+/* ============================================================
+   ANIMAÇÃO
+   ============================================================ */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
