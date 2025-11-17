@@ -7,7 +7,6 @@ const { requireAuth } = require('../middlewares/authmiddleware');
 
 router.use(requireAuth);
 
-// Rotas de instituições
 router.get("/", controller.getAllInstituicoes);
 router.post("/", controller.createInstituicao);
 router.get("/:id", controller.getInstituicaoById);

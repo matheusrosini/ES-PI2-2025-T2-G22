@@ -1,20 +1,29 @@
-import { addInstituicao, getInstituicoes } from "./api.js";
+import {
+  addInstituicao,
+  getInstituicoes,
+  deleteInstituicao,
+  updateInstituicao
+} from "./api.js";
 
 const formInstituicao = document.getElementById("form-instituicao");
 
-  if (window.lucide && lucide.createIcons) {
+// Ativar ícones Lucide
+if (window.lucide && lucide.createIcons) {
   lucide.createIcons();
 }
 
-// Alteração: agora suporta apenas o input 'nome' do HTML de instituicoes.html
+// =====================
+// CADASTRAR INSTITUIÇÃO
+// =====================
 formInstituicao.addEventListener("submit", async (e) => {
   e.preventDefault();
+
   const nome = formInstituicao.querySelector("input").value.trim();
 
   if (!nome) return alert("Preencha o nome da instituição!");
 
   try {
-    const res = await addInstituicao({ nome }); // Alterado: enviando só {nome} para a API
+    await addInstituicao({ nome });
     alert("Instituição adicionada com sucesso!");
     formInstituicao.reset();
     carregarInstituicoes();
@@ -24,35 +33,64 @@ formInstituicao.addEventListener("submit", async (e) => {
   }
 });
 
+// =====================
+// CARREGAR LISTA
+// =====================
 async function carregarInstituicoes() {
   try {
     const instituicoes = await getInstituicoes();
-    console.log("Instituições:", instituicoes);
 
-    // Alteração: renderizar lista na tabela do HTML
     const tbody = document.querySelector(".list-section tbody");
     tbody.innerHTML = "";
+
     instituicoes.forEach((i) => {
       const tr = document.createElement("tr");
+
       tr.innerHTML = `
         <td>${i.nome}</td>
         <td>
-          <button class="edit">Editar</button>
+          <button class="edit" data-id="${i.id}" data-nome="${i.nome}">Editar</button>
           <button class="delete" data-id="${i.id}">Excluir</button>
         </td>
       `;
+
       tbody.appendChild(tr);
     });
 
-    // Delegação de evento para excluir
-    tbody.querySelectorAll(".delete").forEach(btn => {
+    // Delegação para excluir
+    tbody.querySelectorAll(".delete").forEach((btn) => {
       btn.addEventListener("click", async () => {
-        if (!confirm(`Excluir instituição "${btn.closest("tr").children[0].textContent}"?`)) return;
+        const id = btn.dataset.id;
+        const nome = btn.closest("tr").children[0].textContent;
+
+        if (!confirm(`Deseja excluir "${nome}"?`)) return;
+
         try {
-          await apiDelete(`/instituicao/${btn.dataset.id}`);
+          await deleteInstituicao(id);
           carregarInstituicoes();
-        } catch(err) {
+        } catch (err) {
+          console.error(err);
           alert("Erro ao excluir instituição.");
+        }
+      });
+    });
+
+    // Delegação para editar
+    tbody.querySelectorAll(".edit").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const id = btn.dataset.id;
+        const nomeAtual = btn.dataset.nome;
+
+        const novoNome = prompt("Novo nome da instituição:", nomeAtual);
+
+        if (!novoNome || novoNome.trim() === "") return;
+
+        try {
+          await updateInstituicao(id, { nome: novoNome });
+          carregarInstituicoes();
+        } catch (err) {
+          console.error(err);
+          alert("Erro ao editar instituição.");
         }
       });
     });
@@ -62,5 +100,5 @@ async function carregarInstituicoes() {
   }
 }
 
-// Inicializa ao carregar página
+// Inicialização
 carregarInstituicoes();
