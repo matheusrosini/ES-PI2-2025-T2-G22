@@ -1,5 +1,4 @@
 <!-- Luis Felipe Moura: RA 25010218 -->
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -7,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard - NotaDez</title>
   <link rel="stylesheet" href="styles/dashboard.css">
-  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
   <div class="sidebar">
@@ -73,7 +71,6 @@
         <form id="form-turma">
           <select required>
             <option value="">Selecione a disciplina</option>
-
           </select>
           <input type="text" placeholder="Nome da turma (ex: Turma 1)" required>
           <select required>
@@ -113,6 +110,7 @@
         </tbody>
       </table>
     </section>
+
     <footer>
       © 2025 NotaDez - Todos os direitos reservados
     </footer>
@@ -128,13 +126,8 @@
     </div>
   </div>
 
-  <script src="scripts/api.js"></script>
-  <script src="scripts/dashboard.js"></script>
-
-  <!-- Inicializa os ícones do Lucide -->
-  <script>
-    lucide.createIcons();
-  </script>
-
+  <!-- Scripts -->
+  <script type="module" src="scripts/dashboard.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
 </body>
 </html>
