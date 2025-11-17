@@ -110,31 +110,40 @@ async function carregarDisciplinas() {
 
 function renderDisciplinas(list) {
   tbody.innerHTML = "";
+
   if (!list || list.length === 0) {
     semDisciplinasMsg.style.display = "block";
     return;
   }
+
   semDisciplinasMsg.style.display = "none";
 
   list.forEach(d => {
-    // o backend aqui retorna a coluna 'instituicao' (i.nome AS instituicao)
-    const instituicaoNome = d.instituicao || (d.instituicao_nome) || (d.instituicao?.nome) || "";
+    // Oracle retorna em MAIÚSCULAS
+    const nome = d.nome || d.NOME || "";
+    const sigla = d.sigla || d.SIGLA || "";
+    const codigo = d.codigo || d.CODIGO || "";
+    const periodo = d.periodo || d.PERIODO || "";
+    const instituicao = d.instituicao || d.INSTITUICAO || "";
+
+    const id = d.id || d.ID;
 
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td>${escapeHtml(d.nome)}</td>
-      <td>${escapeHtml(d.sigla)}</td>
-      <td>${escapeHtml(d.codigo)}</td>
-      <td>${escapeHtml(d.periodo)}</td>
-      <td>${escapeHtml(instituicaoNome)}</td>
+      <td>${escapeHtml(nome)}</td>
+      <td>${escapeHtml(sigla)}</td>
+      <td>${escapeHtml(codigo)}</td>
+      <td>${escapeHtml(periodo)}</td>
+      <td>${escapeHtml(instituicao)}</td>
       <td>
-        <button class="btn-edit" data-id="${d.id}">Editar</button>
-        <button class="btn-delete" data-id="${d.id}">Excluir</button>
+        <button class="btn-edit" data-id="${id}">Editar</button>
+        <button class="btn-delete" data-id="${id}">Excluir</button>
       </td>
     `;
     tbody.appendChild(tr);
   });
 }
+
 
 // ---------- criar disciplina ----------
 form.addEventListener("submit", async (e) => {
@@ -261,7 +270,5 @@ tbody.addEventListener("click", async (e) => {
     }
   }
 });
-
-
 
 

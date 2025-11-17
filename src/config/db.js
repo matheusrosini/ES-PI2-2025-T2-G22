@@ -47,9 +47,10 @@ async function execute(sql, params = {}, options = { autoCommit: true }) {
   }
 }
 
-// --------- QUERY (compatível com controllers antigos) ----------
+// --------- QUERY Inteligente ----------
 async function query(sql, params = {}) {
-  return execute(sql, params, { autoCommit: false });
+  const isSelect = /^\s*SELECT/i.test(sql);
+  return execute(sql, params, { autoCommit: !isSelect });
 }
 
 // Exporta tudo necessário
