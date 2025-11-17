@@ -25,11 +25,11 @@ O sistema também conta com autenticação via JWT, recuperação de senha por e
 
 ## 👥 Equipe — ES-PI2-2025-T2-G22
 Leonardo Dionel Lima Silva - RA: 25010092
-
+---
 Luis Felipe Moura - RA: 25010218
-
+---
 Matheus Henrique Portugal Narducci - RA: 25008976
-
+---
 Matheus Rosini Borges de Salles - RA: 25015832
 ---
 
