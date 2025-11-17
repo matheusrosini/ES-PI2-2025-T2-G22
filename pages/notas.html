@@ -18,15 +18,14 @@
     <!-- ===== Sidebar ===== -->
     <div class="sidebar">
         <h1>NotaDez</h1>
-
         <nav>
             <ul>
-                  <li><a href="dashboard.html"><i data-lucide="layout-dashboard"></i> Dashboard</a></li>
-                  <li><a href="instituicoes.html"><i data-lucide="school"></i> Instituições</a></li>
-                  <li><a href="disciplinas.html"><i data-lucide="book-open"></i> Disciplinas</a></li>
-                  <li><a href="turmas.html"><i data-lucide="users"></i> Turmas</a></li>
-                  <li><a href="notas.html"><i data-lucide="pencil"></i> Notas</a></li>
-                  <li><a href="index.html"><i data-lucide="log-out"></i> Sair</a></li>
+                <li><a href="dashboard.html"><i data-lucide="layout-dashboard"></i> Dashboard</a></li>
+                <li><a href="instituicoes.html"><i data-lucide="school"></i> Instituições</a></li>
+                <li><a href="disciplinas.html"><i data-lucide="book-open"></i> Disciplinas</a></li>
+                <li><a href="turmas.html"><i data-lucide="users"></i> Turmas</a></li>
+                <li><a href="notas.html"><i data-lucide="pencil"></i> Notas</a></li>
+                <li><a href="index.html"><i data-lucide="log-out"></i> Sair</a></li>
             </ul>
         </nav>
     </div>
@@ -36,52 +35,40 @@
 
         <h2><i data-lucide="clipboard-list"></i> Lançamento de Notas</h2>
 
-        <!-- ===== Seleção de disciplina e turma ===== -->
+        <!-- Seleção de disciplina e turma -->
         <section class="form-section">
             <h3>Selecione a disciplina e a turma</h3>
-
-            <form>
-                <select required>
+            <form id="form-filtro">
+                <select id="select-disciplina" required>
                     <option value="">Selecione a disciplina</option>
                 </select>
 
-                <select required>
+                <select id="select-turma" required>
                     <option value="">Selecione a turma</option>
                 </select>
 
-                <button type="button">Carregar alunos</button>
+                <button type="button" id="btn-carregar-alunos">Carregar alunos</button>
             </form>
         </section>
 
-         <div class="formula-container">
-    <label for="formulaMedia">Fórmula da Média:</label>
-    <input type="text" id="formulaMedia" value="(P1 + P2 + P3) / 3">
-    <small>Exemplo: (P1 + P2 + P3) / 3</small>
-  </div>
+        <div class="formula-container">
+            <label for="formulaMedia">Fórmula da Média:</label>
+            <input type="text" id="formulaMedia" value="(P1 + P2 + P3) / 3">
+            <small>Exemplo: (P1 + P2 + P3) / 3</small>
+        </div>
 
-        <!-- ===== Tabela de notas ===== -->
+        <!-- Tabela de notas -->
         <section class="list-section">
             <h3><i data-lucide="list"></i> Notas Lançadas</h3>
-
-            <table>
+            <table id="tabela-notas">
                 <thead>
                     <tr>
                         <th>Aluno</th>
-                        <th>P1</th>
-                        <th>P2</th>
-                        <th>P3</th>
-                        <th>Média</th>
+                        <th>Matrícula</th>
+                        <!-- Colunas de componentes serão geradas dinamicamente -->
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td>Exemplo de aluno</td>
-                        <td><input type="number" step="0.01" min="0" max="10"></td>
-                        <td><input type="number" step="0.01" min="0" max="10"></td>
-                        <td><input type="number" step="0.01" min="0" max="10"></td>
-                        <td>—</td>
-                    </tr>
-                </tbody>
+                <tbody></tbody>
             </table>
         </section>
 
@@ -91,49 +78,8 @@
         </div>
 
     </main>
-    <script>
-  lucide.createIcons();
 
-  // Seleciona todos os campos de nota
-  const notasInputs = document.querySelectorAll('tbody input[type="number"]');
-
-  // Função para calcular média de uma linha
-  function calcularMedia(linha) {
-    const notas = linha.querySelectorAll('input[type="number"]');
-    let soma = 0;
-    let quantidade = 0;
-
-    notas.forEach(input => {
-      const valor = parseFloat(input.value);
-      if (!isNaN(valor)) {
-        soma += valor;
-        quantidade++;
-      }
-    });
-
-    const mediaCell = linha.querySelector('td:last-child');
-    if (quantidade > 0) {
-      const media = soma / quantidade;
-      mediaCell.textContent = media.toFixed(2);
-    } else {
-      mediaCell.textContent = '—';
-    }
-  }
-
-  // Adiciona evento para recalcular média ao digitar
-  notasInputs.forEach(input => {
-    input.addEventListener('input', () => {
-      const linha = input.closest('tr');
-      calcularMedia(linha);
-    });
-  });
-
-  // (opcional) recalcular todas ao carregar a página
-  document.querySelectorAll('tbody tr').forEach(tr => calcularMedia(tr));
-</script>
-
-    
-
-
+    <!-- Script JS -->
+    <script type="module" src="scripts/nota.js"></script>
 </body>
 </html>

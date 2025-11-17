@@ -1,8 +1,13 @@
 import { apiGet, apiPost, apiPut, apiDelete } from "./api.js";
 
+// Inicializa ícones
+lucide.createIcons();
+
+// Seletores
 const turmaSelect = document.getElementById("select-turma");
 const disciplinaSelect = document.getElementById("select-disciplina");
 const tabelaNotas = document.getElementById("tabela-notas").querySelector("tbody");
+const formulaMediaInput = document.getElementById("formulaMedia");
 
 let turmaIdSelecionada = null;
 let disciplinaIdSelecionada = null;
@@ -13,9 +18,7 @@ let disciplinaIdSelecionada = null;
 async function carregarTurmas() {
   try {
     const turmas = await apiGet("/turma");
-
     turmaSelect.innerHTML = `<option value="">Selecione...</option>`;
-
     turmas.forEach(t => {
       turmaSelect.innerHTML += `<option value="${t.id}">${t.nome}</option>`;
     });
@@ -29,7 +32,6 @@ async function carregarTurmas() {
 // ===============================
 turmaSelect.addEventListener("change", async () => {
   turmaIdSelecionada = turmaSelect.value;
-
   tabelaNotas.innerHTML = "";
   disciplinaSelect.innerHTML = `<option value="">Carregando...</option>`;
 
@@ -37,9 +39,7 @@ turmaSelect.addEventListener("change", async () => {
 
   try {
     const disciplinas = await apiGet("/disciplina");
-
     disciplinaSelect.innerHTML = `<option value="">Selecione...</option>`;
-
     disciplinas.forEach(d => {
       disciplinaSelect.innerHTML += `<option value="${d.id}">${d.nome}</option>`;
     });
@@ -58,12 +58,8 @@ disciplinaSelect.addEventListener("change", () => {
 
 async function carregarNotas() {
   tabelaNotas.innerHTML = `<tr><td colspan="10">Carregando...</td></tr>`;
-
   try {
-    const data = await apiGet(
-      `/notas/turma/${turmaIdSelecionada}/disciplina/${disciplinaIdSelecionada}`
-    );
-
+    const data = await apiGet(`/notas/turma/${turmaIdSelecionada}/disciplina/${disciplinaIdSelecionada}`);
     tabelaNotas.innerHTML = "";
 
     const { alunos, componentes } = data;
@@ -74,43 +70,65 @@ async function carregarNotas() {
       <th>Aluno</th>
       <th>Matrícula</th>
       ${componentes.map(c => `<th>${c.sigla}</th>`).join("")}
+      <th>Média</th>
     `;
 
     alunos.forEach(a => {
       const linha = document.createElement("tr");
 
       const colunasNotas = a.componentes
-        .map(c => {
-          return `
-            <td>
-              <input type="number" 
-                     min="0" max="10" step="0.1"
+        .map(c => `<td>
+              <input type="number" min="0" max="10" step="0.1"
                      value="${c.valor !== null ? c.valor : ""}"
                      data-aluno="${a.aluno_id}"
                      data-componente="${c.componente_id}"
                      style="width:60px;">
-            </td>
-          `;
-        })
+            </td>`)
         .join("");
 
-      linha.innerHTML = `
-        <td>${a.nome}</td>
-        <td>${a.matricula}</td>
-        ${colunasNotas}
-      `;
+      linha.innerHTML = `<td>${a.nome}</td><td>${a.matricula}</td>${colunasNotas}<td class="media">—</td>`;
 
       tabelaNotas.appendChild(linha);
+      calcularMedia(linha); // Calcula média inicial
     });
+
+    // Adiciona listener para recalcular média ao digitar
+    tabelaNotas.querySelectorAll('input[type="number"]').forEach(input => {
+      input.addEventListener('input', () => {
+        const linha = input.closest('tr');
+        calcularMedia(linha);
+      });
+    });
+
   } catch (err) {
     console.error("Erro ao carregar notas:", err);
   }
 }
 
 // ===============================
-// 4 — SALVAR NOTA QUANDO O INPUT É ALTERADO
+// 4 — CALCULAR MÉDIA DINÂMICA
 // ===============================
-document.addEventListener("change", async (e) => {
+function calcularMedia(linha) {
+  const notas = linha.querySelectorAll('input[type="number"]');
+  let soma = 0;
+  let qtd = 0;
+
+  notas.forEach(input => {
+    const valor = parseFloat(input.value);
+    if (!isNaN(valor)) {
+      soma += valor;
+      qtd++;
+    }
+  });
+
+  const mediaCell = linha.querySelector('td.media');
+  mediaCell.textContent = qtd > 0 ? (soma / qtd).toFixed(2) : '—';
+}
+
+// ===============================
+// 5 — SALVAR NOTA AUTOMÁTICO (AO ALTERAR INPUT)
+// ===============================
+tabelaNotas.addEventListener("change", async (e) => {
   if (e.target.tagName !== "INPUT") return;
 
   const aluno_id = e.target.dataset.aluno;
@@ -120,12 +138,7 @@ document.addEventListener("change", async (e) => {
   if (!aluno_id || !componente_id) return;
 
   try {
-    const resposta = await apiPut("/notas/registrar", {
-      aluno_id,
-      componente_id,
-      valor
-    });
-
+    const resposta = await apiPut("/notas/registrar", { aluno_id, componente_id, valor });
     console.log("Nota salva:", resposta.message);
   } catch (err) {
     console.error("Erro ao salvar nota:", err);
