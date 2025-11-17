@@ -36,39 +36,46 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
-
     const { email, senha } = req.body;
 
-    const [rows] = await db.query('SELECT * FROM usuario WHERE email = ?', [email]);
-    if (rows.length === 0) return res.status(400).json({ message: 'Credenciais inválidas' });
+    const user = await Usuario.findOne({ where: { email } });
+    if (!user) {
+      return res.status(404).json({ message: 'Usuário não encontrado' });
+    }
 
-    const user = rows[0];
-    const valid = await bcrypt.compare(senha, user.senha);
-    if (!valid) return res.status(400).json({ message: 'Credenciais inválidas' });
+    const validPassword = await bcrypt.compare(senha, user.senha);
+    if (!validPassword) {
+      return res.status(400).json({ message: 'Senha incorreta' });
+    }
 
-    const token = jwt.sign({ id: user.id, nome: user.nome, email: user.email }, JWT_SECRET, {
-      expiresIn: '7d'
+    const JWT_SECRET = process.env.JWT_SECRET;
+
+    const token = jwt.sign(
+      {
+        id: user.id,
+        nome: user.nome,
+        email: user.email
+      },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    return res.status(200).json({
+      message: 'Login bem-sucedido',
+      token,
+      user: {
+        id: user.id,
+        nome: user.nome,
+        email: user.email
+      }
     });
 
-    // Configurar cookie
-    const isProd = process.env.NODE_ENV === 'production';
-    res.cookie('jwt', token, {
-      httpOnly: true,
-      secure: isProd,                       // true em produção (HTTPS)
-      sameSite: isProd ? 'none' : 'lax',    // 'none' se frontend em domínio diferente; em dev 'lax' funciona
-      maxAge: 7 * 24 * 60 * 60 * 1000       // 7 dias
-    });
-
-    // Retorna info do usuário (sem token no body, opcional retornar também)
-    res.json({ user: { id: user.id, nome: user.nome, email: user.email } });
-
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Erro no login', error: err.message });
+  } catch (error) {
+    console.error("Erro no login:", error);
+    res.status(500).json({ message: 'Erro interno no servidor' });
   }
 };
+
 
 /* ======================
    ESQUECI A SENHA

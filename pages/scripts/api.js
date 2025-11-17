@@ -1,80 +1,77 @@
 // Feito por Leonardo e Matheus Rosini
-// ================= API GENÉRICA =================
 
-const API_URL = "https://es-pi2-2025-t2-g22-production-b5bc.up.railway.app/api";
+const API_BASE = "https://es-pi2-2025-t2-g22-production-b5bc.up.railway.app/api";
 
-async function handleResponse(response) {
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok) {
-        throw new Error(data.message || `Erro na requisição: ${response.status}`);
-    }
-    return data;
+
+function getToken() {
+  try {
+    return localStorage.getItem("token");
+  } catch {
+    return null;
+  }
 }
 
-// ==== CRUD genérico ====
+function authHeaders() {
+  const token = getToken();
+  return token ? { "Authorization": `Bearer ${token}` } : {};
+}
+
+async function handleResponse(res) {
+  const contentType = res.headers.get("content-type") || "";
+
+  if (!res.ok) {
+    let body;
+    try {
+      body = contentType.includes("application/json") ? await res.json() : { message: await res.text() };
+    } catch {
+      body = { message: "Erro inesperado na resposta" };
+    }
+    const error = new Error(body.message || "Erro na requisição");
+    error.status = res.status;
+    throw error;
+  }
+
+  return contentType.includes("application/json") ? res.json() : res.text();
+}
+
 export async function apiGet(path) {
-    const response = await fetch(`${API_URL}${path}`);
-    return handleResponse(response);
+  return fetch(API_BASE + path, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      ...authHeaders()
+    }
+  }).then(handleResponse);
 }
 
 export async function apiPost(path, data) {
-    const response = await fetch(`${API_URL}${path}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-    });
-    return handleResponse(response);
+  return fetch(API_BASE + path, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...authHeaders()
+    },
+    body: JSON.stringify(data)
+  }).then(handleResponse);
 }
 
 export async function apiPut(path, data) {
-    const response = await fetch(`${API_URL}${path}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-    });
-    return handleResponse(response);
+  return fetch(API_BASE + path, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...authHeaders()
+    },
+    body: JSON.stringify(data)
+  }).then(handleResponse);
 }
 
 export async function apiDelete(path) {
-    const response = await fetch(`${API_URL}${path}`, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" }
-    });
-    return handleResponse(response);
+  return fetch(API_BASE + path, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      ...authHeaders()
+    }
+  }).then(handleResponse);
 }
-
-// ==== Auth ====
-export async function login(email, senha) {
-    return apiPost('/auth/login', { email, senha });
-}
-
-export async function register(nome, email, senha, telefone = "") {
-    return apiPost('/auth/register', { nome, email, telefone, senha });
-}
-
-// ==== Instituições ====
-export async function getInstituicoes() {
-    return apiGet('/instituicoes');
-}
-
-export async function addInstituicao(data) {
-    return apiPost('/instituicoes', data);
-}
-
-export async function updateInstituicao(id, data) {
-    return apiPut(`/instituicoes/${id}`, data);
-}
-
-export async function deleteInstituicao(id) {
-    return apiDelete(`/instituicoes/${id}`);
-}
-
-// ==== Disciplinas ====
-export async function getDisciplinas() { return apiGet('/disciplinas'); }
-export async function addDisciplina(data) { return apiPost('/disciplinas', data); }
-
-// ==== Turmas ====
-export async function getTurmas() { return apiGet('/turmas'); }
-export async function addTurma(data) { return apiPost('/turmas', data); }
-export async function updateTurma(id, data) { return apiPut(`/turmas/${id}`, data); }
-export async function deleteTurma(id) { return apiDelete(`/turmas/${id}`); }
