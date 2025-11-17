@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 const turmaController = require("../controllers/turmaController");
 
 // Rotas da turma
@@ -12,6 +13,8 @@ router.put("/:id", turmaController.updateTurma);
 router.delete("/:id", turmaController.deleteTurma);
 
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 <<<<<<< HEAD
@@ -31,6 +34,9 @@ router.put("/:id", turmaController.updateTurma);
 router.delete("/:id", turmaController.deleteTurma);
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
