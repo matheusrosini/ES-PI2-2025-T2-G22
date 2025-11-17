@@ -1,5 +1,8 @@
-node_modules
-.idea
-.vercel
+node_modules/
 .env
-.env
+.env.local
+.env.development
+.env.production
+.idea/
+.vercel/
+wallet/
