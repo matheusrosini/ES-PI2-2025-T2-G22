@@ -8,7 +8,7 @@ const requireAuth =(req, res, next) =>{
 
   // checa para ver se o jwt ja existe e é verificado
   if(token) {
-    jwt.verify(token, JWS_SECRET, (err, decodedToken) => {
+    jwt.verify(token, JWT_SECRET, (err, decodedToken) => {
       if(err) {
       console.log('JWT verify error:', err.message);
         res.redirect('/login');
