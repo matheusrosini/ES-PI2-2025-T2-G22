@@ -1,5 +1,3 @@
-<!-- Luis Felipe Moura: RA 25010218 -->
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -18,8 +16,8 @@
     <nav>
       <ul>
         <li><a href="dashboard.html"><i data-lucide="layout-dashboard"></i> Dashboard</a></li>
-        <li><a href="instituicoes.html"><i data-lucide="school"></i> Instituições</a></li>
-        <li><a href="disciplinas.html" class="active"><i data-lucide="book-open"></i> Disciplinas</a></li>
+        <li><a href="instituicoes.html" class="active"><i data-lucide="school"></i> Instituições</a></li>
+        <li><a href="disciplinas.html"><i data-lucide="book-open"></i> Disciplinas</a></li>
         <li><a href="turmas.html"><i data-lucide="users"></i> Turmas</a></li>
         <li><a href="notas.html"><i data-lucide="pencil"></i> Notas</a></li>
         <li><a href="index.html"><i data-lucide="log-out"></i> Sair</a></li>
@@ -27,50 +25,39 @@
     </nav>
   </div>
 
-  <!-- ===== Conteúdo Principal ===== -->
   <main class="main-content">
-
     <h2><i data-lucide="school"></i> Gerenciar Instituições</h2>
 
-    <!-- ===== Formulário ===== -->
     <section class="form-section">
       <h3>Adicionar nova instituição</h3>
 
       <form id="form-instituicao">
-        <input type="text" placeholder="Nome da instituição" required>
+        <input type="text" id="nome-instituicao" placeholder="Nome da instituição" required>
         <button type="submit">Cadastrar Instituição</button>
       </form>
     </section>
 
-    <!-- ===== Lista ===== -->
     <section class="list-section">
       <h3><i data-lucide="list"></i> Instituições cadastradas</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Nome</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
 
-          <tbody>
-            <!-- Instituição de exemplo -->
-            <tr>
-              <td>PUC-Campinas</td>
-              <td>
-                <button class="edit">Editar</button>
-                <button class="delete">Excluir</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
+      <table>
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+
+        <tbody></tbody>
+      </table>
+    </section>
     
     <footer>
-    © 2025 NotaDez - Todos os direitos reservados
+      © 2025 NotaDez - Todos os direitos reservados
     </footer>
 
   </main>
+
   <script type="module" src="scripts/instituicoes.js"></script>
 
 </body>

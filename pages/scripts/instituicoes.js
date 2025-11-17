@@ -18,7 +18,7 @@ if (window.lucide && lucide.createIcons) {
 formInstituicao.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const nome = formInstituicao.querySelector("input").value.trim();
+  const nome = document.getElementById("nome-instituicao").value.trim();
 
   if (!nome) return alert("Preencha o nome da instituição!");
 
@@ -57,7 +57,7 @@ async function carregarInstituicoes() {
       tbody.appendChild(tr);
     });
 
-    // Delegação para excluir
+    // Excluir
     tbody.querySelectorAll(".delete").forEach((btn) => {
       btn.addEventListener("click", async () => {
         const id = btn.dataset.id;
@@ -75,7 +75,7 @@ async function carregarInstituicoes() {
       });
     });
 
-    // Delegação para editar
+    // Editar
     tbody.querySelectorAll(".edit").forEach((btn) => {
       btn.addEventListener("click", async () => {
         const id = btn.dataset.id;
