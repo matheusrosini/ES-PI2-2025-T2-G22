@@ -1,6 +1,11 @@
+// Feito por Leonardo e Matheus Rosini
+
 const express = require("express");
 const router = express.Router();
 const turmaController = require("../controllers/turmaController");
+const { requireAuth } = require('../middlewares/authmiddleware');
+
+router.use(requireAuth);
 
 // Rotas da turma
 router.get("/", turmaController.getAllTurmas);

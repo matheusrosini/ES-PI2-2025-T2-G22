@@ -4,6 +4,9 @@
 const express = require("express");
 const router = express.Router();
 const usuarioController = require("../controllers/usuarioController");
+const { requireAuth } = require('../middlewares/authmiddleware');
+
+router.use(requireAuth);
 
 // ===== CRUD Usuário =====
 router.get("/", usuarioController.getAllUsuarios);

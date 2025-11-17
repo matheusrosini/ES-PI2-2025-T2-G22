@@ -3,6 +3,10 @@
 const express = require('express');
 const router = express.Router();
 const alunoController = require('../controllers/alunoController');
+const { requireAuth } = require('../middlewares/authmiddleware');
+
+
+router.use(requireAuth);
 
 // Listar alunos por turma
 router.get('/turma/:turmaId', alunoController.getAlunosByTurma);
