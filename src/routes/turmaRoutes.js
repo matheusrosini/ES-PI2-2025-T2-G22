@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 const turmaController = require("../controllers/turmaController");
 
 // Rotas da turma
@@ -11,6 +12,8 @@ router.put("/:id", turmaController.updateTurma);
 router.delete("/:id", turmaController.deleteTurma);
 
 =======
+=======
+>>>>>>> Stashed changes
 <<<<<<< HEAD
 const turmaController = require('../controllers/turmaController');
 const { requireAuth } = require('../middlewares/authmiddleware');
@@ -27,5 +30,8 @@ router.post("/", turmaController.createTurma);
 router.put("/:id", turmaController.updateTurma);
 router.delete("/:id", turmaController.deleteTurma);
 
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 module.exports = router;
