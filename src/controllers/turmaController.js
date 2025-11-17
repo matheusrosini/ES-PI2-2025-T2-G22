@@ -1,40 +1,63 @@
 const db = require('../config/db');
 
+// ==============================
+// LISTAR TURMAS
+// ==============================
 exports.getTurmas = async (req, res) => {
   try {
     const [rows] = await db.query('SELECT * FROM turmas');
-    res.json(rows);
+    return res.json(rows);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Erro ao buscar turmas' });
+    console.error("Erro ao buscar turmas:", error);
+    return res.status(500).json({ error: 'Erro ao buscar turmas' });
   }
 };
 
+// ==============================
+// CRIAR TURMA
+// ==============================
 exports.createTurma = async (req, res) => {
   try {
     const { nome, professor_id } = req.body;
+
+    if (!nome || !professor_id) {
+      return res.status(400).json({ error: "Nome e professor_id são obrigatórios!" });
+    }
 
     const [result] = await db.query(
       'INSERT INTO turmas (nome, professor_id) VALUES (?, ?)',
       [nome, professor_id]
     );
 
-    res.status(201).json({ id: result.insertId, nome, professor_id });
+    return res.status(201).json({
+      id: result.insertId,
+      nome,
+      professor_id
+    });
+
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Erro ao criar turma' });
+    console.error("Erro ao criar turma:", error);
+    return res.status(500).json({ error: 'Erro ao criar turma' });
   }
 };
 
+// ==============================
+// DELETAR TURMA
+// ==============================
 exports.deleteTurma = async (req, res) => {
   try {
     const { id } = req.params;
 
-    await db.query('DELETE FROM turmas WHERE id = ?', [id]);
+    const [result] = await db.query('DELETE FROM turmas WHERE id = ?', [id]);
 
-    res.json({ message: 'Turma deletada com sucesso' });
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Turma não encontrada" });
+    }
+
+    return res.json({ message: 'Turma deletada com sucesso' });
+
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Erro ao deletar turma' });
+    console.error("Erro ao deletar turma:", error);
+    return res.status(500).json({ error: 'Erro ao deletar turma' });
   }
 };
