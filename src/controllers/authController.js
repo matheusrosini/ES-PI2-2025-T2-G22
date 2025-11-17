@@ -1,6 +1,6 @@
 // Feito por Leonardo
 
-const oracledb = require('../config/db');
+const db = require('../config/db');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
@@ -11,27 +11,28 @@ const JWT_SECRET = process.env.JWT_SECRET;
 const FRONT_URL = process.env.FRONT_URL || "http://localhost:3000";
 
 
-// ======================================
+// ======================================================================
 // REGISTER
-// ======================================
+// ======================================================================
 exports.register = async (req, res) => {
   let conn;
 
   try {
     const errors = validationResult(req);
-    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+    if (!errors.isEmpty()) 
+      return res.status(400).json({ errors: errors.array() });
 
     const { nome, email, telefone, senha } = req.body;
 
-    conn = await oracledb.getConnection();
+    conn = await db.getConnection();
 
-    // Verificar email duplicado
-    const result = await conn.execute(
+    // Verifica duplicidade de email
+    const check = await conn.execute(
       `SELECT id FROM usuario WHERE email = :email`,
       { email }
     );
 
-    if (result.rows.length > 0) {
+    if (check.rows.length > 0) {
       return res.status(400).json({ message: 'Email já cadastrado' });
     }
 
@@ -40,9 +41,10 @@ exports.register = async (req, res) => {
     await conn.execute(
       `INSERT INTO usuario (nome, email, telefone, senha)
        VALUES (:nome, :email, :telefone, :senha)`,
-      { nome, email, telefone, senha: hashed },
-      { autoCommit: true }
+      { nome, email, telefone, senha: hashed }
     );
+
+    await conn.commit();
 
     res.status(201).json({ message: 'Usuário registrado com sucesso' });
 
@@ -55,21 +57,20 @@ exports.register = async (req, res) => {
 };
 
 
-// ======================================
+
+// ======================================================================
 // LOGIN
-// ======================================
+// ======================================================================
 exports.login = async (req, res) => {
   let conn;
 
   try {
     const { email, senha } = req.body;
 
-    conn = await oracledb.getConnection();
+    conn = await db.getConnection();
 
     const result = await conn.execute(
-      `SELECT id, nome, email, senha
-       FROM usuario 
-       WHERE email = :email`,
+      `SELECT id, nome, email, senha FROM usuario WHERE email = :email`,
       { email }
     );
 
@@ -86,7 +87,6 @@ exports.login = async (req, res) => {
       senhaHash: row.SENHA
     };
 
-
     const validPassword = await bcrypt.compare(senha, user.senhaHash);
     if (!validPassword) {
       return res.status(400).json({ message: 'Senha incorreta' });
@@ -98,7 +98,7 @@ exports.login = async (req, res) => {
       { expiresIn: '7d' }
     );
 
-    return res.status(200).json({
+    res.status(200).json({
       message: 'Login bem-sucedido',
       token,
       user: { id: user.id, nome: user.nome, email: user.email }
@@ -113,9 +113,10 @@ exports.login = async (req, res) => {
 };
 
 
-// ======================================
+
+// ======================================================================
 // FORGOT PASSWORD
-// ======================================
+// ======================================================================
 exports.forgotPassword = async (req, res) => {
   let conn;
 
@@ -123,91 +124,98 @@ exports.forgotPassword = async (req, res) => {
     const { email } = req.body;
     if (!email) return res.status(400).json({ message: 'Email é obrigatório' });
 
-    conn = await oracledb.getConnection();
+    conn = await db.getConnection();
 
     const result = await conn.execute(
-      `SELECT id, nome 
-       FROM usuario 
-       WHERE email = :email`,
+      `SELECT id, nome FROM usuario WHERE email = :email`,
       { email }
     );
 
+    // Sempre retornar OK (evita revelar se email existe)
     if (result.rows.length === 0) {
-      return res.json({ message: 'Se o e-mail estiver cadastrado, você receberá instruções.' });
+      return res.json({ message: "Se o e-mail estiver cadastrado, você receberá instruções." });
     }
 
+    const row = result.rows[0];
     const user = {
-      id: result.rows[0][0],
-      nome: result.rows[0][1]
+      id: row.ID,
+      nome: row.NOME
     };
 
-    const token = crypto.randomBytes(32).toString('hex');
-    const expira = new Date(Date.now() + 60 * 60 * 1000);
+    const token = crypto.randomBytes(32).toString("hex");
+    const expira = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
 
     await conn.execute(
       `UPDATE usuario 
        SET reset_token = :token, reset_token_expira = :expira 
        WHERE id = :id`,
-      { token, expira, id: user.id },
-      { autoCommit: true }
+      { token, expira, id: user.id }
     );
+
+    await conn.commit();
 
     const resetLink = `${FRONT_URL.replace(/\/$/, '')}/reset-password.html?token=${token}&email=${encodeURIComponent(email)}`;
 
-    const subject = 'Recuperação de senha';
-    const html = `
-      <p>Olá ${user.nome},</p>
-      <p>Para redefinir sua senha, clique no link abaixo (válido por 1 hora):</p>
-      <p><a href="${resetLink}">${resetLink}</a></p>
-    `;
+    await sendMail({
+      to: email,
+      subject: "Recuperação de senha",
+      html: `
+        <p>Olá ${user.nome},</p>
+        <p>Para redefinir sua senha, clique no link abaixo (válido por 1 hora):</p>
+        <p><a href="${resetLink}">${resetLink}</a></p>
+      `,
+      text: resetLink
+    });
 
-    await sendMail({ to: email, subject, html, text: resetLink });
-
-    return res.json({ message: 'Se o e-mail estiver cadastrado, você receberá instruções.' });
+    res.json({ message: "Se o e-mail estiver cadastrado, você receberá instruções." });
 
   } catch (err) {
-    console.error('forgotPassword error:', err);
-    return res.status(500).json({ message: 'Erro ao processar recuperação de senha', error: err.message });
+    console.error("forgotPassword error:", err);
+    res.status(500).json({ message: "Erro ao processar recuperação de senha" });
   } finally {
     if (conn) await conn.close();
   }
 };
 
 
-// ======================================
+
+// ======================================================================
 // RESET PASSWORD
-// ======================================
+// ======================================================================
 exports.resetPassword = async (req, res) => {
   let conn;
 
   try {
     const { token, senha, email } = req.body;
 
-    if (!token || !senha || !email)
+    if (!token || !senha || !email) {
       return res.status(400).json({ message: 'Dados incompletos' });
-
-    if (senha.length < 6)
+    }
+    if (senha.length < 6) {
       return res.status(400).json({ message: 'Senha precisa ter ao menos 6 caracteres' });
+    }
 
-    conn = await oracledb.getConnection();
+    conn = await db.getConnection();
 
     const result = await conn.execute(
-      `SELECT id, reset_token_expira
+      `SELECT id, reset_token_expira 
        FROM usuario
        WHERE email = :email AND reset_token = :token`,
       { email, token }
     );
 
-    if (result.rows.length === 0)
-      return res.status(400).json({ message: 'Token inválido ou expirado' });
+    if (result.rows.length === 0) {
+      return res.status(400).json({ message: "Token inválido ou expirado" });
+    }
 
+    const row = result.rows[0];
     const user = {
-      id: result.rows[0][0],
-      expira: result.rows[0][1]
+      id: row.ID,
+      expira: row.RESET_TOKEN_EXPIRA
     };
 
     if (!user.expira || new Date(user.expira) < new Date()) {
-      return res.status(400).json({ message: 'Token expirado' });
+      return res.status(400).json({ message: "Token expirado" });
     }
 
     const hashed = await bcrypt.hash(senha, 10);
@@ -216,15 +224,16 @@ exports.resetPassword = async (req, res) => {
       `UPDATE usuario
        SET senha = :senha, reset_token = NULL, reset_token_expira = NULL
        WHERE id = :id`,
-      { senha: hashed, id: user.id },
-      { autoCommit: true }
+      { senha: hashed, id: user.id }
     );
 
-    return res.json({ message: 'Senha redefinida com sucesso' });
+    await conn.commit();
+
+    res.json({ message: "Senha redefinida com sucesso" });
 
   } catch (err) {
-    console.error('resetPassword error:', err);
-    return res.status(500).json({ message: 'Erro ao redefinir senha', error: err.message });
+    console.error("resetPassword error:", err);
+    res.status(500).json({ message: "Erro ao redefinir senha" });
   } finally {
     if (conn) await conn.close();
   }
