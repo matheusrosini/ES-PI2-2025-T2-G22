@@ -1,5 +1,7 @@
-// dashboard.js
 import { getInstituicoes, addInstituicao, getDisciplinas, addDisciplina, addTurma } from './api.js';
+
+// ---- INICIALIZA ÍCONES LUCIDE ----
+lucide.createIcons();
 
 // ---- SEÇÃO 1: Instituição e Curso ----
 const formInstituicao = document.getElementById('form-instituicao');
