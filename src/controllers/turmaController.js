@@ -1,15 +1,29 @@
-const db = require('../config/db');
+// Feito por Leonardo e Matheus Rosini
+
+const { open, close } = require("../config/db");
 
 // ==============================
 // LISTAR TODAS AS TURMAS
 // ==============================
 exports.getAllTurmas = async (req, res) => {
+  let connection;
   try {
-    const [rows] = await db.query('SELECT * FROM turmas');
-    return res.json(rows);
+    connection = await open();
+
+    const result = await connection.execute(`
+        SELECT id, nome, professor_id 
+        FROM turmas
+        ORDER BY nome
+    `);
+
+    res.json(result.rows);
+
   } catch (error) {
     console.error("Erro ao buscar turmas:", error);
-    return res.status(500).json({ error: 'Erro ao buscar turmas' });
+    res.status(500).json({ error: "Erro ao buscar turmas" });
+
+  } finally {
+    if (connection) await close(connection);
   }
 };
 
@@ -17,18 +31,28 @@ exports.getAllTurmas = async (req, res) => {
 // BUSCAR TURMA POR ID
 // ==============================
 exports.getTurmaById = async (req, res) => {
+  let connection;
   try {
     const { id } = req.params;
-    const [rows] = await db.query('SELECT * FROM turmas WHERE id = ?', [id]);
 
-    if (rows.length === 0) {
-      return res.status(404).json({ error: 'Turma não encontrada' });
-    }
+    connection = await open();
 
-    return res.json(rows[0]);
+    const result = await connection.execute(
+      `SELECT id, nome, professor_id FROM turmas WHERE id = :id`,
+      [id]
+    );
+
+    if (result.rows.length === 0)
+      return res.status(404).json({ error: "Turma não encontrada" });
+
+    res.json(result.rows[0]);
+
   } catch (error) {
     console.error("Erro ao buscar turma:", error);
-    return res.status(500).json({ error: 'Erro ao buscar turma' });
+    res.status(500).json({ error: "Erro ao buscar turma" });
+
+  } finally {
+    if (connection) await close(connection);
   }
 };
 
@@ -36,26 +60,39 @@ exports.getTurmaById = async (req, res) => {
 // CRIAR TURMA
 // ==============================
 exports.createTurma = async (req, res) => {
+  let connection;
   try {
     const { nome, professor_id } = req.body;
 
-    if (!nome || !professor_id) {
-      return res.status(400).json({ error: 'Nome e professor_id são obrigatórios' });
-    }
+    if (!nome || !professor_id)
+      return res.status(400).json({ error: "Nome e professor_id são obrigatórios" });
 
-    const [result] = await db.query(
-      'INSERT INTO turmas (nome, professor_id) VALUES (?, ?)',
-      [nome, professor_id]
+    connection = await open();
+
+    const result = await connection.execute(
+      `INSERT INTO turmas (nome, professor_id) VALUES (:nome, :professor_id)
+       RETURNING id INTO :id`,
+      {
+        nome,
+        professor_id,
+        id: { dir: require("oracledb").BIND_OUT, type: require("oracledb").NUMBER }
+      }
     );
 
-    return res.status(201).json({
-      id: result.insertId,
+    await connection.commit();
+
+    res.status(201).json({
+      id: result.outBinds.id[0],
       nome,
       professor_id,
     });
+
   } catch (error) {
     console.error("Erro ao criar turma:", error);
-    return res.status(500).json({ error: 'Erro ao criar turma' });
+    res.status(500).json({ error: "Erro ao criar turma" });
+
+  } finally {
+    if (connection) await close(connection);
   }
 };
 
@@ -63,23 +100,33 @@ exports.createTurma = async (req, res) => {
 // ATUALIZAR TURMA
 // ==============================
 exports.updateTurma = async (req, res) => {
+  let connection;
   try {
     const { id } = req.params;
     const { nome, professor_id } = req.body;
 
-    const [result] = await db.query(
-      'UPDATE turmas SET nome = ?, professor_id = ? WHERE id = ?',
-      [nome, professor_id, id]
+    connection = await open();
+
+    const result = await connection.execute(
+      `UPDATE turmas 
+       SET nome = :nome, professor_id = :professor_id
+       WHERE id = :id`,
+      { nome, professor_id, id }
     );
 
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ error: 'Turma não encontrada' });
-    }
+    await connection.commit();
 
-    return res.json({ message: 'Turma atualizada com sucesso' });
+    if (result.rowsAffected === 0)
+      return res.status(404).json({ error: "Turma não encontrada" });
+
+    res.json({ message: "Turma atualizada com sucesso" });
+
   } catch (error) {
     console.error("Erro ao atualizar turma:", error);
-    return res.status(500).json({ error: 'Erro ao atualizar turma' });
+    res.status(500).json({ error: "Erro ao atualizar turma" });
+
+  } finally {
+    if (connection) await close(connection);
   }
 };
 
@@ -87,18 +134,29 @@ exports.updateTurma = async (req, res) => {
 // DELETAR TURMA
 // ==============================
 exports.deleteTurma = async (req, res) => {
+  let connection;
   try {
     const { id } = req.params;
 
-    const [result] = await db.query('DELETE FROM turmas WHERE id = ?', [id]);
+    connection = await open();
 
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ error: 'Turma não encontrada' });
-    }
+    const result = await connection.execute(
+      `DELETE FROM turmas WHERE id = :id`,
+      [id]
+    );
 
-    return res.json({ message: 'Turma deletada com sucesso' });
+    await connection.commit();
+
+    if (result.rowsAffected === 0)
+      return res.status(404).json({ error: "Turma não encontrada" });
+
+    res.json({ message: "Turma deletada com sucesso" });
+
   } catch (error) {
     console.error("Erro ao deletar turma:", error);
-    return res.status(500).json({ error: 'Erro ao deletar turma' });
+    res.status(500).json({ error: "Erro ao deletar turma" });
+
+  } finally {
+    if (connection) await close(connection);
   }
 };

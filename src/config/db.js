@@ -1,18 +1,15 @@
-import oracledb from "oracledb";
-import dotenv from "dotenv";
+// db.js - Oracle (CommonJS)
 
-// Carrega variáveis do .env
-dotenv.config();
+const oracledb = require("oracledb");
+require("dotenv").config();
 
-// Caminho do wallet
 const walletPath = process.env.ORACLE_WALLET_DIR;
 
-// Inicializar cliente Oracle usando o wallet
 oracledb.initOracleClient({
     configDir: walletPath
 });
 
-// Formato da saída: objetos JS
+// Sempre retornar objetos JS
 oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
 
 const dbConfig = {
@@ -22,24 +19,24 @@ const dbConfig = {
 };
 
 // Abrir conexão
-export async function open() {
+async function open() {
     try {
-        const connection = await oracledb.getConnection(dbConfig);
-        console.log("Conexão OCI - aberta");
-        return connection;
+        const conn = await oracledb.getConnection(dbConfig);
+        return conn;
     } catch (err) {
-        console.error(`Erro ao abrir conexão com o Oracle: ${err}`);
+        console.error("Erro ao abrir conexão Oracle:", err);
         throw err;
     }
 }
 
 // Fechar conexão
-export async function close(connection) {
+async function close(conn) {
+    if (!conn) return;
     try {
-        await connection.close();
-        console.log("Conexão OCI - fechada");
+        await conn.close();
     } catch (err) {
-        console.error(`Erro ao fechar conexão com o Oracle: ${err}`);
-        throw err;
+        console.error("Erro ao fechar conexão Oracle:", err);
     }
 }
+
+module.exports = { open, close };

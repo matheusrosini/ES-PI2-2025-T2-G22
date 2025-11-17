@@ -1,6 +1,6 @@
 // Feito por Leonardo
 
-const db = require('../config/db');
+const oracledb = require('../config/db');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
@@ -8,54 +8,91 @@ const crypto = require('crypto');
 const { sendMail } = require('../utils/mailer');
 
 const JWT_SECRET = process.env.JWT_SECRET;
-const FRONT_URL = process.env.FRONT_URL || "http://localhost:3000"; // frontend base (Vercel URL)
+const FRONT_URL = process.env.FRONT_URL || "http://localhost:3000";
 
+
+// ======================================
+// REGISTER
+// ======================================
 exports.register = async (req, res) => {
+  let conn;
+
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
     const { nome, email, telefone, senha } = req.body;
 
-    const [rows] = await db.query('SELECT id FROM usuario WHERE email = ?', [email]);
-    if (rows.length > 0) return res.status(400).json({ message: 'Email já cadastrado' });
+    conn = await oracledb.getConnection();
+
+    // Verificar email duplicado
+    const result = await conn.execute(
+      `SELECT id FROM usuario WHERE email = :email`,
+      { email }
+    );
+
+    if (result.rows.length > 0) {
+      return res.status(400).json({ message: 'Email já cadastrado' });
+    }
 
     const hashed = await bcrypt.hash(senha, 10);
 
-    await db.query(
-      'INSERT INTO usuario (nome, email, telefone, senha) VALUES (?, ?, ?, ?)',
-      [nome, email, telefone, hashed]
+    await conn.execute(
+      `INSERT INTO usuario (nome, email, telefone, senha)
+       VALUES (:nome, :email, :telefone, :senha)`,
+      { nome, email, telefone, senha: hashed },
+      { autoCommit: true }
     );
 
     res.status(201).json({ message: 'Usuário registrado com sucesso' });
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Erro no registro', error: err.message });
+  } finally {
+    if (conn) await conn.close();
   }
 };
 
+
+// ======================================
+// LOGIN
+// ======================================
 exports.login = async (req, res) => {
+  let conn;
+
   try {
     const { email, senha } = req.body;
 
-    const user = await Usuario.findOne({ where: { email } });
-    if (!user) {
+    conn = await oracledb.getConnection();
+
+    const result = await conn.execute(
+      `SELECT id, nome, email, senha
+       FROM usuario 
+       WHERE email = :email`,
+      { email }
+    );
+
+    if (result.rows.length === 0) {
       return res.status(404).json({ message: 'Usuário não encontrado' });
     }
 
-    const validPassword = await bcrypt.compare(senha, user.senha);
+    const row = result.rows[0];
+
+    const user = {
+      id: row[0],
+      nome: row[1],
+      email: row[2],
+      senhaHash: row[3]
+    };
+
+    const validPassword = await bcrypt.compare(senha, user.senhaHash);
     if (!validPassword) {
       return res.status(400).json({ message: 'Senha incorreta' });
     }
 
-    const JWT_SECRET = process.env.JWT_SECRET;
-
     const token = jwt.sign(
-      {
-        id: user.id,
-        nome: user.nome,
-        email: user.email
-      },
+      { id: user.id, nome: user.nome, email: user.email },
       JWT_SECRET,
       { expiresIn: '7d' }
     );
@@ -63,91 +100,131 @@ exports.login = async (req, res) => {
     return res.status(200).json({
       message: 'Login bem-sucedido',
       token,
-      user: {
-        id: user.id,
-        nome: user.nome,
-        email: user.email
-      }
+      user: { id: user.id, nome: user.nome, email: user.email }
     });
 
-  } catch (error) {
-    console.error("Erro no login:", error);
+  } catch (err) {
+    console.error("Erro no login:", err);
     res.status(500).json({ message: 'Erro interno no servidor' });
+  } finally {
+    if (conn) await conn.close();
   }
 };
 
 
-/* ======================
-   ESQUECI A SENHA
-   ====================== */
+// ======================================
+// FORGOT PASSWORD
+// ======================================
 exports.forgotPassword = async (req, res) => {
+  let conn;
+
   try {
     const { email } = req.body;
     if (!email) return res.status(400).json({ message: 'Email é obrigatório' });
 
-    const [rows] = await db.query('SELECT id, nome FROM usuario WHERE email = ?', [email]);
-    if (rows.length === 0) {
-      // Para evitar user enumeration, retornamos mensagem genérica
+    conn = await oracledb.getConnection();
+
+    const result = await conn.execute(
+      `SELECT id, nome 
+       FROM usuario 
+       WHERE email = :email`,
+      { email }
+    );
+
+    if (result.rows.length === 0) {
       return res.json({ message: 'Se o e-mail estiver cadastrado, você receberá instruções.' });
     }
 
-    const user = rows[0];
+    const user = {
+      id: result.rows[0][0],
+      nome: result.rows[0][1]
+    };
 
-    // gerar token aleatório
     const token = crypto.randomBytes(32).toString('hex');
-    const expira = new Date(Date.now() + 60 * 60 * 1000); // 1 hora
+    const expira = new Date(Date.now() + 60 * 60 * 1000);
 
-    // salvar token e expiração no banco
-    await db.query(
-      'UPDATE usuario SET reset_token = ?, reset_token_expira = ? WHERE id = ?',
-      [token, expira, user.id]
+    await conn.execute(
+      `UPDATE usuario 
+       SET reset_token = :token, reset_token_expira = :expira 
+       WHERE id = :id`,
+      { token, expira, id: user.id },
+      { autoCommit: true }
     );
 
-    // link de reset
     const resetLink = `${FRONT_URL.replace(/\/$/, '')}/reset-password.html?token=${token}&email=${encodeURIComponent(email)}`;
 
-    // enviar e-mail (se mailer configurado, caso contrário log)
     const subject = 'Recuperação de senha';
     const html = `
       <p>Olá ${user.nome},</p>
-      <p>Recebemos um pedido para redefinir sua senha. Clique no link abaixo para criar uma nova senha (válido por 1 hora):</p>
+      <p>Para redefinir sua senha, clique no link abaixo (válido por 1 hora):</p>
       <p><a href="${resetLink}">${resetLink}</a></p>
-      <p>Se você não solicitou, ignore essa mensagem.</p>
     `;
 
-    await sendMail({ to: email, subject, html, text: `Redefinir: ${resetLink}` });
+    await sendMail({ to: email, subject, html, text: resetLink });
 
     return res.json({ message: 'Se o e-mail estiver cadastrado, você receberá instruções.' });
+
   } catch (err) {
     console.error('forgotPassword error:', err);
     return res.status(500).json({ message: 'Erro ao processar recuperação de senha', error: err.message });
+  } finally {
+    if (conn) await conn.close();
   }
 };
 
+
+// ======================================
+// RESET PASSWORD
+// ======================================
 exports.resetPassword = async (req, res) => {
+  let conn;
+
   try {
     const { token, senha, email } = req.body;
 
-    if (!token || !senha || !email) return res.status(400).json({ message: 'Dados incompletos' });
-    if (senha.length < 6) return res.status(400).json({ message: 'Senha precisa ter ao menos 6 caracteres' });
+    if (!token || !senha || !email)
+      return res.status(400).json({ message: 'Dados incompletos' });
 
-    // buscar usuário de acordo com token e email
-    const [rows] = await db.query('SELECT id, reset_token_expira FROM usuario WHERE email = ? AND reset_token = ?', [email, token]);
-    if (rows.length === 0) return res.status(400).json({ message: 'Token inválido ou expirado' });
+    if (senha.length < 6)
+      return res.status(400).json({ message: 'Senha precisa ter ao menos 6 caracteres' });
 
-    const user = rows[0];
-    const expira = new Date(user.reset_token_expira);
-    if (!expira || expira < new Date()) {
+    conn = await oracledb.getConnection();
+
+    const result = await conn.execute(
+      `SELECT id, reset_token_expira
+       FROM usuario
+       WHERE email = :email AND reset_token = :token`,
+      { email, token }
+    );
+
+    if (result.rows.length === 0)
+      return res.status(400).json({ message: 'Token inválido ou expirado' });
+
+    const user = {
+      id: result.rows[0][0],
+      expira: result.rows[0][1]
+    };
+
+    if (!user.expira || new Date(user.expira) < new Date()) {
       return res.status(400).json({ message: 'Token expirado' });
     }
 
-    // atualizar senha
     const hashed = await bcrypt.hash(senha, 10);
-    await db.query('UPDATE usuario SET senha = ?, reset_token = NULL, reset_token_expira = NULL WHERE id = ?', [hashed, user.id]);
+
+    await conn.execute(
+      `UPDATE usuario
+       SET senha = :senha, reset_token = NULL, reset_token_expira = NULL
+       WHERE id = :id`,
+      { senha: hashed, id: user.id },
+      { autoCommit: true }
+    );
 
     return res.json({ message: 'Senha redefinida com sucesso' });
+
   } catch (err) {
     console.error('resetPassword error:', err);
     return res.status(500).json({ message: 'Erro ao redefinir senha', error: err.message });
+  } finally {
+    if (conn) await conn.close();
   }
 };

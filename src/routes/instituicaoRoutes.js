@@ -3,9 +3,6 @@
 const express = require("express");
 const router = express.Router();
 const controller = require("../controllers/instituicaoController");
-const { requireAuth } = require('../middlewares/authmiddleware');
-
-router.use(requireAuth);
 
 router.get("/", controller.getAllInstituicoes);
 router.post("/", controller.createInstituicao);

@@ -5,8 +5,9 @@ const db = require('../config/db');
 // Buscar todas as instituições
 exports.getAllInstituicoes = async (req, res) => {
     try {
-        const [rows] = await db.query('SELECT * FROM instituicao');
-        res.json(rows);
+        const result = await db.query('SELECT * FROM instituicao');
+
+        res.json(result.rows);
     } catch (error) {
         res.status(500).json({ message: 'Erro ao buscar instituições', error });
     }
@@ -16,18 +17,22 @@ exports.getAllInstituicoes = async (req, res) => {
 exports.getInstituicaoById = async (req, res) => {
     try {
         const { id } = req.params;
-        const [rows] = await db.query('SELECT * FROM instituicao WHERE id = ?', [id]);
 
-        if (rows.length === 0)
+        const result = await db.query(
+            'SELECT * FROM instituicao WHERE id = :id',
+            { id }
+        );
+
+        if (result.rows.length === 0)
             return res.status(404).json({ message: 'Instituição não encontrada' });
 
-        res.json(rows[0]);
+        res.json(result.rows[0]);
     } catch (error) {
         res.status(500).json({ message: 'Erro ao buscar instituição', error });
     }
 };
 
-// Criar nova instituição (somente NOME)
+// Criar nova instituição
 exports.createInstituicao = async (req, res) => {
     try {
         const { nome } = req.body;
@@ -35,7 +40,11 @@ exports.createInstituicao = async (req, res) => {
         if (!nome)
             return res.status(400).json({ message: 'O nome é obrigatório' });
 
-        await db.query('INSERT INTO instituicao (nome) VALUES (?)', [nome]);
+        await db.query(
+            `INSERT INTO instituicao (nome) VALUES (:nome)`,
+            { nome },
+            { autoCommit: true }
+        );
 
         res.status(201).json({ message: 'Instituição criada com sucesso!' });
     } catch (error) {
@@ -43,7 +52,7 @@ exports.createInstituicao = async (req, res) => {
     }
 };
 
-// Atualizar instituição (somente NOME)
+// Atualizar instituição
 exports.updateInstituicao = async (req, res) => {
     try {
         const { id } = req.params;
@@ -52,12 +61,13 @@ exports.updateInstituicao = async (req, res) => {
         if (!nome)
             return res.status(400).json({ message: 'O nome é obrigatório' });
 
-        const [result] = await db.query(
-            'UPDATE instituicao SET nome = ? WHERE id = ?',
-            [nome, id]
+        const result = await db.query(
+            `UPDATE instituicao SET nome = :nome WHERE id = :id`,
+            { nome, id },
+            { autoCommit: true }
         );
 
-        if (result.affectedRows === 0)
+        if (result.rowsAffected === 0)
             return res.status(404).json({ message: 'Instituição não encontrada' });
 
         res.json({ message: 'Instituição atualizada com sucesso!' });
@@ -71,9 +81,13 @@ exports.deleteInstituicao = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const [result] = await db.query('DELETE FROM instituicao WHERE id = ?', [id]);
+        const result = await db.query(
+            `DELETE FROM instituicao WHERE id = :id`,
+            { id },
+            { autoCommit: true }
+        );
 
-        if (result.affectedRows === 0)
+        if (result.rowsAffected === 0)
             return res.status(404).json({ message: 'Instituição não encontrada' });
 
         res.json({ message: 'Instituição removida com sucesso!' });

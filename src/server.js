@@ -1,8 +1,7 @@
-// Feito por Leonardo e Matheus Rosini
-
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 
 const userRoutes = require("./routes/usuarioRoutes");
 const instituicaoRoutes = require("./routes/instituicaoRoutes");
@@ -12,14 +11,11 @@ const alunoRoutes = require("./routes/alunoRoutes");
 const notaRoutes = require("./routes/notaRoutes");
 const componenteNotaRoutes = require("./routes/componenteNotaRoutes");
 const authRoutes = require("./routes/authRoutes");
-const cookieParser = require('cookie-parser');
 
 const app = express();
 
 app.use(cors({
     origin: process.env.FRONT_URL,
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true
 }));
 
@@ -36,18 +32,10 @@ app.use("/api/componentes", componenteNotaRoutes);
 app.use("/api/auth", authRoutes);
 
 app.get("/", (req, res) => {
-    res.send("API está funcionando!");
+    res.send("API rodando local com Oracle!");
 });
 
-// Ignorar requisições para favicon.ico
-app.get('/favicon.ico', (req, res) => res.status(204).end());
-
-
-if (process.env.RAILWAY_ENVIRONMENT) {
-    const PORT = process.env.PORT || 3000;
-    app.listen(PORT, () => {
-        console.log(`🚀 Servidor rodando no Railway na porta ${PORT}`);
-    });
-}
-
-module.exports = app;
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Servidor rodando na porta ${PORT}`);
+});

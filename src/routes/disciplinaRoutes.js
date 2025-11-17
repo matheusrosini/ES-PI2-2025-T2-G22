@@ -3,9 +3,6 @@
 const express = require("express");
 const router = express.Router();
 const controller = require("../controllers/disciplinaController");
-const { requireAuth } = require('../middlewares/authmiddleware');
-
-router.use(requireAuth);
 
 // Rotas de disciplinas
 router.get("/", controller.getAllDisciplinas);

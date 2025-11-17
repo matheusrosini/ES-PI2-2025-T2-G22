@@ -1,79 +1,97 @@
-// Feito por Leonardo
+// Feito por Leonardo - versão final corrigida para Oracle
 
 const db = require('../config/db');
 
-// Listar componentes por disciplina
+/* ===============================
+    LISTAR COMPONENTES POR DISCIPLINA
+================================= */
 exports.getByDisciplina = async (req, res) => {
   try {
     const { disciplinaId } = req.params;
 
-    const [rows] = await db.query(
-      "SELECT * FROM componente_nota WHERE disciplina_id = ?",
-      [disciplinaId]
+    const result = await db.execute(
+      `SELECT id, nome, peso, disciplina_id 
+       FROM componente_nota 
+       WHERE disciplina_id = :disciplinaId`,
+      { disciplinaId },
+      { outFormat: db.OUT_FORMAT_OBJECT }
     );
 
-    res.json(rows);
-  } catch (error) {
-    res.status(500).json({ message: "Erro ao listar componentes", error });
+    return res.json(result.rows);
+
+  } catch (err) {
+    console.error("Erro ao buscar componentes:", err);
+    res.status(500).json({ message: "Erro ao buscar componentes", error: err.message });
   }
 };
 
-// Criar componente
+/* ===============================
+    CRIAR COMPONENTE
+================================= */
 exports.create = async (req, res) => {
   try {
-    const { nome, sigla, descricao, disciplina_id } = req.body;
+    const { nome, peso, disciplina_id } = req.body;
 
-    if (!nome || !sigla || !disciplina_id) {
-      return res.status(400).json({ message: "Nome, sigla e disciplina são obrigatórios." });
-    }
-
-    // Verifica duplicação dentro da mesma disciplina
-    const [existente] = await db.query(
-      "SELECT id FROM componente_nota WHERE sigla = ? AND disciplina_id = ?",
-      [sigla, disciplina_id]
+    await db.execute(
+      `INSERT INTO componente_nota (nome, peso, disciplina_id)
+       VALUES (:nome, :peso, :disciplina_id)`,
+      { nome, peso, disciplina_id }
     );
 
-    if (existente.length > 0) {
-      return res.status(400).json({ message: "Já existe um componente com essa sigla nesta disciplina." });
-    }
-
-    await db.query(
-      "INSERT INTO componente_nota (nome, sigla, descricao, disciplina_id) VALUES (?, ?, ?, ?)",
-      [nome, sigla, descricao || null, disciplina_id]
-    );
+    await db.commit();
 
     res.status(201).json({ message: "Componente criado com sucesso!" });
-  } catch (error) {
-    res.status(500).json({ message: "Erro ao criar componente", error });
+
+  } catch (err) {
+    console.error("Erro ao criar componente:", err);
+    res.status(500).json({ message: "Erro ao criar componente", error: err.message });
   }
 };
 
-// Atualizar componente
+/* ===============================
+    ATUALIZAR COMPONENTE
+================================= */
 exports.update = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nome, sigla, descricao } = req.body;
+    const { nome, peso } = req.body;
 
-    await db.query(
-      "UPDATE componente_nota SET nome = ?, sigla = ?, descricao = ? WHERE id = ?",
-      [nome, sigla, descricao || null, id]
+    await db.execute(
+      `UPDATE componente_nota
+       SET nome = :nome,
+           peso = :peso
+       WHERE id = :id`,
+      { nome, peso, id }
     );
 
+    await db.commit();
+
     res.json({ message: "Componente atualizado com sucesso!" });
-  } catch (error) {
-    res.status(500).json({ message: "Erro ao atualizar componente", error });
+
+  } catch (err) {
+    console.error("Erro ao atualizar componente:", err);
+    res.status(500).json({ message: "Erro ao atualizar componente", error: err.message });
   }
 };
 
-// Deletar componente
+/* ===============================
+    DELETAR COMPONENTE
+================================= */
 exports.delete = async (req, res) => {
   try {
     const { id } = req.params;
 
-    await db.query("DELETE FROM componente_nota WHERE id = ?", [id]);
+    await db.execute(
+      `DELETE FROM componente_nota WHERE id = :id`,
+      { id }
+    );
+
+    await db.commit();
 
     res.json({ message: "Componente removido com sucesso!" });
-  } catch (error) {
-    res.status(500).json({ message: "Erro ao remover componente", error });
+
+  } catch (err) {
+    console.error("Erro ao deletar componente:", err);
+    res.status(500).json({ message: "Erro ao remover componente", error: err.message });
   }
 };

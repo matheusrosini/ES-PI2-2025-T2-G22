@@ -1,197 +1,258 @@
 // Feito por Leonardo e Matheus Rosini
 
-const db = require("../config/db");
+const { open, close } = require("../config/db");
 
-//   1 — LISTAR ALUNOS + COMPONENTES + NOTAS
+// =======================================================
+// 1 — LISTAR ALUNOS + COMPONENTES + NOTAS
+// =======================================================
 exports.getNotasByTurmaEDisciplina = async (req, res) => {
+    let conn;
+
     try {
         const { turmaId, disciplinaId } = req.params;
 
-        if (!turmaId || !disciplinaId) {
-            return res.status(400).json({ message: "Turma e disciplina são obrigatórias." });
-        }
+        conn = await open();
 
-        const [alunos] = await db.query(
-            "SELECT id, nome, matricula FROM aluno WHERE turma_id = ?",
-            [turmaId]
+        // Buscar alunos da turma
+        const alunos = await conn.execute(
+            `SELECT id, nome, matricula
+             FROM aluno
+             WHERE turma_id = :turmaId`,
+            { turmaId }
         );
 
-        const [componentes] = await db.query(
-            "SELECT id, nome, sigla FROM componente_nota WHERE disciplina_id = ?",
-            [disciplinaId]
+        // Buscar componentes da disciplina
+        const componentes = await conn.execute(
+            `SELECT id, nome, sigla
+             FROM componente_nota
+             WHERE disciplina_id = :disciplinaId`,
+            { disciplinaId }
         );
 
-        const [notas] = await db.query(
+        // Buscar notas existentes
+        const notas = await conn.execute(
             `SELECT n.id, n.valor, n.aluno_id, n.componente_id
              FROM nota n
              JOIN componente_nota c ON c.id = n.componente_id
-             WHERE c.disciplina_id = ?`,
-            [disciplinaId]
+             WHERE c.disciplina_id = :disciplinaId`,
+            { disciplinaId }
         );
 
-        const resposta = alunos.map(a => ({
-            aluno_id: a.id,
-            nome: a.nome,
-            matricula: a.matricula,
-            componentes: componentes.map(c => {
-                const nota = notas.find(n => n.aluno_id === a.id && n.componente_id === c.id);
+        // Montar resposta final
+        const resposta = alunos.rows.map(a => ({
+            aluno_id: a.ID,
+            nome: a.NOME,
+            matricula: a.MATRICULA,
+            componentes: componentes.rows.map(c => {
+                const nota = notas.rows.find(n =>
+                    n.ALUNO_ID === a.ID && n.COMPONENTE_ID === c.ID
+                );
+
                 return {
-                    componente_id: c.id,
-                    nome: c.nome,
-                    sigla: c.sigla,
-                    valor: nota ? nota.valor : null,
-                    nota_id: nota ? nota.id : null
+                    componente_id: c.ID,
+                    nome: c.NOME,
+                    sigla: c.SIGLA,
+                    valor: nota ? nota.VALOR : null,
+                    nota_id: nota ? nota.ID : null
                 };
             })
         }));
 
-        res.json({ alunos: resposta, componentes });
+        res.json({ alunos: resposta, componentes: componentes.rows });
 
     } catch (err) {
         res.status(500).json({
             message: "Erro ao carregar notas.",
             error: err.message
         });
+    } finally {
+        if (conn) await close(conn);
     }
 };
 
-/* =======================================================
-   2 — REGISTRAR / ATUALIZAR NOTA
-======================================================= */
+
+// =======================================================
+// 2 — REGISTRAR / ATUALIZAR NOTA
+// =======================================================
 exports.registrarNota = async (req, res) => {
+    let conn;
+
     try {
         const { aluno_id, componente_id, valor } = req.body;
 
         if (!aluno_id || !componente_id || valor === undefined)
             return res.status(400).json({ message: "Dados incompletos." });
 
-        if (isNaN(valor))
-            return res.status(400).json({ message: "O valor da nota deve ser numérico." });
+        conn = await open();
 
-        if (valor < 0 || valor > 10)
-            return res.status(400).json({ message: "A nota deve ser entre 0 e 10." });
-
-        const [alunoExiste] = await db.query(
-            "SELECT id FROM aluno WHERE id = ?",
-            [aluno_id]
+        // Verifica aluno
+        const alunoExiste = await conn.execute(
+            "SELECT id FROM aluno WHERE id = :id",
+            { id: aluno_id }
         );
-        if (alunoExiste.length === 0)
+        if (alunoExiste.rows.length === 0)
             return res.status(404).json({ message: "Aluno não encontrado." });
 
-        const [compExiste] = await db.query(
-            "SELECT id FROM componente_nota WHERE id = ?",
-            [componente_id]
+        // Verifica componente
+        const compExiste = await conn.execute(
+            "SELECT id FROM componente_nota WHERE id = :id",
+            { id: componente_id }
         );
-        if (compExiste.length === 0)
+        if (compExiste.rows.length === 0)
             return res.status(404).json({ message: "Componente não encontrado." });
 
-        const [existe] = await db.query(
-            "SELECT id FROM nota WHERE aluno_id = ? AND componente_id = ?",
-            [aluno_id, componente_id]
+        // Verifica se nota existe
+        const existe = await conn.execute(
+            `SELECT id FROM nota
+             WHERE aluno_id = :aluno_id
+             AND componente_id = :componente_id`,
+            { aluno_id, componente_id }
         );
 
-        if (existe.length > 0) {
-            await db.query(
-                "UPDATE nota SET valor = ? WHERE id = ?",
-                [valor, existe[0].id]
+        if (existe.rows.length > 0) {
+            await conn.execute(
+                `UPDATE nota SET valor = :valor WHERE id = :id`,
+                { valor, id: existe.rows[0].ID },
+                { autoCommit: true }
             );
+
             return res.json({ message: "Nota atualizada com sucesso." });
         }
 
-        await db.query(
-            "INSERT INTO nota (aluno_id, componente_id, valor) VALUES (?, ?, ?)",
-            [aluno_id, componente_id, valor]
+        // Inserir nova nota
+        await conn.execute(
+            `INSERT INTO nota (aluno_id, componente_id, valor)
+             VALUES (:aluno_id, :componente_id, :valor)`,
+            { aluno_id, componente_id, valor },
+            { autoCommit: true }
         );
 
         res.json({ message: "Nota registrada com sucesso." });
 
     } catch (err) {
-        res.status(500).json({ 
-            message: "Erro ao registrar nota.", 
-            error: err.message 
+        res.status(500).json({
+            message: "Erro ao registrar nota.",
+            error: err.message
         });
+    } finally {
+        if (conn) await close(conn);
     }
 };
 
-/* =======================================================
-   3 — CRUD COMPLETO (GET, POST, PUT, DELETE)
-======================================================= */
+
+// =======================================================
+// 3 — CRUD COMPLETO
+// =======================================================
 
 // GET — listar todas as notas
 exports.getAllNotas = async (req, res) => {
+    let conn;
     try {
-        const [rows] = await db.query(
-            `SELECT n.id, n.valor, a.nome AS aluno, c.nome AS componente 
+        conn = await open();
+
+        const result = await conn.execute(
+            `SELECT n.id, n.valor, a.nome AS aluno, c.nome AS componente
              FROM nota n
              JOIN aluno a ON a.id = n.aluno_id
              JOIN componente_nota c ON c.id = n.componente_id`
         );
-        res.json(rows);
+
+        res.json(result.rows);
+
     } catch (err) {
         res.status(500).json({ message: "Erro ao buscar notas.", error: err.message });
+    } finally {
+        if (conn) await close(conn);
     }
 };
 
 // GET — nota por ID
 exports.getNotaById = async (req, res) => {
+    let conn;
     try {
-        const [rows] = await db.query("SELECT * FROM nota WHERE id = ?", [
-            req.params.id,
-        ]);
+        conn = await open();
 
-        if (rows.length === 0)
+        const result = await conn.execute(
+            "SELECT * FROM nota WHERE id = :id",
+            { id: req.params.id }
+        );
+
+        if (result.rows.length === 0)
             return res.status(404).json({ message: "Nota não encontrada." });
 
-        res.json(rows[0]);
+        res.json(result.rows[0]);
+
     } catch (err) {
         res.status(500).json({ message: "Erro ao buscar nota.", error: err.message });
+    } finally {
+        if (conn) await close(conn);
     }
 };
 
-// POST — criar nota manualmente
+// POST — criar nota
 exports.createNota = async (req, res) => {
+    let conn;
     try {
         const { aluno_id, componente_id, valor } = req.body;
 
-        if (!aluno_id || !componente_id || valor === undefined)
-            return res.status(400).json({ message: "Preencha todos os dados." });
+        conn = await open();
 
-        await db.query(
-            "INSERT INTO nota (aluno_id, componente_id, valor) VALUES (?, ?, ?)",
-            [aluno_id, componente_id, valor]
+        await conn.execute(
+            `INSERT INTO nota (aluno_id, componente_id, valor)
+             VALUES (:aluno_id, :componente_id, :valor)`,
+            { aluno_id, componente_id, valor },
+            { autoCommit: true }
         );
 
         res.status(201).json({ message: "Nota criada com sucesso." });
+
     } catch (err) {
         res.status(500).json({ message: "Erro ao criar nota.", error: err.message });
+    } finally {
+        if (conn) await close(conn);
     }
 };
 
-// PUT — atualizar nota por ID
+// PUT — atualizar nota
 exports.updateNota = async (req, res) => {
+    let conn;
     try {
         const { valor } = req.body;
 
-        if (valor === undefined)
-            return res.status(400).json({ message: "Valor da nota é obrigatório." });
+        conn = await open();
 
-        await db.query("UPDATE nota SET valor = ? WHERE id = ?", [
-            valor,
-            req.params.id,
-        ]);
+        await conn.execute(
+            `UPDATE nota SET valor = :valor WHERE id = :id`,
+            { valor, id: req.params.id },
+            { autoCommit: true }
+        );
 
         res.json({ message: "Nota atualizada com sucesso." });
+
     } catch (err) {
         res.status(500).json({ message: "Erro ao atualizar nota.", error: err.message });
+    } finally {
+        if (conn) await close(conn);
     }
 };
 
 // DELETE — deletar nota
 exports.deleteNota = async (req, res) => {
+    let conn;
     try {
-        await db.query("DELETE FROM nota WHERE id = ?", [req.params.id]);
+        conn = await open();
+
+        await conn.execute(
+            "DELETE FROM nota WHERE id = :id",
+            { id: req.params.id },
+            { autoCommit: true }
+        );
+
         res.json({ message: "Nota deletada com sucesso." });
+
     } catch (err) {
         res.status(500).json({ message: "Erro ao deletar nota.", error: err.message });
+    } finally {
+        if (conn) await close(conn);
     }
 };

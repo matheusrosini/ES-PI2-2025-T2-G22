@@ -1,177 +1,116 @@
-// Feito por Leonardo 
+// Feito por Leonardo
 
-// Conexão com o banco
-const db = require('../config/db');
-const csv = require("csv-parser");
-const stream = require("stream");
+const db = require("../config/db");
 
-
-// 1 — LISTAR TODOS OS ALUNOS
-exports.getAllAlunos = async (req, res) => {
-  try {
-    const [rows] = await db.query('SELECT * FROM aluno');
-    res.json(rows);
-  } catch (error) {
-    res.status(500).json({ message: 'Erro ao buscar alunos', error });
-  }
-};
-
-
-
-// 2 — BUSCAR ALUNOS POR TURMA
+// ================================
+// Listar alunos por turma
+// ================================
 exports.getAlunosByTurma = async (req, res) => {
   try {
     const { turmaId } = req.params;
 
-    const [rows] = await db.query(
-      'SELECT * FROM aluno WHERE turma_id = ?',
-      [turmaId]
+    const result = await db.query(
+      `SELECT id_aluno, nome, email, telefone 
+       FROM aluno 
+       WHERE id_turma = :turmaId`,
+      { turmaId }
     );
 
-    res.json(rows);
-  } catch (error) {
-    res.status(500).json({ message: 'Erro ao buscar alunos da turma', error });
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Erro getAlunosByTurma:", err);
+    res.status(500).json({ message: "Erro ao buscar alunos da turma" });
   }
 };
 
-
-
-// 3 — BUSCAR ALUNO POR ID
-exports.getAlunoById = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const [rows] = await db.query('SELECT * FROM aluno WHERE id = ?', [id]);
-
-    if (rows.length === 0) {
-      return res.status(404).json({ message: 'Aluno não encontrado' });
-    }
-
-    res.json(rows[0]);
-  } catch (error) {
-    res.status(500).json({ message: 'Erro ao buscar aluno', error });
-  }
-};
-
-
-
-
-// 4 — CRIAR NOVO ALUNO
+// ================================
+// Criar aluno em uma turma
+// ================================
 exports.createAluno = async (req, res) => {
   try {
     const { turmaId } = req.params;
-    const { matricula, nome } = req.body;
-
-    if (!matricula || !nome) {
-      return res.status(400).json({ message: 'Matrícula e nome são obrigatórios' });
-    }
+    const { nome, email, telefone } = req.body;
 
     await db.query(
-      'INSERT INTO aluno (matricula, nome, turma_id) VALUES (?, ?, ?)',
-      [matricula, nome, turmaId]
+      `INSERT INTO aluno (nome, email, telefone, id_turma)
+       VALUES (:nome, :email, :telefone, :turmaId)`,
+      { nome, email, telefone, turmaId }
     );
 
-    res.status(201).json({ message: 'Aluno criado com sucesso!' });
-  } catch (error) {
-    if (error.code === 'ER_DUP_ENTRY') {
-      res.status(400).json({ message: 'Matrícula já cadastrada' });
-    } else {
-      res.status(500).json({ message: 'Erro ao criar aluno', error });
-    }
+    res.status(201).json({ message: "Aluno criado com sucesso" });
+  } catch (err) {
+    console.error("Erro createAluno:", err);
+    res.status(500).json({ message: "Erro ao criar aluno" });
   }
 };
 
+// ================================
+// Buscar aluno por ID
+// ================================
+exports.getAlunoById = async (req, res) => {
+  try {
+    const { id } = req.params;
 
+    const result = await db.query(
+      `SELECT id_aluno, nome, email, telefone, id_turma
+       FROM aluno
+       WHERE id_aluno = :id`,
+      { id }
+    );
 
-// 5 — ATUALIZAR ALUNO
+    if (result.rows.length === 0)
+      return res.status(404).json({ message: "Aluno não encontrado" });
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error("Erro getAlunoById:", err);
+    res.status(500).json({ message: "Erro ao buscar aluno" });
+  }
+};
+
+// ================================
+// Atualizar aluno
+// ================================
 exports.updateAluno = async (req, res) => {
   try {
     const { id } = req.params;
-    const { matricula, nome, turma_id } = req.body;
+    const { nome, email, telefone, id_turma } = req.body;
 
     await db.query(
-      'UPDATE aluno SET matricula = ?, nome = ?, turma_id = ? WHERE id = ?',
-      [matricula, nome, turma_id, id]
+      `UPDATE aluno
+       SET nome = :nome,
+           email = :email,
+           telefone = :telefone,
+           id_turma = :id_turma
+       WHERE id_aluno = :id`,
+      { nome, email, telefone, id_turma, id }
     );
 
-    res.json({ message: 'Aluno atualizado com sucesso!' });
-  } catch (error) {
-    res.status(500).json({ message: 'Erro ao atualizar aluno', error });
+    res.json({ message: "Aluno atualizado com sucesso" });
+  } catch (err) {
+    console.error("Erro updateAluno:", err);
+    res.status(500).json({ message: "Erro ao atualizar aluno" });
   }
 };
 
-
-
-// 6 — DELETAR ALUNO
+// ================================
+// Deletar aluno
+// ================================
 exports.deleteAluno = async (req, res) => {
   try {
     const { id } = req.params;
 
-    await db.query('DELETE FROM aluno WHERE id = ?', [id]);
-    res.json({ message: 'Aluno removido com sucesso!' });
-  } catch (error) {
-    res.status(500).json({ message: 'Erro ao remover aluno', error });
+    const result = await db.query(
+      `DELETE FROM aluno WHERE id_aluno = :id`,
+      { id }
+    );
+
+    if (result.rowsAffected === 0)
+      return res.status(404).json({ message: "Aluno não encontrado" });
+
+    res.json({ message: "Aluno removido com sucesso" });
+  } catch (err) {
+    console.error("Erro deleteAluno:", err);
+    res.status(500).json({ message: "Erro ao remover aluno" });
   }
 };
-
-
-
-// 7 — IMPORTAR CSV
-exports.importarCSV = async (req, res) => {
-  try {
-    const { turmaId } = req.params;
-
-    if (!req.file) {
-      return res.status(400).json({ message: "Nenhum arquivo enviado" });
-    }
-
-    const results = [];
-    const readable = new stream.Readable();
-
-    readable._read = () => {};
-    readable.push(req.file.buffer);
-    readable.push(null);
-
-    readable
-      .pipe(csv())
-      .on("data", row => {
-        const cleanKeys = Object.keys(row).map(k => k.replace(/\ufeff/g, ""));
-        const matricula = row[cleanKeys[0]];
-        const nome = row[cleanKeys[1]];
-
-        if (matricula && nome) {
-          results.push({ matricula, nome });
-        }
-      })
-      .on("end", async () => {
-        let inseridos = 0;
-
-        for (const aluno of results) {
-          const [existente] = await db.query(
-            "SELECT id FROM aluno WHERE matricula = ? AND turma_id = ?",
-            [aluno.matricula, turmaId]
-          );
-
-          if (existente.length === 0) {
-            await db.query(
-              "INSERT INTO aluno (matricula, nome, turma_id) VALUES (?, ?, ?)",
-              [aluno.matricula, aluno.nome, turmaId]
-            );
-            inseridos++;
-          }
-        }
-
-        res.json({
-          message: "Importação concluída",
-          totalProcessado: results.length,
-          inseridos
-        });
-      });
-
-  } catch (error) {
-    res.status(500).json({
-      message: "Erro ao importar CSV",
-      error: error.message
-    });
-  }
-};
-
