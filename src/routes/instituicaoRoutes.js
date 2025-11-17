@@ -1,13 +1,14 @@
-// Feito por Matheus Rosini
-
-const express = require("express");
+// src/routes/instituicaoRoutes.js
+const express = require('express');
 const router = express.Router();
-const controller = require("../controllers/instituicaoController");
+const controller = require('../controllers/instituicaoController');
+const { authMiddleware } = require('../middlewares/authmiddleware');
 
-router.get("/", controller.getAllInstituicoes);
-router.post("/", controller.createInstituicao);
-router.get("/:id", controller.getInstituicaoById);
-router.put("/:id", controller.updateInstituicao);
-router.delete("/:id", controller.deleteInstituicao);
+// Todas as rotas da entidade instituicao devem ser protegidas:
+router.get('/', authMiddleware, controller.getAllInstituicoes);
+router.post('/', authMiddleware, controller.createInstituicao);
+router.get('/:id', authMiddleware, controller.getInstituicaoById);
+router.put('/:id', authMiddleware, controller.updateInstituicao);
+router.delete('/:id', authMiddleware, controller.deleteInstituicao);
 
 module.exports = router;

@@ -1,97 +1,102 @@
-// Feito por Matheus Rosini
+const db = require("../config/db");
 
-const db = require('../config/db');
+module.exports = {
+    // GET: listar apenas instituições do usuário logado
+    async getAllInstituicoes(req, res) {
+        try {
+            const userId = req.user.id;
 
-// Buscar todas as instituições
-exports.getAllInstituicoes = async (req, res) => {
-    try {
-        const result = await db.query('SELECT * FROM instituicao');
+            const result = await db.execute(
+                "SELECT * FROM instituicao WHERE usuario_id = :usuario_id",
+                { usuario_id: userId }
+            );
 
-        res.json(result.rows);
-    } catch (error) {
-        res.status(500).json({ message: 'Erro ao buscar instituições', error });
-    }
-};
+            res.json(result.rows || []);
+        } catch (error) {
+            console.error("Erro ao listar instituições:", error);
+            res.status(500).json({ message: "Erro ao listar instituições", error });
+        }
+    },
 
-// Buscar instituição por ID
-exports.getInstituicaoById = async (req, res) => {
-    try {
-        const { id } = req.params;
+    // POST: criar instituição ligada ao usuário logado
+    async createInstituicao(req, res) {
+        try {
+            const userId = req.user.id;
+            const { nome } = req.body;
 
-        const result = await db.query(
-            'SELECT * FROM instituicao WHERE id = :id',
-            { id }
-        );
+            const result = await db.execute(
+                `INSERT INTO instituicao (nome, usuario_id)
+                 VALUES (:nome, :usuario_id)`,
+                { nome, usuario_id: userId }
+            );
 
-        if (result.rows.length === 0)
-            return res.status(404).json({ message: 'Instituição não encontrada' });
+            res.status(201).json({ message: "Instituição criada com sucesso" });
+        } catch (error) {
+            console.error("Erro ao criar instituição:", error);
+            res.status(500).json({ message: "Erro ao criar instituição", error });
+        }
+    },
 
-        res.json(result.rows[0]);
-    } catch (error) {
-        res.status(500).json({ message: 'Erro ao buscar instituição', error });
-    }
-};
+    // GET por id (somente se for dono)
+    async getInstituicaoById(req, res) {
+        try {
+            const userId = req.user.id;
+            const instituicaoId = req.params.id;
 
-// Criar nova instituição
-exports.createInstituicao = async (req, res) => {
-    try {
-        const { nome } = req.body;
+            const result = await db.execute(
+                `SELECT * FROM instituicao 
+                 WHERE id = :id AND usuario_id = :usuario_id`,
+                { id: instituicaoId, usuario_id: userId }
+            );
 
-        if (!nome)
-            return res.status(400).json({ message: 'O nome é obrigatório' });
+            if (result.rows.length === 0) {
+                return res.status(404).json({ message: "Instituição não encontrada" });
+            }
 
-        await db.query(
-            `INSERT INTO instituicao (nome) VALUES (:nome)`,
-            { nome },
-            { autoCommit: true }
-        );
+            res.json(result.rows[0]);
+        } catch (error) {
+            console.error("Erro ao buscar instituição:", error);
+            res.status(500).json({ message: "Erro ao buscar instituição", error });
+        }
+    },
 
-        res.status(201).json({ message: 'Instituição criada com sucesso!' });
-    } catch (error) {
-        res.status(500).json({ message: 'Erro ao criar instituição', error });
-    }
-};
+    // PUT (somente se for dono)
+    async updateInstituicao(req, res) {
+        try {
+            const userId = req.user.id;
+            const instituicaoId = req.params.id;
+            const { nome } = req.body;
 
-// Atualizar instituição
-exports.updateInstituicao = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { nome } = req.body;
+            const result = await db.execute(
+                `UPDATE instituicao
+                 SET nome = :nome
+                 WHERE id = :id AND usuario_id = :usuario_id`,
+                { id: instituicaoId, nome, usuario_id: userId }
+            );
 
-        if (!nome)
-            return res.status(400).json({ message: 'O nome é obrigatório' });
+            res.json({ message: "Instituição atualizada com sucesso" });
+        } catch (error) {
+            console.error("Erro ao atualizar instituição:", error);
+            res.status(500).json({ message: "Erro ao atualizar instituição", error });
+        }
+    },
 
-        const result = await db.query(
-            `UPDATE instituicao SET nome = :nome WHERE id = :id`,
-            { nome, id },
-            { autoCommit: true }
-        );
+    // DELETE (somente se for dono)
+    async deleteInstituicao(req, res) {
+        try {
+            const userId = req.user.id;
+            const instituicaoId = req.params.id;
 
-        if (result.rowsAffected === 0)
-            return res.status(404).json({ message: 'Instituição não encontrada' });
+            await db.execute(
+                `DELETE FROM instituicao
+                 WHERE id = :id AND usuario_id = :usuario_id`,
+                { id: instituicaoId, usuario_id: userId }
+            );
 
-        res.json({ message: 'Instituição atualizada com sucesso!' });
-    } catch (error) {
-        res.status(500).json({ message: 'Erro ao atualizar instituição', error });
-    }
-};
-
-// Deletar instituição
-exports.deleteInstituicao = async (req, res) => {
-    try {
-        const { id } = req.params;
-
-        const result = await db.query(
-            `DELETE FROM instituicao WHERE id = :id`,
-            { id },
-            { autoCommit: true }
-        );
-
-        if (result.rowsAffected === 0)
-            return res.status(404).json({ message: 'Instituição não encontrada' });
-
-        res.json({ message: 'Instituição removida com sucesso!' });
-    } catch (error) {
-        res.status(500).json({ message: 'Erro ao remover instituição', error });
+            res.json({ message: "Instituição excluída com sucesso" });
+        } catch (error) {
+            console.error("Erro ao excluir instituição:", error);
+            res.status(500).json({ message: "Erro ao excluir instituição", error });
+        }
     }
 };
