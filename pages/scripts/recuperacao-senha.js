@@ -1,4 +1,4 @@
-// Assumindo que apiPost existe em ./api.js
+// Feito por Leonardo e Matheus Henrique Portugal Narducci
 import { apiPost } from './api.js';
 
 const form = document.getElementById('recuperacaoForm');

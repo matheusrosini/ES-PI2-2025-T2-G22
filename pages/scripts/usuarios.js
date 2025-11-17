@@ -1,6 +1,4 @@
-// ===============================
-//  USUÁRIOS - INTEGRAÇÃO COM API
-// ===============================
+// Leonardo e Matheus Rosini
 
 import { apiGet, apiPost, apiPut, apiDelete } from "./api.js";
 

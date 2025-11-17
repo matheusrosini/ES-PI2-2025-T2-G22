@@ -1,4 +1,4 @@
-// Feito por Leonardo e Matheus Rosini
+// Feito por Leonardo, Matheus Rosini e Matheus Henrique Portugal Narducci
 import { apiGet, apiPost, apiPut, apiDelete } from "./api.js";
 
 let turmas = [];

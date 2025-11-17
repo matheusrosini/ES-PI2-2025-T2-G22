@@ -1,3 +1,5 @@
+//Feito por Matheus Rosini
+
 import { apiGet } from "./api.js";
 
 if (window.lucide && lucide.createIcons) {

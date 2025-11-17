@@ -1,4 +1,5 @@
 // Feito por Matheus Rosini e Leonardo
+
 import { register } from './auth.js';
 
 const form = document.getElementById('cadastroForm');

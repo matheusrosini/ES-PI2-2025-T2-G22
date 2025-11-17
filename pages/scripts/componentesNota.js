@@ -1,4 +1,5 @@
 // Feito por Matheus Rosini e Leonardo
+
 import { apiGet, apiPost, apiPut, apiDelete } from './api.js';
 
 document.addEventListener('DOMContentLoaded', () => {

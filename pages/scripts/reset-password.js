@@ -1,3 +1,4 @@
+// Feito por Matheus Rosini e Leonardo
 import { apiPost } from './api.js';
 
 function getQuery() {

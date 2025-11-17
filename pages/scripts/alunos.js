@@ -1,3 +1,5 @@
+//Feito por Matheus Henrique Portugal Narducci
+
 // Seleciona o formulário de cadastro e a tabela
 const formCadastro = document.getElementById('form-cadastro');
 const tabela = document.getElementById('tabela-alunos').querySelector('tbody');

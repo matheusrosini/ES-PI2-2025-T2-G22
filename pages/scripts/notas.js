@@ -1,3 +1,5 @@
+//Feito por Matheus Henrique Portugal Narducci
+
 import { apiGet, apiPost, apiPut, apiDelete } from "./api.js";
 
 // Seletores
