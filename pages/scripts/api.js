@@ -1,7 +1,6 @@
 // Feito por Leonardo e Matheus Rosini
 
-const API_BASE = "https://es-pi2-2025-t2-g22-production-b5bc.up.railway.app/api";
-
+const API_BASE = "http://localhost:3000/api";
 
 function getToken() {
   try {
@@ -14,6 +13,31 @@ function getToken() {
 function authHeaders() {
   const token = getToken();
   return token ? { "Authorization": `Bearer ${token}` } : {};
+}
+
+/**
+ * fetchWithTimeout: wrapper do fetch que aborta a requisição após `timeout` ms.
+ * Lança Error("Request timed out") quando o tempo expira.
+ */
+async function fetchWithTimeout(resource, options = {}, timeout = 8000) {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeout);
+
+  try {
+    const response = await fetch(resource, {
+      ...options,
+      signal: controller.signal
+    });
+    return response;
+  } catch (err) {
+    // Normaliza o erro de timeout para uma mensagem legível
+    if (err && err.name === 'AbortError') {
+      throw new Error('Request timed out');
+    }
+    throw err;
+  } finally {
+    clearTimeout(id);
+  }
 }
 
 async function handleResponse(res) {
@@ -34,44 +58,47 @@ async function handleResponse(res) {
   return contentType.includes("application/json") ? res.json() : res.text();
 }
 
-export async function apiGet(path) {
-  return fetch(API_BASE + path, {
+// GET: não define Content-Type por padrão
+export async function apiGet(path, timeout = 8000) {
+  const res = await fetchWithTimeout(API_BASE + path, {
     method: "GET",
     headers: {
-      "Content-Type": "application/json",
       ...authHeaders()
     }
-  }).then(handleResponse);
+  }, timeout);
+  return handleResponse(res);
 }
 
-export async function apiPost(path, data) {
-  return fetch(API_BASE + path, {
+export async function apiPost(path, data, timeout = 8000) {
+  const res = await fetchWithTimeout(API_BASE + path, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       ...authHeaders()
     },
     body: JSON.stringify(data)
-  }).then(handleResponse);
+  }, timeout);
+  return handleResponse(res);
 }
 
-export async function apiPut(path, data) {
-  return fetch(API_BASE + path, {
+export async function apiPut(path, data, timeout = 8000) {
+  const res = await fetchWithTimeout(API_BASE + path, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
       ...authHeaders()
     },
     body: JSON.stringify(data)
-  }).then(handleResponse);
+  }, timeout);
+  return handleResponse(res);
 }
 
-export async function apiDelete(path) {
-  return fetch(API_BASE + path, {
+export async function apiDelete(path, timeout = 8000) {
+  const res = await fetchWithTimeout(API_BASE + path, {
     method: "DELETE",
     headers: {
-      "Content-Type": "application/json",
       ...authHeaders()
     }
-  }).then(handleResponse);
+  }, timeout);
+  return handleResponse(res);
 }

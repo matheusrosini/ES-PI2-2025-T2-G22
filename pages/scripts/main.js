@@ -1,6 +1,9 @@
 // main.js
 // Import correto (antes importava de './auth.js' por engano)
-import { login, apiGet, apiPost } from './api.js';
+// main.js
+import { login } from './auth.js';
+import { apiGet, apiPost } from './api.js';
+
 
 // ===== LOGIN =====
 const form = document.getElementById('loginForm');

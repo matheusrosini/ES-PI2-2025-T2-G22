@@ -1,4 +1,4 @@
-// cadastro.js
+// Feito por Matheus Rosini
 import { register } from './api.js';
 
 const form = document.getElementById('cadastroForm');
