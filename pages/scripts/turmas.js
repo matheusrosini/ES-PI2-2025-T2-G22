@@ -7,6 +7,11 @@ import { apiGet, apiPost, apiPut, apiDelete } from "./api.js";
 let turmas = [];
 let editingTurmaId = null;
 
+
+  if (window.lucide && lucide.createIcons) {
+  lucide.createIcons();
+}
+
 /* ========================
     CARREGAR TURMAS
 ======================== */
@@ -30,6 +35,7 @@ function renderTurmas() {
     semTurmasMsg.style.display = "block";
     return;
   }
+
 
   semTurmasMsg.style.display = "none";
 
@@ -161,3 +167,4 @@ async function openDetalhes(id) {
   INICIALIZAÇÃO
 ======================== */
 carregarTurmas();
+

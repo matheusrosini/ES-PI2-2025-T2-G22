@@ -1,7 +1,9 @@
 import { apiGet, apiPost, apiPut, apiDelete } from "./api.js";
 
-// Inicializa ícones
-lucide.createIcons();
+
+  if (window.lucide && lucide.createIcons) {
+  lucide.createIcons();
+}
 
 // Seletores
 const turmaSelect = document.getElementById("select-turma");
@@ -11,6 +13,8 @@ const formulaMediaInput = document.getElementById("formulaMedia");
 
 let turmaIdSelecionada = null;
 let disciplinaIdSelecionada = null;
+
+
 
 // ===============================
 // 1 — CARREGAR TURMAS
