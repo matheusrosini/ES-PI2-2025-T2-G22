@@ -1,5 +1,5 @@
 // Feito por Matheus Rosini
-import { register } from './api.js';
+import { register } from './auth.js';
 
 const form = document.getElementById('cadastroForm');
 
