@@ -7,7 +7,7 @@ import {
   apiDelete
 } from "./api.js";
 
-// Funções da API específicas
+// Funções específicas
 async function getInstituicoes() {
   return apiGet("/instituicoes");
 }
@@ -20,12 +20,10 @@ async function addDisciplina(data) {
   return apiPost("/disciplinas", data);
 }
 
-
-
-// Ativa Lucide (ícones)
+// Ativa ícones Lucide
 if (window.lucide && lucide.createIcons) lucide.createIcons();
 
-// Elementos
+// ------------------------ ELEMENTOS ------------------------
 const form = document.getElementById("form-disciplina");
 const tbody = document.getElementById("disciplinas-tbody");
 const semDisciplinasMsg = document.getElementById("semDisciplinasMsg");
@@ -36,19 +34,16 @@ const inputCodigo = document.getElementById("disc-codigo");
 const inputPeriodo = document.getElementById("disc-periodo");
 const selectInstituicao = document.getElementById("disc-instituicao");
 
-// 
 const fetchInstituicoes = (typeof getInstituicoes === "function")
   ? getInstituicoes
   : () => apiGet("/instituicoes");
 
-
-// Carrega inicialmente
+// Carrega tudo no início
 document.addEventListener("DOMContentLoaded", () => {
   carregarInstituicoes();
   carregarDisciplinas();
 });
 
-// ---------- helpers ----------
 function showAlert(msg) {
   alert(msg);
 }
@@ -61,7 +56,7 @@ function clearForm() {
   selectInstituicao.value = "";
 }
 
-// escapando texto simples para evitar XSS básico
+// proteção básica XSS
 function escapeHtml(s) {
   if (s == null) return "";
   return String(s)
@@ -72,11 +67,10 @@ function escapeHtml(s) {
     .replace(/'/g, "&#039;");
 }
 
-// ---------- carregar instituições para select ----------
+// ------------------------ INSTITUIÇÕES ------------------------
 async function carregarInstituicoes() {
   try {
     const insts = await fetchInstituicoes();
-    // caso o retorno venha envelopado, lidamos também
     const list = Array.isArray(insts) ? insts : (insts.data || insts.result || []);
     selectInstituicao.innerHTML = `<option value="">Selecione a instituição</option>`;
 
@@ -96,10 +90,10 @@ async function carregarInstituicoes() {
   }
 }
 
-// ---------- carregar disciplinas ----------
+// ------------------------ DISCIPLINAS ------------------------
 async function carregarDisciplinas() {
   try {
-    const disciplinas = await (typeof getDisciplinas === "function" ? getDisciplinas() : apiGet("/disciplinas"));
+    const disciplinas = await getDisciplinas();
     const list = Array.isArray(disciplinas) ? disciplinas : (disciplinas.data || []);
     renderDisciplinas(list || []);
   } catch (err) {
@@ -119,7 +113,6 @@ function renderDisciplinas(list) {
   semDisciplinasMsg.style.display = "none";
 
   list.forEach(d => {
-    // Oracle retorna em MAIÚSCULAS
     const nome = d.nome || d.NOME || "";
     const sigla = d.sigla || d.SIGLA || "";
     const codigo = d.codigo || d.CODIGO || "";
@@ -144,8 +137,7 @@ function renderDisciplinas(list) {
   });
 }
 
-
-// ---------- criar disciplina ----------
+// ------------------------ CRIAR DISCIPLINA ------------------------
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -162,20 +154,7 @@ form.addEventListener("submit", async (e) => {
   const payload = { nome, sigla, codigo, periodo, instituicao_id: Number(instituicao_id) };
 
   try {
-    if (typeof addDisciplina === "function") {
-      await addDisciplina(payload);
-    } else {
-      // fallback para api generic POST
-      await fetch("/disciplinas", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      }).then(r => {
-        if (!r.ok) throw new Error("Erro na criação");
-        return r.json();
-      });
-    }
-
+    await addDisciplina(payload);
     showAlert("Disciplina cadastrada com sucesso.");
     clearForm();
     carregarDisciplinas();
@@ -185,21 +164,17 @@ form.addEventListener("submit", async (e) => {
   }
 });
 
-// ---------- delegação para editar / excluir ----------
+// ------------------------ EDITAR / EXCLUIR ------------------------
 tbody.addEventListener("click", async (e) => {
   const id = e.target.dataset.id;
   if (!id) return;
 
-  // EXCLUIR
+  // ---------------- EXCLUIR ----------------
   if (e.target.classList.contains("btn-delete")) {
     if (!confirm("Deseja realmente excluir esta disciplina?")) return;
+
     try {
-      if (typeof apiDelete === "function") {
-        await apiDelete(`/disciplinas/${id}`);
-      } else {
-        const res = await fetch(`/disciplinas/${id}`, { method: "DELETE" });
-        if (!res.ok) throw new Error("Erro ao deletar");
-      }
+      await apiDelete(`/disciplinas/${id}`);
       showAlert("Disciplina excluída.");
       carregarDisciplinas();
     } catch (err) {
@@ -208,9 +183,10 @@ tbody.addEventListener("click", async (e) => {
     }
   }
 
-  // EDITAR (simples prompts)
+  // ---------------- EDITAR ----------------
   if (e.target.classList.contains("btn-edit")) {
     const tr = e.target.closest("tr");
+
     const curNome = tr.children[0].textContent;
     const curSigla = tr.children[1].textContent;
     const curCodigo = tr.children[2].textContent;
@@ -218,50 +194,59 @@ tbody.addEventListener("click", async (e) => {
     const curInstituicaoTxt = tr.children[4].textContent || "";
 
     const novoNome = prompt("Nome da disciplina:", curNome);
-    if (novoNome === null) return; // cancelou
+    if (novoNome === null) return;
+
     const novaSigla = prompt("Sigla:", curSigla);
     if (novaSigla === null) return;
+
     const novoCodigo = prompt("Código:", curCodigo);
     if (novoCodigo === null) return;
+
     const novoPeriodo = prompt("Período:", curPeriodo);
     if (novoPeriodo === null) return;
 
-    let novaInstId = null;
+    // Obter lista atual de instituições
+    const instituicoes = Array.from(selectInstituicao.options)
+      .filter(o => o.value)
+      .map(o => ({ id: Number(o.value), nome: o.textContent }));
+
+    // Tentar identificar a instituição atual
+    const instituicaoAtualObj = instituicoes.find(i => i.nome === curInstituicaoTxt);
+    const instituicaoAtualId = instituicaoAtualObj ? instituicaoAtualObj.id : null;
+
+    // GARANTIA: se não achar, NÃO perde a instituição
+    let novaInstId = instituicaoAtualId;
+
     const mudarInst = confirm("Deseja alterar a instituição? (OK = Sim, Cancel = Não)");
     if (mudarInst) {
-      // mostra opções curtas para o usuário colar o ID
-      const options = Array.from(selectInstituicao.options)
-        .filter(o => o.value)
-        .map(o => `${o.value}: ${o.textContent}`)
-        .join("\n");
-      const escolha = prompt(`Cole o ID da instituição desejada:\n${options}`, "");
+      const options = instituicoes.map(o => `${o.id}: ${o.nome}`).join("\n");
+
+      const escolha = prompt(
+        `Digite o ID da nova instituição:\n${options}`,
+        instituicaoAtualId ? String(instituicaoAtualId) : ""
+      );
+
       if (escolha === null) return;
-      novaInstId = Number(escolha.trim());
-      if (!Number.isFinite(novaInstId) || novaInstId <= 0) {
+
+      const numero = Number(escolha.trim());
+      if (!Number.isFinite(numero) || numero <= 0) {
         showAlert("ID de instituição inválido. Edição cancelada.");
         return;
       }
+
+      novaInstId = numero;
     }
 
     const payload = {
       nome: novoNome.trim(),
       sigla: novaSigla.trim(),
       codigo: novoCodigo.trim(),
-      periodo: novoPeriodo.trim()
+      periodo: novoPeriodo.trim(),
+      instituicao_id: novaInstId // <- SEMPRE manda um ID válido
     };
-    if (novaInstId) payload.instituicao_id = novaInstId;
 
     try {
-      if (typeof apiPut === "function") {
-        await apiPut(`/disciplinas/${id}`, payload);
-      } else {
-        const res = await fetch(`/disciplinas/${id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-        if (!res.ok) throw new Error("Erro ao atualizar");
-      }
+      await apiPut(`/disciplinas/${id}`, payload);
       showAlert("Disciplina atualizada.");
       carregarDisciplinas();
     } catch (err) {
@@ -270,5 +255,3 @@ tbody.addEventListener("click", async (e) => {
     }
   }
 });
-
-
