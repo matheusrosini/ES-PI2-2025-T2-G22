@@ -1,10 +1,5 @@
 import { apiGet, apiPost, apiPut, apiDelete } from "./api.js";
 
-
-  if (window.lucide && lucide.createIcons) {
-  lucide.createIcons();
-}
-
 // Seletores
 const turmaSelect = document.getElementById("select-turma");
 const disciplinaSelect = document.getElementById("select-disciplina");
@@ -15,7 +10,9 @@ let turmaIdSelecionada = null;
 let disciplinaIdSelecionada = null;
 
 
-
+  if (window.lucide && lucide.createIcons) {
+  lucide.createIcons();
+}
 // ===============================
 // 1 — CARREGAR TURMAS
 // ===============================

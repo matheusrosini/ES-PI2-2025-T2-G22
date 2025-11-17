@@ -2,6 +2,10 @@ import { addInstituicao, getInstituicoes } from "./api.js";
 
 const formInstituicao = document.getElementById("form-instituicao");
 
+  if (window.lucide && lucide.createIcons) {
+  lucide.createIcons();
+}
+
 // Alteração: agora suporta apenas o input 'nome' do HTML de instituicoes.html
 formInstituicao.addEventListener("submit", async (e) => {
   e.preventDefault();
