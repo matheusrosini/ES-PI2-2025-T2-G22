@@ -9,13 +9,14 @@ const usuarioController = require("../controllers/usuarioController");
 router.post("/login", usuarioController.login);
 router.post("/register", usuarioController.register);
 
+const { authMiddleware } = require('../middlewares/authmiddleware');
 
 // ===== CRUD Usuário =====
-router.get("/", usuarioController.getAllUsuarios);
-router.get("/:id", usuarioController.getUsuariosById);
-router.post("/", usuarioController.createUsuarios);
-router.put("/:id", usuarioController.updateUsuarios);
-router.delete("/:id", usuarioController.removeUsuarios);
+router.get("/", authMiddleware, usuarioController.getAllUsuarios);
+router.get("/:id", authMiddleware, usuarioController.getUsuariosById);
+router.post("/", authMiddleware, usuarioController.createUsuarios);
+router.put("/:id", authMiddleware, usuarioController.updateUsuarios);
+router.delete("/:id", authMiddleware, usuarioController.removeUsuarios);
 
 
 

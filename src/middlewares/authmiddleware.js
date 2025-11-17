@@ -1,31 +1,41 @@
-// Feito por Leonardo
-const jwt = require('jsonwebtoken');
-
+// /src/middlewares/authmiddleware.js
+const jwt = require("jsonwebtoken");
 const JWT_SECRET = process.env.JWT_SECRET;
 
 function authMiddleware(req, res, next) {
   try {
+    // 1. tenta header Authorization (Bearer ...)
+    let token = null;
     const authHeader = req.headers.authorization || req.headers.Authorization;
-    if (!authHeader) {
-      return res.status(401).json({ message: 'Token não enviado.' });
+
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      token = authHeader.split(" ")[1];
     }
 
-    const parts = authHeader.split(' ');
-    if (parts.length !== 2 || parts[0] !== 'Bearer') {
-      return res.status(401).json({ message: 'Formato de token inválido.' });
+    // 2. se não veio no header, tenta cookie named "token"
+    if (!token && req.cookies && req.cookies.token) {
+      token = req.cookies.token;
     }
 
-    const token = parts[1];
+    // 3. se ainda não tiver token -> 401
+    if (!token) {
+      return res.status(401).json({ message: "Token não enviado." });
+    }
+
+    // 4. valida o token
     const decoded = jwt.verify(token, JWT_SECRET);
 
     if (!decoded || !decoded.id) {
-      return res.status(401).json({ message: 'Token inválido.' });
+      return res.status(401).json({ message: "Token inválido." });
     }
 
+    // 5. insere req.user e continua
     req.user = { id: decoded.id };
-    return next();
+    next();
+
   } catch (err) {
-    return res.status(401).json({ message: 'Token inválido ou expirado.' });
+    console.error("Erro no authMiddleware:", err);
+    return res.status(401).json({ message: "Token inválido ou expirado." });
   }
 }
 
