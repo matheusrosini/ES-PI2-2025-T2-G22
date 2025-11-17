@@ -1,61 +1,40 @@
-const db = require('../db');
+const db = require('../config/db');
 
-// GET /turma
-exports.getAllTurmas = (req, res) => {
-  const sql = `
-    SELECT t.*, d.nome AS disciplina_nome
-    FROM turma t
-    JOIN disciplina d ON d.id = t.disciplina_id
-  `;
-  db.query(sql, (err, result) => {
-    if (err) return res.status(500).json(err);
-    res.json(result);
-  });
+exports.getTurmas = async (req, res) => {
+  try {
+    const [rows] = await db.query('SELECT * FROM turmas');
+    res.json(rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao buscar turmas' });
+  }
 };
 
-// GET /turma/:id
-exports.getTurmaById = (req, res) => {
-  db.query("SELECT * FROM turma WHERE id = ?", [req.params.id], (err, result) => {
-    if (err) return res.status(500).json(err);
-    res.json(result[0]);
-  });
+exports.createTurma = async (req, res) => {
+  try {
+    const { nome, professor_id } = req.body;
+
+    const [result] = await db.query(
+      'INSERT INTO turmas (nome, professor_id) VALUES (?, ?)',
+      [nome, professor_id]
+    );
+
+    res.status(201).json({ id: result.insertId, nome, professor_id });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao criar turma' });
+  }
 };
 
-// POST /turma
-exports.createTurma = (req, res) => {
-  const { nome, codigo, periodo, disciplina_id } = req.body;
+exports.deleteTurma = async (req, res) => {
+  try {
+    const { id } = req.params;
 
-  const sql = `
-    INSERT INTO turma (nome, codigo, periodo, disciplina_id)
-    VALUES (?, ?, ?, ?)
-  `;
+    await db.query('DELETE FROM turmas WHERE id = ?', [id]);
 
-  db.query(sql, [nome, codigo, periodo, disciplina_id], (err, result) => {
-    if (err) return res.status(500).json(err);
-
-    res.json({ id: result.insertId, message: "Turma criada." });
-  });
-};
-
-// PUT /turma/:id
-exports.updateTurma = (req, res) => {
-  const { nome, codigo, periodo, disciplina_id } = req.body;
-
-  const sql = `
-    UPDATE turma SET nome=?, codigo=?, periodo=?, disciplina_id=?
-    WHERE id=?
-  `;
-
-  db.query(sql, [nome, codigo, periodo, disciplina_id, req.params.id], (err) => {
-    if (err) return res.status(500).json(err);
-    res.json({ message: "Turma atualizada." });
-  });
-};
-
-// DELETE /turma/:id
-exports.deleteTurma = (req, res) => {
-  db.query("DELETE FROM turma WHERE id=?", [req.params.id], (err) => {
-    if (err) return res.status(500).json(err);
-    res.json({ message: "Turma excluída." });
-  });
+    res.json({ message: 'Turma deletada com sucesso' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao deletar turma' });
+  }
 };
