@@ -3,6 +3,7 @@
 const express = require("express");
 const router = express.Router();
 const notaController = require("../controllers/notaController");
+const { authMiddleware } = require('../middlewares/authmiddleware');
 
 // LISTAR alunos + componentes + notas da turma
 router.get(
@@ -14,10 +15,10 @@ router.get(
 router.put("/registrar", notaController.registrarNota);
 
 // CRUD
-router.get("/", notaController.getAllNotas);
-router.get("/:id", notaController.getNotaById);
-router.post("/", notaController.createNota);
-router.put("/:id", notaController.updateNota);
-router.delete("/:id", notaController.deleteNota);
+router.get("/", authMiddleware, notaController.getAllNotas);
+router.get("/:id", authMiddleware, notaController.getNotaById);
+router.post("/", authMiddleware, notaController.createNota);
+router.put("/:id", authMiddleware, notaController.updateNota);
+router.delete("/:id", authMiddleware, notaController.deleteNota);
 
 module.exports = router;

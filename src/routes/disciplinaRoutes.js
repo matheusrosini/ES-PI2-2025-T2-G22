@@ -1,14 +1,17 @@
-// Feito por Matheus Rosini
+// Feito por Matheus Rosini e Leonardo
 
 const express = require("express");
 const router = express.Router();
 const controller = require("../controllers/disciplinaController");
 
-// Rotas de disciplinas
-router.get("/", controller.getAllDisciplinas);
-router.post("/", controller.createDisciplina);
-router.get("/:id", controller.getDisciplinaById);
-router.put("/:id", controller.updateDisciplina);
-router.delete("/:id", controller.deleteDisciplina);
+// 
+const { authMiddleware } = require("../middlewares/authmiddleware");
+
+// Todas as rotas agora protegidas corretamente
+router.get("/", authMiddleware, controller.getAllDisciplinas);
+router.post("/", authMiddleware, controller.createDisciplina);
+router.get("/:id", authMiddleware, controller.getDisciplinaById);
+router.put("/:id", authMiddleware, controller.updateDisciplina);
+router.delete("/:id", authMiddleware, controller.deleteDisciplina);
 
 module.exports = router;

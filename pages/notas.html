@@ -25,7 +25,7 @@
                 <li><a href="disciplinas.html"><i data-lucide="book-open"></i> Disciplinas</a></li>
                 <li><a href="turmas.html"><i data-lucide="users"></i> Turmas</a></li>
                 <li><a href="notas.html"><i data-lucide="pencil"></i> Notas</a></li>
-                <li><a href="index.html"><i data-lucide="log-out"></i> Sair</a></li>
+                <li><a href="#" id="logoutBtn"><i data-lucide="log-out"></i> Sair</a></li>
             </ul>
         </nav>
     </div>
@@ -81,5 +81,20 @@
 
     <!-- Script JS -->
     <script type="module" src="scripts/notas.js"></script>
+    <script src="scripts/authGuard.js"></script>
+    <!-- Modal de Logout -->
+<div id="logoutModal" class="logout-modal">
+  <div class="logout-modal-content">
+    <h3>Confirmar saída</h3>
+    <p>Tem certeza que deseja desconectar da sua conta?</p>
+
+    <div class="logout-modal-buttons">
+      <button id="logoutCancel" class="logout-cancel">Cancelar</button>
+      <button id="logoutConfirm" class="logout-confirm">Sair</button>
+        </div>
+    </div>
+</div>
+
+
 </body>
 </html>

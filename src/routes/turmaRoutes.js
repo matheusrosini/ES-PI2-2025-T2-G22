@@ -3,12 +3,13 @@
 const express = require("express");
 const router = express.Router();
 const turmaController = require("../controllers/turmaController");
+const { authMiddleware } = require('../middlewares/authmiddleware');
 
 // Rotas da turma
-router.get("/", turmaController.getAllTurmas);
-router.get("/:id", turmaController.getTurmaById);
-router.post("/", turmaController.createTurma);
-router.put("/:id", turmaController.updateTurma);
-router.delete("/:id", turmaController.deleteTurma);
+router.get("/", authMiddleware, turmaController.getAllTurmas);
+router.get("/:id", authMiddleware, turmaController.getTurmaById);
+router.post("/", authMiddleware, turmaController.createTurma);
+router.put("/:id", authMiddleware, turmaController.updateTurma);
+router.delete("/:id", authMiddleware, turmaController.deleteTurma);
 
 module.exports = router;

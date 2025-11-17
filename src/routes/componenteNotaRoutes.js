@@ -3,17 +3,18 @@
 const express = require("express");
 const router = express.Router();
 const componenteNotaController = require("../controllers/componenteNotaController");
+const { authMiddleware } = require("../middlewares/authmiddleware");
 
 // Listar componentes por disciplina
-router.get("/disciplina/:disciplinaId", componenteNotaController.getByDisciplina);
+router.get("/disciplina/:disciplinaId", authMiddleware, componenteNotaController.getByDisciplina);
 
 // Criar componente
-router.post("/", componenteNotaController.create);
+router.post("/", authMiddleware, componenteNotaController.create);
 
 // Atualizar componente
-router.put("/:id", componenteNotaController.update);
+router.put("/:id", authMiddleware, componenteNotaController.update);
 
 // Deletar componente
-router.delete("/:id", componenteNotaController.delete);
+router.delete("/:id", authMiddleware, componenteNotaController.delete);
 
 module.exports = router;
