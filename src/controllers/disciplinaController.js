@@ -26,6 +26,7 @@ exports.getAllDisciplinas = async (req, res) => {
        d.SIGLA, 
        d.CODIGO, 
        d.PERIODO,
+       d.FORMULA_NOTA,
        d.INSTITUICAO_ID,
               i.NOME AS INSTITUICAO
        FROM DISCIPLINA d

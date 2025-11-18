@@ -11,6 +11,15 @@ exports.getNotasByTurmaEDisciplina = async (req, res) => {
     try {
         const { turmaId, disciplinaId } = req.params;
 
+        console.log(`Buscando notas para turmaId: ${turmaId}, disciplinaId: ${disciplinaId}`);
+
+        if (!turmaId || !disciplinaId) {
+            return res.status(400).json({
+                message: "turmaId e disciplinaId são obrigatórios.",
+                error: "Parâmetros inválidos"
+            });
+        }
+
         conn = await open();
 
         // Buscar alunos da turma
@@ -18,16 +27,41 @@ exports.getNotasByTurmaEDisciplina = async (req, res) => {
             `SELECT ID, NOME, MATRICULA
              FROM ALUNO
              WHERE TURMA_ID = :turmaId`,
-            { turmaId }
+            { turmaId: Number(turmaId) }
         );
 
+        console.log(`Alunos encontrados: ${alunos.rows?.length || 0}`);
+
         // Buscar componentes da disciplina
+        // Buscar todos os campos disponíveis e adicionar PESO padrão se não existir
         const componentes = await conn.execute(
-            `SELECT ID, NOME, SIGLA
+            `SELECT ID, NOME, SIGLA, DESCRICAO
              FROM COMPONENTE_NOTA
              WHERE DISCIPLINA_ID = :disciplinaId`,
-            { disciplinaId }
+            { disciplinaId: Number(disciplinaId) }
         );
+        
+        // Tentar adicionar PESO se a coluna existir
+        if (componentes.rows && componentes.rows.length > 0) {
+            try {
+                const componentesComPeso = await conn.execute(
+                    `SELECT ID, NOME, SIGLA, DESCRICAO, NVL(PESO, 1) AS PESO
+                     FROM COMPONENTE_NOTA
+                     WHERE DISCIPLINA_ID = :disciplinaId`,
+                    { disciplinaId: Number(disciplinaId) }
+                );
+                // Se funcionou, usar os dados com PESO
+                if (componentesComPeso.rows) {
+                    componentes.rows = componentesComPeso.rows;
+                }
+            } catch (pesoErr) {
+                // Se PESO não existir, adicionar valor padrão
+                console.warn("Campo PESO não encontrado, usando valor padrão 1");
+                componentes.rows = componentes.rows.map(c => ({ ...c, PESO: 1 }));
+            }
+        }
+
+        console.log(`Componentes encontrados: ${componentes.rows?.length || 0}`);
 
         // Buscar notas existentes
         const notas = await conn.execute(
@@ -35,16 +69,27 @@ exports.getNotasByTurmaEDisciplina = async (req, res) => {
              FROM NOTA n
              JOIN COMPONENTE_NOTA c ON c.ID = n.COMPONENTE_ID
              WHERE c.DISCIPLINA_ID = :disciplinaId`,
-            { disciplinaId }
+            { disciplinaId: Number(disciplinaId) }
         );
 
-        // Montar resposta final
+        console.log(`Notas encontradas: ${notas.rows?.length || 0}`);
+
+        // Verificar se alunos.rows existe
+        if (!alunos.rows) {
+            console.error("alunos.rows é undefined");
+            return res.status(500).json({
+                message: "Erro ao processar dados dos alunos.",
+                error: "Dados inválidos retornados do banco"
+            });
+        }
+
+        // Montar resposta final - normalizar dados Oracle (maiúsculas → minúsculas)
         const resposta = alunos.rows.map(a => ({
             aluno_id: a.ID,
             nome: a.NOME,
             matricula: a.MATRICULA,
-            componentes: componentes.rows.map(c => {
-                const nota = notas.rows.find(n =>
+            componentes: (componentes.rows || []).map(c => {
+                const nota = (notas.rows || []).find(n =>
                     n.ALUNO_ID === a.ID && n.COMPONENTE_ID === c.ID
                 );
 
@@ -58,15 +103,35 @@ exports.getNotasByTurmaEDisciplina = async (req, res) => {
             })
         }));
 
-        res.json({ alunos: resposta, componentes: componentes.rows });
+        // Normalizar componentes também
+        const componentesNormalizados = (componentes.rows || []).map(c => ({
+            id: c.ID,
+            nome: c.NOME,
+            sigla: c.SIGLA,
+            descricao: c.DESCRICAO || null,
+            peso: c.PESO || 1,
+            disciplina_id: c.DISCIPLINA_ID || disciplinaId
+        }));
+
+        console.log(`Retornando ${resposta.length} alunos e ${componentesNormalizados.length} componentes`);
+
+        res.json({ alunos: resposta, componentes: componentesNormalizados });
 
     } catch (err) {
+        console.error("Erro detalhado em getNotasByTurmaEDisciplina:", err);
+        console.error("Stack trace:", err.stack);
         res.status(500).json({
             message: "Erro ao carregar notas.",
-            error: err.message
+            error: err.message || "Erro desconhecido"
         });
     } finally {
-        if (conn) await close(conn);
+        if (conn) {
+            try {
+                await close(conn);
+            } catch (closeErr) {
+                console.error("Erro ao fechar conexão:", closeErr);
+            }
+        }
     }
 };
 

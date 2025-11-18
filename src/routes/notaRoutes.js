@@ -8,11 +8,12 @@ const { authMiddleware } = require('../middlewares/authmiddleware');
 // LISTAR alunos + componentes + notas da turma
 router.get(
   "/turma/:turmaId/disciplina/:disciplinaId",
+  authMiddleware,
   notaController.getNotasByTurmaEDisciplina
 );
 
 // REGISTRAR / ATUALIZAR nota via PUT
-router.put("/registrar", notaController.registrarNota);
+router.put("/registrar", authMiddleware, notaController.registrarNota);
 
 // CRUD
 router.get("/", authMiddleware, notaController.getAllNotas);

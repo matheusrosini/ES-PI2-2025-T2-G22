@@ -53,9 +53,26 @@ async function query(sql, params = {}) {
   return execute(sql, params, { autoCommit: !isSelect });
 }
 
+// Funções open/close para compatibilidade com notaController
+async function open() {
+  return await getConnection();
+}
+
+async function close(conn) {
+  if (conn) {
+    try {
+      await conn.close();
+    } catch (err) {
+      console.error("Erro ao fechar conexão:", err);
+    }
+  }
+}
+
 // Exporta tudo necessário
 module.exports = {
   getConnection,
   execute,
-  query
+  query,
+  open,
+  close
 };

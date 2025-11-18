@@ -17,11 +17,12 @@ notas.HTML
     <h1>NotaDez</h1>
     <nav>
       <ul>
+        <li><a href="dashboard.html"><i data-lucide="layout-dashboard"></i> Dashboard</a></li>
         <li><a href="instituicoes.html"><i data-lucide="school"></i> Instituições</a></li>
         <li><a href="disciplinas.html"><i data-lucide="book-open"></i> Disciplinas</a></li>
         <li><a href="turmas.html"><i data-lucide="users"></i> Turmas</a></li>
         <li><a href="notas.html"><i data-lucide="pencil"></i> Notas</a></li>
-        <li><a href="dashboard.html"><i data-lucide="layout-dashboard"></i> Dashboard</a></li>
+        <li><a href="alunos.html"><i data-lucide="user"></i> Alunos</a></li>
         <li><a href="#" id="logoutBtn" data-logout><i data-lucide="log-out"></i> Sair</a></li>
       </ul>
     </nav>
@@ -54,9 +55,29 @@ notas.HTML
     </section>
 
     <div class="formula-container">
-      <label for="formulaMedia">Fórmula da Média</label>
-      <input id="formulaMedia" type="text" placeholder="Ex: (P1 + P2 + P3) / 3" />
-      <small>Edite a fórmula se desejar. Use apenas siglas dos componentes.</small>
+      <div style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 300px;">
+          <label for="formulaMedia">Fórmula da Média</label>
+          <input id="formulaMedia" type="text" placeholder="Ex: (P1 + P2 + P3) / 3" />
+          <small>Edite a fórmula se desejar. Use apenas siglas dos componentes.</small>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div>
+            <label for="tipoCalculo">Tipo de Cálculo:</label>
+            <select id="tipoCalculo" style="padding: 8px; width: 150px;">
+              <option value="normal">Normal (Aritmética)</option>
+              <option value="ponderada">Ponderada</option>
+            </select>
+          </div>
+          <div>
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+              <input type="checkbox" id="arredondarNotas" />
+              <span>Arredondar notas</span>
+            </label>
+          </div>
+          <button id="btnSalvarFormula" type="button" class="btn" style="width: 150px;">Salvar Fórmula</button>
+        </div>
+      </div>
     </div>
 
     <!-- Container para controles extras (gerador pelo CSS/JS assume que existe) -->

@@ -10,14 +10,23 @@ exports.getByDisciplina = async (req, res) => {
     const { disciplinaId } = req.params;
 
     const result = await db.execute(
-      `SELECT id, nome, peso, disciplina_id 
-       FROM componente_nota 
-       WHERE disciplina_id = :disciplinaId`,
-      { disciplinaId },
-      { outFormat: db.OUT_FORMAT_OBJECT }
+      `SELECT ID, NOME, SIGLA, DESCRICAO, PESO, DISCIPLINA_ID 
+       FROM COMPONENTE_NOTA 
+       WHERE DISCIPLINA_ID = :disciplinaId`,
+      { disciplinaId }
     );
 
-    return res.json(result.rows);
+    // Normalizar dados Oracle (maiúsculas → minúsculas)
+    const componentesNormalizados = result.rows.map(c => ({
+      id: c.ID,
+      nome: c.NOME,
+      sigla: c.SIGLA,
+      descricao: c.DESCRICAO || null,
+      peso: c.PESO || 1, // Padrão: peso 1 se não especificado
+      disciplina_id: c.DISCIPLINA_ID
+    }));
+
+    return res.json(componentesNormalizados);
 
   } catch (err) {
     console.error("Erro ao buscar componentes:", err);
@@ -30,15 +39,17 @@ exports.getByDisciplina = async (req, res) => {
 ================================= */
 exports.create = async (req, res) => {
   try {
-    const { nome, peso, disciplina_id } = req.body;
+    const { nome, sigla, descricao, peso, disciplina_id } = req.body;
+
+    if (!nome || !sigla || !disciplina_id) {
+      return res.status(400).json({ message: "Nome, sigla e disciplina_id são obrigatórios." });
+    }
 
     await db.execute(
-      `INSERT INTO componente_nota (nome, peso, disciplina_id)
-       VALUES (:nome, :peso, :disciplina_id)`,
-      { nome, peso, disciplina_id }
+      `INSERT INTO COMPONENTE_NOTA (NOME, SIGLA, DESCRICAO, PESO, DISCIPLINA_ID)
+       VALUES (:nome, :sigla, :descricao, :peso, :disciplina_id)`,
+      { nome, sigla, descricao: descricao || null, peso: peso || 1, disciplina_id }
     );
-
-    await db.commit();
 
     res.status(201).json({ message: "Componente criado com sucesso!" });
 
@@ -54,17 +65,17 @@ exports.create = async (req, res) => {
 exports.update = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nome, peso } = req.body;
+    const { nome, sigla, descricao, peso } = req.body;
 
     await db.execute(
-      `UPDATE componente_nota
-       SET nome = :nome,
-           peso = :peso
-       WHERE id = :id`,
-      { nome, peso, id }
+      `UPDATE COMPONENTE_NOTA
+       SET NOME = :nome,
+           SIGLA = :sigla,
+           DESCRICAO = :descricao,
+           PESO = :peso
+       WHERE ID = :id`,
+      { nome, sigla, descricao: descricao || null, peso: peso || 1, id }
     );
-
-    await db.commit();
 
     res.json({ message: "Componente atualizado com sucesso!" });
 
@@ -82,11 +93,9 @@ exports.delete = async (req, res) => {
     const { id } = req.params;
 
     await db.execute(
-      `DELETE FROM componente_nota WHERE id = :id`,
+      `DELETE FROM COMPONENTE_NOTA WHERE ID = :id`,
       { id }
     );
-
-    await db.commit();
 
     res.json({ message: "Componente removido com sucesso!" });
 
