@@ -36,6 +36,8 @@ async function carregarInstituicoes() {
       option.textContent = inst.nome;
       selectInstituicao.appendChild(option);
     });
+    // Após carregar as instituições, carregar as disciplinas
+    carregarDisciplinas();
   } catch (err) {
     console.error("Erro ao carregar instituições:", err);
   }
@@ -46,6 +48,15 @@ async function carregarDisciplinas() {
   try {
     const resp = await apiGet("/disciplinas");
     disciplinasCache = resp;
+    selectDisciplina.innerHTML = "<option value=''>Selecione...</option>";
+    resp.forEach(disciplina => {
+      const option = document.createElement("option");
+      option.value = disciplina.id;
+      option.textContent = disciplina.nome;
+      selectDisciplina.appendChild(option);
+    });
+    // Após carregar as disciplinas, carregar as turmas
+    carregarTurmas();
   } catch (err) {
     console.error("Erro ao carregar disciplinas:", err);
   }
@@ -162,6 +173,5 @@ btnAplicarFiltro.addEventListener("click", carregarAlunos);
 // Inicializar a página
 (async function init() {
   await carregarInstituicoes();
-  await carregarDisciplinas();
-  carregarAlunos();
+  carregarAlunos(); // Carregar alunos após as instituições
 })();
