@@ -15,26 +15,26 @@ exports.getNotasByTurmaEDisciplina = async (req, res) => {
 
         // Buscar alunos da turma
         const alunos = await conn.execute(
-            `SELECT id, nome, matricula
-             FROM aluno
-             WHERE turma_id = :turmaId`,
+            `SELECT ID, NOME, MATRICULA
+             FROM ALUNO
+             WHERE TURMA_ID = :turmaId`,
             { turmaId }
         );
 
         // Buscar componentes da disciplina
         const componentes = await conn.execute(
-            `SELECT id, nome, sigla
-             FROM componente_nota
-             WHERE disciplina_id = :disciplinaId`,
+            `SELECT ID, NOME, SIGLA
+             FROM COMPONENTE_NOTA
+             WHERE DISCIPLINA_ID = :disciplinaId`,
             { disciplinaId }
         );
 
         // Buscar notas existentes
         const notas = await conn.execute(
-            `SELECT n.id, n.valor, n.aluno_id, n.componente_id
-             FROM nota n
-             JOIN componente_nota c ON c.id = n.componente_id
-             WHERE c.disciplina_id = :disciplinaId`,
+            `SELECT n.ID, n.VALOR, n.ALUNO_ID, n.COMPONENTE_ID
+             FROM NOTA n
+             JOIN COMPONENTE_NOTA c ON c.ID = n.COMPONENTE_ID
+             WHERE c.DISCIPLINA_ID = :disciplinaId`,
             { disciplinaId }
         );
 
@@ -87,7 +87,7 @@ exports.registrarNota = async (req, res) => {
 
         // Verifica aluno
         const alunoExiste = await conn.execute(
-            "SELECT id FROM aluno WHERE id = :id",
+            "SELECT ID FROM ALUNO WHERE ID = :id",
             { id: aluno_id }
         );
         if (alunoExiste.rows.length === 0)
@@ -95,7 +95,7 @@ exports.registrarNota = async (req, res) => {
 
         // Verifica componente
         const compExiste = await conn.execute(
-            "SELECT id FROM componente_nota WHERE id = :id",
+            "SELECT ID FROM COMPONENTE_NOTA WHERE ID = :id",
             { id: componente_id }
         );
         if (compExiste.rows.length === 0)
@@ -103,15 +103,15 @@ exports.registrarNota = async (req, res) => {
 
         // Verifica se nota existe
         const existe = await conn.execute(
-            `SELECT id FROM nota
-             WHERE aluno_id = :aluno_id
-             AND componente_id = :componente_id`,
+            `SELECT ID FROM NOTA
+             WHERE ALUNO_ID = :aluno_id
+             AND COMPONENTE_ID = :componente_id`,
             { aluno_id, componente_id }
         );
 
         if (existe.rows.length > 0) {
             await conn.execute(
-                `UPDATE nota SET valor = :valor WHERE id = :id`,
+                `UPDATE NOTA SET VALOR = :valor WHERE ID = :id`,
                 { valor, id: existe.rows[0].ID },
                 { autoCommit: true }
             );
@@ -121,7 +121,7 @@ exports.registrarNota = async (req, res) => {
 
         // Inserir nova nota
         await conn.execute(
-            `INSERT INTO nota (aluno_id, componente_id, valor)
+            `INSERT INTO NOTA (ALUNO_ID, COMPONENTE_ID, VALOR)
              VALUES (:aluno_id, :componente_id, :valor)`,
             { aluno_id, componente_id, valor },
             { autoCommit: true }

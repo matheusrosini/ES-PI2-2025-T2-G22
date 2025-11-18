@@ -1,35 +1,36 @@
-// pages/scripts/aluno.js
+//Feito por Matheus Henrique Portugal Narducci
+// Atualizado para implementar cascata Instituição → Disciplina → Turma
+
 import { apiGet, apiPost, apiPut, apiDelete } from "./api.js";
 
-// DOM elements for the page
+// Seletores do HTML
 const selectInstituicao = document.getElementById("selectInstituicao");
 const selectDisciplina = document.getElementById("selectDisciplina");
 const selectTurma = document.getElementById("selectTurma");
-const btnAplicarFiltro = document.getElementById("btnAplicarFiltro");
-const listaContainer = document.getElementById("lista-container");
-const tabelaBody = document.querySelector("#tabela-alunos tbody");
-const semAlunosMsg = document.getElementById("semAlunosMsg");
-
-const novoAlunoBtn = document.getElementById("novoAlunoBtn");
-const modalAluno = document.getElementById("modalCadastroAluno");
-const closeModalAluno = document.getElementById("closeModalAluno");
-const alunoNomeInput = document.getElementById("alunoNome");
-const alunoMatriculaInput = document.getElementById("alunoMatricula");
-const instituicaoAlunoSelect = document.getElementById("instituicaoAluno");
-const disciplinaAlunoSelect = document.getElementById("disciplinaAluno");
-const turmaAlunoSelect = document.getElementById("turmaAluno");
-const salvarAlunoBtn = document.getElementById("salvarAlunoBtn");
-const cancelarAlunoBtn = document.getElementById("cancelarAlunoBtn");
+const btnCarregarAlunos = document.getElementById("btnCarregarAlunos");
+const tableWrapper = document.getElementById("tableWrapper");
+const nenhumaTabela = document.getElementById("nenhumaTabela");
+const formulaMediaInput = document.getElementById("formulaMedia");
 
 // Verificar se os elementos foram encontrados
-if (!novoAlunoBtn) console.error("❌ Botão 'Adicionar Aluno' não encontrado!");
-if (!modalAluno) console.error("❌ Modal de cadastro não encontrado!");
-if (!salvarAlunoBtn) console.error("❌ Botão 'Salvar' não encontrado!");
+if (!selectInstituicao) console.error("❌ Select Instituição não encontrado!");
+if (!selectDisciplina) console.error("❌ Select Disciplina não encontrado!");
+if (!selectTurma) console.error("❌ Select Turma não encontrado!");
+if (!btnCarregarAlunos) console.error("❌ Botão Carregar Alunos não encontrado!");
+if (!tableWrapper) console.error("❌ TableWrapper não encontrado!");
 
 // Store data
 let instituicoesCache = [];
 let disciplinasCache = [];
 let turmasCache = [];
+
+let turmaIdSelecionada = null;
+let disciplinaIdSelecionada = null;
+let instituicaoIdSelecionada = null;
+
+if (window.lucide && lucide.createIcons) {
+  lucide.createIcons();
+}
 
 // Helper functions
 function escapeHtml(s) {
@@ -37,69 +38,20 @@ function escapeHtml(s) {
   return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
 
-async function openModal() {
-  if (!modalAluno) {
-    console.error("❌ Modal não encontrado na função openModal!");
-    return;
-  }
-  
-  console.log("Abrindo modal...");
-  modalAluno.classList.add("show");
-  
-  // Preencher os campos do modal com os valores dos filtros se estiverem selecionados
-  if (selectInstituicao && selectInstituicao.value) {
-    if (instituicaoAlunoSelect) {
-      instituicaoAlunoSelect.value = selectInstituicao.value;
-      // Popular disciplinas baseado na instituição selecionada
-      popularDisciplinaSelectByInstituicao(selectInstituicao.value, disciplinaAlunoSelect);
-      
-      if (selectDisciplina && selectDisciplina.value) {
-        if (disciplinaAlunoSelect) {
-          disciplinaAlunoSelect.value = selectDisciplina.value;
-          // Carregar turmas baseado na instituição e disciplina selecionadas
-          await carregarTurmas(selectInstituicao.value, selectDisciplina.value, turmaAlunoSelect);
-          
-          if (selectTurma && selectTurma.value && turmaAlunoSelect) {
-            turmaAlunoSelect.value = selectTurma.value;
-          }
-        }
-      } else {
-        // Limpar turma se não houver disciplina selecionada
-        if (turmaAlunoSelect) {
-          turmaAlunoSelect.innerHTML = "<option value=''>Selecione...</option>";
-        }
-      }
-    }
-  } else {
-    // Se não houver instituição selecionada, popular disciplinas sem filtro
-    if (disciplinaAlunoSelect) {
-      popularDisciplinaSelectByInstituicao(null, disciplinaAlunoSelect);
-    }
-    if (turmaAlunoSelect) {
-      turmaAlunoSelect.innerHTML = "<option value=''>Selecione...</option>";
-    }
-  }
-  
-  console.log("✅ Modal aberto com sucesso!");
-}
-
-function closeModal() {
-  if (!modalAluno) {
-    console.error("❌ Modal não encontrado na função closeModal!");
-    return;
-  }
-  modalAluno.classList.remove("show");
-  console.log("✅ Modal fechado!");
-}
-
-// Carregar as Instituições
+// ===============================
+// 1 — CARREGAR INSTITUIÇÕES
+// ===============================
 async function carregarInstituicoes() {
   try {
+    if (!selectInstituicao) {
+      console.error("Select Instituição não encontrado!");
+      return;
+    }
+    
     const resp = await apiGet("/instituicoes");
     instituicoesCache = Array.isArray(resp) ? resp : (resp.data || []);
     
-    // Popular select de filtro
-    selectInstituicao.innerHTML = "<option value=''>Selecione...</option>";
+    selectInstituicao.innerHTML = "<option value=''>Selecione a instituição</option>";
     instituicoesCache.forEach(inst => {
       const option = document.createElement("option");
       option.value = inst.id || inst.ID;
@@ -107,20 +59,18 @@ async function carregarInstituicoes() {
       selectInstituicao.appendChild(option);
     });
     
-    // Popular select do modal
-    instituicaoAlunoSelect.innerHTML = "<option value=''>Selecione...</option>";
-    instituicoesCache.forEach(inst => {
-      const option = document.createElement("option");
-      option.value = inst.id || inst.ID;
-      option.textContent = inst.nome || inst.NOME;
-      instituicaoAlunoSelect.appendChild(option);
-    });
+    console.log(`✅ ${instituicoesCache.length} instituições carregadas`);
   } catch (err) {
     console.error("Erro ao carregar instituições:", err);
+    if (selectInstituicao) {
+      selectInstituicao.innerHTML = "<option value=''>Erro ao carregar</option>";
+    }
   }
 }
 
-// Carregar todas as Disciplinas
+// ===============================
+// 2 — CARREGAR TODAS AS DISCIPLINAS
+// ===============================
 async function carregarDisciplinas() {
   try {
     const resp = await apiGet("/disciplinas");
@@ -131,9 +81,16 @@ async function carregarDisciplinas() {
   }
 }
 
-// Popular disciplinas filtradas por instituição
+// ===============================
+// 3 — POPULAR DISCIPLINAS FILTRADAS POR INSTITUIÇÃO
+// ===============================
 function popularDisciplinaSelectByInstituicao(instituicaoId, targetSelect) {
-  targetSelect.innerHTML = "<option value=''>Selecione...</option>";
+  if (!targetSelect) {
+    console.error("Target select não encontrado!");
+    return;
+  }
+  
+  targetSelect.innerHTML = "<option value=''>Selecione a disciplina</option>";
   const list = (disciplinasCache || []).filter(d => {
     const idInst = d.instituicao_id || d.INSTITUICAO_ID;
     return instituicaoId ? Number(idInst) === Number(instituicaoId) : true;
@@ -149,9 +106,16 @@ function popularDisciplinaSelectByInstituicao(instituicaoId, targetSelect) {
   }
 }
 
-// Carregar turmas para a Instituição e Disciplina selecionadas
+// ===============================
+// 4 — CARREGAR TURMAS PARA INSTITUIÇÃO E DISCIPLINA
+// ===============================
 async function carregarTurmas(instituicaoId, disciplinaId, targetSelect) {
   try {
+    if (!targetSelect) {
+      console.error("Target select não encontrado!");
+      return;
+    }
+    
     const params = new URLSearchParams();
     if (instituicaoId) params.append("instituicao_id", instituicaoId);
     if (disciplinaId) params.append("disciplina_id", disciplinaId);
@@ -159,7 +123,7 @@ async function carregarTurmas(instituicaoId, disciplinaId, targetSelect) {
     const turmas = await apiGet(`/turmas?${params.toString()}`);
     const turmasList = Array.isArray(turmas) ? turmas : (turmas.data || []);
 
-    targetSelect.innerHTML = "<option value=''>Selecione...</option>";
+    targetSelect.innerHTML = "<option value=''>Selecione a turma</option>";
     turmasList.forEach(turma => {
       const option = document.createElement("option");
       option.value = turma.id || turma.ID;
@@ -170,214 +134,254 @@ async function carregarTurmas(instituicaoId, disciplinaId, targetSelect) {
     if (turmasList.length === 0) {
       targetSelect.innerHTML = "<option value=''>Nenhuma turma disponível</option>";
     }
+    
+    console.log(`✅ ${turmasList.length} turmas carregadas`);
   } catch (err) {
     console.error("Erro ao carregar turmas:", err);
-    targetSelect.innerHTML = "<option value=''>Erro ao carregar</option>";
+    if (targetSelect) {
+      targetSelect.innerHTML = "<option value=''>Erro ao carregar</option>";
+    }
   }
 }
 
-// Carregar alunos com base nos filtros
-async function carregarAlunos() {
-  const instituicaoId = selectInstituicao.value;
-  const disciplinaId = selectDisciplina.value;
-  const turmaId = selectTurma.value;
+// ===============================
+// 5 — EVENT LISTENERS PARA CASCATA
+// ===============================
 
-  // Validar se pelo menos um filtro foi selecionado
-  if (!instituicaoId && !disciplinaId && !turmaId) {
-    alert("Por favor, selecione pelo menos um filtro (Instituição, Disciplina ou Turma) para visualizar os alunos.");
+// Quando mudar instituição, filtrar disciplinas
+selectInstituicao.addEventListener("change", () => {
+  instituicaoIdSelecionada = selectInstituicao.value;
+  popularDisciplinaSelectByInstituicao(instituicaoIdSelecionada, selectDisciplina);
+  // Limpar turma quando mudar instituição
+  selectTurma.innerHTML = "<option value=''>Selecione a turma</option>";
+  turmaIdSelecionada = null;
+  disciplinaIdSelecionada = null;
+  // Limpar tabela
+  tableWrapper.innerHTML = "";
+  nenhumaTabela.style.display = "block";
+});
+
+// Quando mudar disciplina, carregar turmas
+selectDisciplina.addEventListener("change", async () => {
+  disciplinaIdSelecionada = selectDisciplina.value;
+  const instId = selectInstituicao.value;
+  await carregarTurmas(instId, disciplinaIdSelecionada, selectTurma);
+  turmaIdSelecionada = null;
+  // Limpar tabela
+  tableWrapper.innerHTML = "";
+  nenhumaTabela.style.display = "block";
+});
+
+// Quando mudar turma, limpar tabela
+selectTurma.addEventListener("change", () => {
+  turmaIdSelecionada = selectTurma.value;
+  tableWrapper.innerHTML = "";
+  nenhumaTabela.style.display = "block";
+});
+
+// ===============================
+// 6 — CARREGAR NOTAS (ALUNOS + COMPONENTES)
+// ===============================
+async function carregarNotas() {
+  if (!turmaIdSelecionada || !disciplinaIdSelecionada) {
+    alert("Por favor, selecione instituição, disciplina e turma antes de carregar os alunos.");
     return;
   }
 
+  tableWrapper.innerHTML = "<div style='padding: 20px; text-align: center;'>Carregando...</div>";
+  nenhumaTabela.style.display = "none";
+
   try {
-    const params = new URLSearchParams();
-    if (instituicaoId) params.append("instituicao_id", instituicaoId);
-    if (disciplinaId) params.append("disciplina_id", disciplinaId);
-    if (turmaId) params.append("turma_id", turmaId);
-
-    console.log("Carregando alunos com filtros:", {
-      instituicao_id: instituicaoId,
-      disciplina_id: disciplinaId,
-      turma_id: turmaId
-    });
-
-    const alunos = await apiGet(`/alunos?${params.toString()}`);
-    const alunosList = Array.isArray(alunos) ? alunos : (alunos.data || []);
+    const data = await apiGet(`/notas/turma/${turmaIdSelecionada}/disciplina/${disciplinaIdSelecionada}`);
     
-    console.log("Alunos recebidos:", alunosList);
-    
-    tabelaBody.innerHTML = "";
-
-    if (alunosList.length === 0) {
-      semAlunosMsg.style.display = "block";
-      listaContainer.style.display = "block";
-    } else {
-      semAlunosMsg.style.display = "none";
-      listaContainer.style.display = "block";
+    if (!data || !data.alunos || data.alunos.length === 0) {
+      tableWrapper.innerHTML = "";
+      nenhumaTabela.style.display = "block";
+      nenhumaTabela.textContent = "Nenhum aluno encontrado para esta turma e disciplina.";
+      return;
     }
 
-    alunosList.forEach(aluno => {
-      const tr = document.createElement("tr");
-      const alunoId = aluno.id || aluno.ID || "";
-      const alunoNome = aluno.nome || aluno.NOME || "";
-      const alunoMatricula = aluno.matricula || aluno.MATRICULA || "";
-      
-      tr.innerHTML = `
+    const { alunos, componentes } = data;
+
+    // Criar tabela dinamicamente
+    const table = document.createElement("table");
+    table.id = "tabela-notas";
+    table.className = "notas-table";
+    
+    // Criar thead
+    const thead = document.createElement("thead");
+    const trHead = document.createElement("tr");
+    trHead.innerHTML = `
+      <th>Aluno</th>
+      <th>Matrícula</th>
+      ${componentes.map(c => `<th>${escapeHtml(c.sigla || c.SIGLA || "")}</th>`).join("")}
+      <th>Média</th>
+    `;
+    thead.appendChild(trHead);
+    table.appendChild(thead);
+
+    // Criar tbody
+    const tbody = document.createElement("tbody");
+    
+    alunos.forEach(a => {
+      const linha = document.createElement("tr");
+      const alunoId = a.aluno_id || a.ALUNO_ID;
+      const alunoNome = a.nome || a.NOME || "";
+      const alunoMatricula = a.matricula || a.MATRICULA || "";
+
+      const colunasNotas = (a.componentes || []).map(c => {
+        const componenteId = c.componente_id || c.COMPONENTE_ID;
+        const componenteNome = c.nome || c.NOME || "";
+        const componenteSigla = c.sigla || c.SIGLA || "";
+        const valor = c.valor !== null && c.valor !== undefined ? c.valor : "";
+        
+        return `<td>
+          <input type="number" min="0" max="10" step="0.1"
+                 value="${valor}"
+                 data-aluno="${alunoId}"
+                 data-componente="${componenteId}"
+                 data-componente-nome="${escapeHtml(componenteNome)}"
+                 data-componente-sigla="${escapeHtml(componenteSigla)}"
+                 placeholder="0.0"
+                 class="nota-input"
+                 style="width:70px; padding: 6px; text-align: center;">
+        </td>`;
+      }).join("");
+
+      linha.innerHTML = `
         <td>${escapeHtml(alunoNome)}</td>
         <td>${escapeHtml(alunoMatricula)}</td>
-        <td>
-          <button class="btn small secondary btn-editar" data-id="${alunoId}">Editar</button>
-          <button class="btn small danger btn-excluir" data-id="${alunoId}">Excluir</button>
-        </td>
+        ${colunasNotas}
+        <td class="media">—</td>
       `;
-      tabelaBody.appendChild(tr);
+
+      tbody.appendChild(linha);
+      calcularMedia(linha); // Calcula média inicial
     });
-    
-    // Adicionar eventos aos botões
-    tabelaBody.querySelectorAll(".btn-editar").forEach(btn => {
-      btn.addEventListener("click", (e) => {
-        const id = e.currentTarget.dataset.id;
-        // TODO: Implementar edição
-        alert("Funcionalidade de edição ainda não implementada");
+
+    table.appendChild(tbody);
+    tableWrapper.innerHTML = "";
+    tableWrapper.appendChild(table);
+    nenhumaTabela.style.display = "none";
+
+    // Adiciona listener para recalcular média ao digitar
+    tbody.querySelectorAll('input[type="number"]').forEach(input => {
+      input.addEventListener('input', () => {
+        const linha = input.closest('tr');
+        calcularMedia(linha);
       });
     });
-    
-    tabelaBody.querySelectorAll(".btn-excluir").forEach(btn => {
-      btn.addEventListener("click", async (e) => {
-        const id = e.currentTarget.dataset.id;
-        if (confirm("Deseja realmente excluir este aluno?")) {
-          try {
-            await apiDelete(`/alunos/${id}`);
-            alert("Aluno excluído com sucesso!");
-            carregarAlunos();
-          } catch (err) {
-            console.error("Erro ao excluir aluno:", err);
-            alert("Erro ao excluir aluno.");
-          }
+
+    // Adiciona listener para salvar nota ao alterar (change = quando o valor mudar e sair do campo)
+    tbody.querySelectorAll('input[type="number"].nota-input').forEach(input => {
+      let valorAnterior = input.value;
+      
+      input.addEventListener("change", async function() {
+        const aluno_id = this.dataset.aluno;
+        const componente_id = this.dataset.componente;
+        const componenteNome = this.dataset.componenteNome || "";
+        const valor = this.value.trim();
+
+        if (!aluno_id || !componente_id) return;
+        
+        // Se o valor não mudou, não fazer nada
+        if (valor === valorAnterior) return;
+
+        try {
+          const resposta = await apiPut("/notas/registrar", { 
+            aluno_id: Number(aluno_id), 
+            componente_id: Number(componente_id), 
+            valor: valor ? parseFloat(valor) : null 
+          });
+          console.log(`Nota salva para ${componenteNome}:`, resposta.message || "Sucesso");
+          
+          // Atualizar valor anterior
+          valorAnterior = valor;
+          
+          // Feedback visual
+          this.style.backgroundColor = "#d4edda";
+          setTimeout(() => {
+            this.style.backgroundColor = "";
+          }, 500);
+        } catch (err) {
+          console.error("Erro ao salvar nota:", err);
+          const errorMsg = err.response?.data?.message || err.message || "Erro ao salvar nota.";
+          alert(`Erro ao salvar nota: ${errorMsg}`);
+          // Restaurar valor anterior em caso de erro
+          this.value = valorAnterior;
+          this.focus();
+        }
+      });
+      
+      // Também salvar ao pressionar Enter
+      input.addEventListener("keypress", async (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          e.target.blur(); // Dispara o evento change
         }
       });
     });
+
   } catch (err) {
-    console.error("Erro ao carregar alunos:", err);
-    alert("Erro ao carregar alunos. Verifique o console para mais detalhes.");
-    tabelaBody.innerHTML = "";
-    semAlunosMsg.style.display = "block";
-    listaContainer.style.display = "block";
+    console.error("Erro ao carregar notas:", err);
+    tableWrapper.innerHTML = "";
+    nenhumaTabela.style.display = "block";
+    nenhumaTabela.textContent = "Erro ao carregar notas. Verifique se a turma e disciplina estão corretas.";
   }
 }
 
-// Event Listeners
+// ===============================
+// 7 — CALCULAR MÉDIA DINÂMICA
+// ===============================
+function calcularMedia(linha) {
+  const notas = linha.querySelectorAll('input[type="number"]');
+  let soma = 0;
+  let qtd = 0;
 
-// Quando mudar instituição no filtro, filtrar disciplinas
-selectInstituicao.addEventListener("change", () => {
-  const instId = selectInstituicao.value;
-  popularDisciplinaSelectByInstituicao(instId, selectDisciplina);
-  // Limpar turma quando mudar instituição
-  selectTurma.innerHTML = "<option value=''>Selecione...</option>";
-});
-
-// Quando mudar disciplina no filtro, carregar turmas
-selectDisciplina.addEventListener("change", async () => {
-  const instId = selectInstituicao.value;
-  const discId = selectDisciplina.value;
-  await carregarTurmas(instId, discId, selectTurma);
-});
-
-// Quando mudar instituição no modal, filtrar disciplinas
-instituicaoAlunoSelect.addEventListener("change", () => {
-  const instId = instituicaoAlunoSelect.value;
-  popularDisciplinaSelectByInstituicao(instId, disciplinaAlunoSelect);
-  // Limpar turma quando mudar instituição
-  turmaAlunoSelect.innerHTML = "<option value=''>Selecione...</option>";
-});
-
-// Quando mudar disciplina no modal, carregar turmas
-disciplinaAlunoSelect.addEventListener("change", async () => {
-  const instId = instituicaoAlunoSelect.value;
-  const discId = disciplinaAlunoSelect.value;
-  await carregarTurmas(instId, discId, turmaAlunoSelect);
-});
-
-// Exibir o modal para adicionar aluno
-if (novoAlunoBtn) {
-  novoAlunoBtn.addEventListener("click", async (e) => {
-    e.preventDefault();
-    console.log("✅ Botão 'Adicionar Aluno' clicado!");
-    
-    if (!modalAluno) {
-      console.error("❌ Modal não encontrado!");
-      return;
-    }
-    
-    alunoNomeInput.value = "";
-    alunoMatriculaInput.value = "";
-    await openModal();
-    console.log("✅ Modal aberto!");
-  });
-  console.log("✅ Event listener adicionado ao botão 'Adicionar Aluno'");
-} else {
-  console.error("❌ Botão 'Adicionar Aluno' não encontrado!");
-}
-
-// Fechar modal
-closeModalAluno.addEventListener("click", closeModal);
-if (cancelarAlunoBtn) {
-  cancelarAlunoBtn.addEventListener("click", closeModal);
-}
-
-// Salvar novo aluno
-if (salvarAlunoBtn) {
-  salvarAlunoBtn.addEventListener("click", async () => {
-    const nome = alunoNomeInput.value.trim();
-    const matricula = alunoMatriculaInput.value.trim();
-    const turma_id = turmaAlunoSelect.value;
-
-    if (!nome || !matricula || !turma_id) {
-      alert("Por favor, preencha todos os campos obrigatórios (Nome, Matrícula e Turma).");
-      return;
-    }
-
-    try {
-      const alunoData = { 
-        nome, 
-        matricula, 
-        turma_id: Number(turma_id) 
-      };
-      
-      console.log("Enviando dados do aluno:", alunoData);
-      const response = await apiPost("/alunos", alunoData);
-      console.log("Resposta do servidor:", response);
-      
-      alert("Aluno cadastrado com sucesso!");
-      closeModal();
-      
-      // Limpar campos
-      alunoNomeInput.value = "";
-      alunoMatriculaInput.value = "";
-      
-      // Recarregar a lista de alunos se houver filtros aplicados
-      if (selectInstituicao.value || selectDisciplina.value || selectTurma.value) {
-        await carregarAlunos();
-      }
-    } catch (err) {
-      console.error("Erro ao salvar aluno:", err);
-      const errorMsg = err.response?.data?.error || err.message || "Erro ao cadastrar aluno.";
-      alert(`Erro ao cadastrar aluno: ${errorMsg}`);
+  notas.forEach(input => {
+    const valor = parseFloat(input.value);
+    if (!isNaN(valor) && valor !== "") {
+      soma += valor;
+      qtd++;
     }
   });
-} else {
-  console.error("Botão 'Salvar' não encontrado!");
+
+  const mediaCell = linha.querySelector('td.media');
+  mediaCell.textContent = qtd > 0 ? (soma / qtd).toFixed(2) : '—';
 }
 
-// Aplicar filtro
-btnAplicarFiltro.addEventListener("click", async () => {
-  await carregarAlunos();
+// ===============================
+// 8 — BOTÃO CARREGAR ALUNOS
+// ===============================
+btnCarregarAlunos.addEventListener("click", async () => {
+  // Atualizar valores dos selects
+  turmaIdSelecionada = selectTurma.value;
+  disciplinaIdSelecionada = selectDisciplina.value;
+  instituicaoIdSelecionada = selectInstituicao.value;
+  
+  if (!instituicaoIdSelecionada || !disciplinaIdSelecionada || !turmaIdSelecionada) {
+    alert("Por favor, selecione instituição, disciplina e turma antes de carregar os alunos.");
+    return;
+  }
+  
+  await carregarNotas();
 });
 
-// Inicializar a página
+// ===============================
+// 9 — INICIALIZAÇÃO
+// ===============================
 (async function init() {
-  await carregarInstituicoes();
-  await carregarDisciplinas();
-  // Popular disciplinas inicialmente (sem filtro)
-  popularDisciplinaSelectByInstituicao(null, selectDisciplina);
-  popularDisciplinaSelectByInstituicao(null, disciplinaAlunoSelect);
+  try {
+    console.log("Inicializando página de notas...");
+    await carregarInstituicoes();
+    console.log("Instituições carregadas:", instituicoesCache.length);
+    await carregarDisciplinas();
+    console.log("Disciplinas carregadas:", disciplinasCache.length);
+    // Popular disciplinas inicialmente (sem filtro)
+    popularDisciplinaSelectByInstituicao(null, selectDisciplina);
+    console.log("✅ Página de notas inicializada com sucesso!");
+  } catch (err) {
+    console.error("❌ Erro na inicialização:", err);
+    alert("Erro ao inicializar a página. Verifique o console para mais detalhes.");
+  }
 })();
