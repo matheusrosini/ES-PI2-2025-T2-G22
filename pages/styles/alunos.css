@@ -1,62 +1,53 @@
-/* ==============================
-   ESTILO GERAL DA PÁGINA DE ALUNOS
-=================================*/
-/* Luis Felipe Moura: RA 25010218 */ 
+/* Matheus Henrique Portugal Narducci */
+
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+font-family: "Segoe UI", Roboto, sans-serif;
+}
+
 body {
-  margin: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f5f7fa;
+  display: flex;
+  background-color: #f0f4fa;
   color: #333;
-  display: flex;
   height: 100vh;
-  overflow: hidden;
 }
 
-/* ==============================
-   SIDEBAR (MANTÉM O PADRÃO DO DASHBOARD)
-=================================*/
+/* Sidebar */
 .sidebar {
-  background-color: #003780;
-  width: 240px;
-  color: #fff;
-  padding: 30px 20px;
+  width: 220px;
+  background-color: #002b5c;
+  color: white;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  align-items: center;
+  padding: 25px 0;
   position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-}
-
-.sidebar-content {
-  display: flex;
-  flex-direction: column;
+  height: 100%;
 }
 
 .sidebar h1 {
-  text-align: center;
   margin-bottom: 40px;
-  font-size: 24px;
-  color: #fff;
+  font-size: 1.6rem;
 }
 
 .sidebar ul {
   list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 0;
-  margin: 0;
+  width: 100%;
+}
+
+.sidebar li {
+  width: 100%;
 }
 
 .sidebar a {
-  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: white;
   text-decoration: none;
-  font-size: 16px;
-  display: block;
-  padding: 10px;
-  border-radius: 6px;
+  padding: 12px 20px;
   transition: background 0.3s;
 }
 
@@ -65,170 +56,151 @@ body {
   background-color: #004aad;
 }
 
-.logout a {
-  display: block;
-  text-align: center;
-  background-color: #004aad;
-  padding: 10px;
-  border-radius: 8px;
-  text-decoration: none;
-  color: white;
-  transition: 0.3s;
-}
-
-.logout a:hover {
-  background-color: #0058d4;
-}
-
-/* ==============================
-   CONTEÚDO PRINCIPAL
-=================================*/
-main.alunos {
-  flex-grow: 1;
-  margin-left: 240px;
+/* Main Content */
+.dashboard {
+  flex: 1;
   padding: 40px;
+  margin-left: 220px;
   overflow-y: auto;
 }
 
-main.alunos h2 {
-  color: #003780;
+.dashboard h1 {
+  color: #004aad;
   margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-/* ==============================
-   FORMULÁRIOS E AÇÕES
-=================================*/
-.form-section {
-  background: white;
-  padding: 20px;
+/* Containers */
+.container {
+  background: #fff;
   border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  padding: 25px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.1);
   margin-bottom: 30px;
 }
 
-.form-section h3 {
-  color: #003780;
-  margin-bottom: 15px;
-}
-
-form {
+/* Form Rows */
+.form-row {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  gap: 20px;
+  flex-wrap: wrap;
 }
 
-input[type="text"],
-input[type="file"],
-select {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+.form-row label {
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.input.full,
+select.input.full {
   width: 100%;
-  box-sizing: border-box;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #fff;
 }
 
-button {
-  background-color: #003780;
+.input.full:focus,
+select.input.full:focus {
+  border-color: #004aad;
+  outline: none;
+}
+
+/* Botões */
+.btn {
+  background-color: #004aad;
   color: white;
   border: none;
-  padding: 10px 14px;
+  padding: 10px 18px;
   border-radius: 6px;
   cursor: pointer;
   transition: background 0.3s;
   font-weight: 500;
 }
 
-button:hover {
-  background-color: #0058d4;
+.btn:hover {
+  background-color: #003780;
 }
 
-/* ==============================
-   TABELA DE ALUNOS
-=================================*/
-.table-section {
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+.btn.ghost {
+  background-color: transparent;
+  color: #004aad;
+  border: 1px solid #004aad;
 }
 
-.table-section h3 {
-  color: #003780;
-  margin-bottom: 15px;
+.btn.ghost:hover {
+  background-color: #004aad;
+  color: white;
 }
 
+/* Tabela */
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 10px;
+  background: #fff;
 }
 
-table th, table td {
-  padding: 10px;
-  text-align: left;
+th, td {
+  padding: 12px 15px;
   border-bottom: 1px solid #ddd;
 }
 
-table th {
-  background-color: #003780;
-  color: white;
+th {
+  background-color: #f0f4fa;
+  color: #004aad;
   font-weight: 600;
 }
 
-table tr:hover {
-  background-color: #f0f4ff;
+tbody tr:hover {
+  background-color: #f9f9f9;
 }
 
-.actions {
-  display: flex;
-  gap: 10px;
+/* Texto secundário */
+.muted {
+  color: #777;
+  font-style: italic;
 }
 
-/* ==============================
-   BOTÕES ESPECIAIS
-=================================*/
-.import-btn {
-  background-color: #004aad;
+/* Modal */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 99;
 }
 
-.import-btn:hover {
-  background-color: #0058d4;
-}
-
-.delete-btn {
-  background-color: #b30000;
-}
-
-.delete-btn:hover {
-  background-color: #d11a1a;
-}
-
-/* ==============================
-   SCROLLBAR PERSONALIZADA
-=================================*/
-main.alunos::-webkit-scrollbar {
-  width: 8px;
-}
-
-main.alunos::-webkit-scrollbar-thumb {
-  background-color: #004aad;
+.modal-content {
+  width: 600px;
+  max-width: 95%;
+  background: white;
+  padding: 25px;
   border-radius: 10px;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.15);
 }
 
-/* ==============================
-   RESPONSIVIDADE
-=================================*/
-@media (max-width: 768px) {
-  .sidebar {
-    width: 200px;
-  }
-
-  main.alunos {
-    margin-left: 200px;
-    padding: 20px;
-  }
-
-  table th, table td {
-    font-size: 14px;
-  }
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
 }
+
+.modal-header h2 {
+  color: #004aad;
+}
+
+.close-x {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #777;
+}
+
+.close-x:hover {
+  color: #c0392b;
+} 

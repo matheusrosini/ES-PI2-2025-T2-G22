@@ -24,7 +24,7 @@ let instituicoesCache = [];
 let disciplinasCache = [];
 let turmasCache = [];
 
-// Load institutions
+// Carregar as Instituições
 async function carregarInstituicoes() {
   try {
     const resp = await apiGet("/instituicoes");
@@ -41,7 +41,7 @@ async function carregarInstituicoes() {
   }
 }
 
-// Load disciplines
+// Carregar as Disciplinas
 async function carregarDisciplinas() {
   try {
     const resp = await apiGet("/disciplinas");
@@ -51,7 +51,7 @@ async function carregarDisciplinas() {
   }
 }
 
-// Load turmas for a selected institution and discipline
+// Carregar as Turmas para a Instituição e Disciplina selecionadas
 async function carregarTurmas() {
   const instituicaoId = selectInstituicao.value;
   const disciplinaId = selectDisciplina.value;
@@ -76,7 +76,7 @@ async function carregarTurmas() {
   }
 }
 
-// Load students based on selected filters
+// Carregar alunos com base nos filtros
 async function carregarAlunos() {
   const instituicaoId = selectInstituicao.value;
   const disciplinaId = selectDisciplina.value;
@@ -114,24 +114,24 @@ async function carregarAlunos() {
   }
 }
 
-// Open modal for new student
+// Exibir o modal para adicionar aluno
 novoAlunoBtn.addEventListener("click", () => {
   alunoNomeInput.value = "";
   alunoMatriculaInput.value = "";
   openModal();
 });
 
-// Open modal
+// Abrir modal
 function openModal() {
   modalAluno.classList.add("show");
 }
 
-// Close modal
+// Fechar modal
 closeModalAluno.addEventListener("click", () => {
   modalAluno.classList.remove("show");
 });
 
-// Save new student
+// Salvar novo aluno
 salvarAlunoBtn.addEventListener("click", async () => {
   const nome = alunoNomeInput.value.trim();
   const matricula = alunoMatriculaInput.value.trim();
@@ -149,17 +149,17 @@ salvarAlunoBtn.addEventListener("click", async () => {
     await apiPost("/alunos", alunoData);
     alert("Aluno cadastrado com sucesso!");
     modalAluno.classList.remove("show");
-    carregarAlunos(); // Reload students
+    carregarAlunos(); // Recarregar a lista de alunos
   } catch (err) {
     console.error("Erro ao salvar aluno:", err);
     alert("Erro ao cadastrar aluno.");
   }
 });
 
-// Apply filter
+// Aplicar filtro
 btnAplicarFiltro.addEventListener("click", carregarAlunos);
 
-// Initialize the page
+// Inicializar a página
 (async function init() {
   await carregarInstituicoes();
   await carregarDisciplinas();
