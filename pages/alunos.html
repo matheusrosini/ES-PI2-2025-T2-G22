@@ -1,109 +1,137 @@
-<!-- Luis Felipe Moura - RA 25010218 -->
+<!-- pages/aluno.html -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Gerenciar Alunos - NotaDez</title>
-  <link rel="stylesheet" href="styles/alunos.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alunos - NotaDez</title>
+
+  <link rel="stylesheet" href="styles/aluno.css">
+
+  <!-- Ícones -->
+  <script src="https://unpkg.com/lucide@latest" defer></script>
 </head>
 <body>
-
-  <!-- SIDEBAR (menu lateral fixo) -->
-  <aside class="sidebar">
-    <div class="sidebar-content">
-      <h1>NotaDez</h1>
+  <div class="sidebar">
+    <h1>NotaDez</h1>
+    <nav>
       <ul>
-        <li><a href="dashboard.html">Instituições</a></li>
-        <li><a href="dashboard.html">Disciplinas</a></li>
-        <li><a href="dashboard.html">Turmas</a></li>
-        <li><a href="alunos.html" class="active">Alunos</a></li>
+        <li><a href="dashboard.html"><i data-lucide="layout-dashboard"></i> Dashboard</a></li>
+        <li><a href="instituicoes.html"><i data-lucide="school"></i> Instituições</a></li>
+        <li><a href="disciplinas.html"><i data-lucide="book-open"></i> Disciplinas</a></li>
+        <li><a href="turmas.html"><i data-lucide="users"></i> Turmas</a></li>
+        <li><a href="notas.html"><i data-lucide="pencil"></i> Notas</a></li>
+        <li><a href="aluno.html" class="active"><i data-lucide="user"></i> Alunos</a></li>
+        <li><a href="#" id="logoutBtn" data-logout><i data-lucide="log-out"></i> Sair</a></li>
       </ul>
+    </nav>
+  </div>
+
+  <main class="dashboard">
+    <div class="container" id="filtro-container">
+      <h1>Filtrar Alunos</h1>
+      <div class="form-row" style="margin-top: 12px; display: flex; gap: 20px;">
+        <div style="flex:1">
+          <label>Instituição</label>
+          <select id="selectInstituicao" class="input full">
+            <option value="">Selecione...</option>
+          </select>
+        </div>
+
+        <div style="flex:1">
+          <label>Disciplina</label>
+          <select id="selectDisciplina" class="input full">
+            <option value="">Selecione...</option>
+          </select>
+        </div>
+
+        <div style="flex:1">
+          <label>Turma</label>
+          <select id="selectTurma" class="input full">
+            <option value="">Selecione...</option>
+          </select>
+        </div>
+      </div>
+
+      <button id="btnAplicarFiltro" class="btn" style="margin-top: 16px;">
+        Aplicar Filtro
+      </button>
     </div>
-    <div class="logout">
-  <li><a href="#" id="logoutBtn" data-logout><i data-lucide="log-out"></i> Sair</a></li>
-    </div>
-  </aside>
 
-  <!-- CONTEÚDO PRINCIPAL -->
-  <main class="alunos">
-    
-    <!-- TÍTULO DA PÁGINA -->
-    <h2>Gerenciamento de Alunos</h2>
+    <div class="container" id="lista-container" style="display:none;">
+      <h1>
+        Lista de Alunos
+        <div style="display:flex; gap:10px; align-items:center;">
+          <button id="novoAlunoBtn" class="btn">Adicionar Aluno</button>
+        </div>
+      </h1>
 
-    <!-- FORMULÁRIO DE CADASTRO DE ALUNO -->
-    <section class="form-section">
-      <h3>Cadastrar novo aluno</h3>
-      <form id="form-cadastro">
-        <!-- Campo de matrícula do aluno -->
-        <input type="text" id="matricula" placeholder="Matrícula do aluno" required>
-        <!-- Campo do nome do aluno -->
-        <input type="text" id="nome" placeholder="Nome completo" required>
-        <!-- Botão de envio -->
-        <button type="submit">Adicionar Aluno</button>
-      </form>
-    </section>
-
-    <!-- IMPORTAÇÃO DE ALUNOS (CSV/JSON) -->
-    <section class="form-section">
-      <h3>Importar alunos (CSV / JSON)</h3>
-      <form id="form-importar">
-        <!-- Campo para escolher o arquivo -->
-        <input type="file" id="arquivo" accept=".csv, .json" required>
-        <!-- Botão para importar -->
-        <button type="submit" class="import-btn">Importar Arquivo</button>
-      </form>
-    </section>
-
-    <!-- TABELA DE ALUNOS CADASTRADOS -->
-    <section class="table-section">
-      <h3>Alunos Cadastrados</h3>
       <table id="tabela-alunos">
         <thead>
           <tr>
+            <th>Nome do Aluno</th>
             <th>Matrícula</th>
-            <th>Nome</th>
             <th>Ações</th>
           </tr>
         </thead>
-        <tbody>
-          <!-- Exemplo inicial de alunos -->
-          <tr>
-            <td>11111</td>
-            <td>Abel Antimônio</td>
-            <td class="actions">
-              <button class="edit-btn">Editar</button>
-              <button class="delete-btn">Excluir</button>
-            </td>
-          </tr>
-          <tr>
-            <td>11112</td>
-            <td>Bianca Nióbio</td>
-            <td class="actions">
-              <button class="edit-btn">Editar</button>
-              <button class="delete-btn">Excluir</button>
-            </td>
-          </tr>
-        </tbody>
+        <tbody></tbody>
       </table>
-    </section>
+
+      <p id="semAlunosMsg" class="muted" style="margin-top:12px; display:none;">
+        Nenhum aluno cadastrado — clique em "Adicionar Aluno".
+      </p>
+    </div>
   </main>
 
+  <!-- Modal de cadastro de aluno -->
+  <div class="modal" id="modalCadastroAluno">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalAlunoTitle">Cadastrar Aluno</h2>
+        <button class="close-x" id="closeModalAluno">&times;</button>
+      </div>
 
-
-    <!-- Modal de Logout -->
-<div id="logoutModal" class="logout-modal">
-  <div class="logout-modal-content">
-    <h3>Confirmar saída</h3>
-    <p>Tem certeza que deseja desconectar da sua conta?</p>
-
-    <div class="logout-modal-buttons">
-      <button id="logoutCancel" class="logout-cancel">Cancelar</button>
-      <button id="logoutConfirm" class="logout-confirm">Sair</button>
+      <div class="form-row">
+        <div style="flex:1">
+          <label>Nome do Aluno</label>
+          <input id="alunoNome" class="input full" type="text" placeholder="Nome do Aluno">
         </div>
+
+        <div style="flex:1">
+          <label>Matrícula</label>
+          <input id="alunoMatricula" class="input full" type="text" placeholder="Matrícula">
+        </div>
+
+        <div style="flex:1">
+          <label>Instituição</label>
+          <select id="instituicaoAluno" class="input full">
+            <option value="">Selecione...</option>
+          </select>
+        </div>
+
+        <div style="flex:1">
+          <label>Disciplina</label>
+          <select id="disciplinaAluno" class="input full">
+            <option value="">Selecione...</option>
+          </select>
+        </div>
+
+        <div style="flex:1">
+          <label>Turma</label>
+          <select id="turmaAluno" class="input full">
+            <option value="">Selecione...</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:16px;">
+        <button id="salvarAlunoBtn" class="btn">Salvar</button>
+        <button id="cancelarAlunoBtn" class="btn ghost">Cancelar</button>
+      </div>
     </div>
-</div>
-   <!-- SCRIPT -->
-  <script type="module" src="scripts/turmas.js"></script>
+  </div>
+
+  <script type="module" src="scripts/aluno.js"></script>
   <script src="scripts/authGuard.js"></script>
   <script src="scripts/logout.js"></script>
 </body>

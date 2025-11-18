@@ -1,117 +1,167 @@
-//Feito por Matheus Henrique Portugal Narducci
+// pages/scripts/aluno.js
+import { apiGet, apiPost, apiPut, apiDelete } from "./api.js";
 
-// Seleciona o formulário de cadastro e a tabela
-const formCadastro = document.getElementById('form-cadastro');
-const tabela = document.getElementById('tabela-alunos').querySelector('tbody');
+// DOM elements for the page
+const selectInstituicao = document.getElementById("selectInstituicao");
+const selectDisciplina = document.getElementById("selectDisciplina");
+const selectTurma = document.getElementById("selectTurma");
+const btnAplicarFiltro = document.getElementById("btnAplicarFiltro");
+const tabelaBody = document.querySelector("#tabela-alunos tbody");
+const semAlunosMsg = document.getElementById("semAlunosMsg");
 
-// 🟢 Delegação de eventos: excluir aluno
-tabela.addEventListener('click', (e) => {
-  if (e.target.classList.contains('delete-btn')) {
-    e.target.closest('tr').remove();
+const novoAlunoBtn = document.getElementById("novoAlunoBtn");
+const modalAluno = document.getElementById("modalCadastroAluno");
+const closeModalAluno = document.getElementById("closeModalAluno");
+const alunoNomeInput = document.getElementById("alunoNome");
+const alunoMatriculaInput = document.getElementById("alunoMatricula");
+const instituicaoAlunoSelect = document.getElementById("instituicaoAluno");
+const disciplinaAlunoSelect = document.getElementById("disciplinaAluno");
+const turmaAlunoSelect = document.getElementById("turmaAluno");
+const salvarAlunoBtn = document.getElementById("salvarAlunoBtn");
+
+// Store data
+let instituicoesCache = [];
+let disciplinasCache = [];
+let turmasCache = [];
+
+// Load institutions
+async function carregarInstituicoes() {
+  try {
+    const resp = await apiGet("/instituicoes");
+    instituicoesCache = resp;
+    selectInstituicao.innerHTML = "<option value=''>Selecione...</option>";
+    resp.forEach(inst => {
+      const option = document.createElement("option");
+      option.value = inst.id;
+      option.textContent = inst.nome;
+      selectInstituicao.appendChild(option);
+    });
+  } catch (err) {
+    console.error("Erro ao carregar instituições:", err);
   }
+}
+
+// Load disciplines
+async function carregarDisciplinas() {
+  try {
+    const resp = await apiGet("/disciplinas");
+    disciplinasCache = resp;
+  } catch (err) {
+    console.error("Erro ao carregar disciplinas:", err);
+  }
+}
+
+// Load turmas for a selected institution and discipline
+async function carregarTurmas() {
+  const instituicaoId = selectInstituicao.value;
+  const disciplinaId = selectDisciplina.value;
+
+  try {
+    const params = new URLSearchParams();
+    if (instituicaoId) params.append("instituicao_id", instituicaoId);
+    if (disciplinaId) params.append("disciplina_id", disciplinaId);
+
+    const turmas = await apiGet(`/turmas?${params.toString()}`);
+    turmasCache = turmas;
+
+    selectTurma.innerHTML = "<option value=''>Selecione...</option>";
+    turmas.forEach(turma => {
+      const option = document.createElement("option");
+      option.value = turma.id;
+      option.textContent = turma.nome;
+      selectTurma.appendChild(option);
+    });
+  } catch (err) {
+    console.error("Erro ao carregar turmas:", err);
+  }
+}
+
+// Load students based on selected filters
+async function carregarAlunos() {
+  const instituicaoId = selectInstituicao.value;
+  const disciplinaId = selectDisciplina.value;
+  const turmaId = selectTurma.value;
+
+  try {
+    const params = new URLSearchParams();
+    if (instituicaoId) params.append("instituicao_id", instituicaoId);
+    if (disciplinaId) params.append("disciplina_id", disciplinaId);
+    if (turmaId) params.append("turma_id", turmaId);
+
+    const alunos = await apiGet(`/alunos?${params.toString()}`);
+    tabelaBody.innerHTML = "";
+
+    if (alunos.length === 0) {
+      semAlunosMsg.style.display = "block";
+    } else {
+      semAlunosMsg.style.display = "none";
+    }
+
+    alunos.forEach(aluno => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${escapeHtml(aluno.nome)}</td>
+        <td>${escapeHtml(aluno.matricula)}</td>
+        <td>
+          <button class="btn small secondary btn-editar" data-id="${aluno.id}">Editar</button>
+          <button class="btn small danger btn-excluir" data-id="${aluno.id}">Excluir</button>
+        </td>
+      `;
+      tabelaBody.appendChild(tr);
+    });
+  } catch (err) {
+    console.error("Erro ao carregar alunos:", err);
+  }
+}
+
+// Open modal for new student
+novoAlunoBtn.addEventListener("click", () => {
+  alunoNomeInput.value = "";
+  alunoMatriculaInput.value = "";
+  openModal();
 });
 
-// 🟢 Adiciona aluno manualmente
-formCadastro.addEventListener('submit', (e) => {
-  e.preventDefault();
+// Open modal
+function openModal() {
+  modalAluno.classList.add("show");
+}
 
-  const matricula = document.getElementById('matricula').value.trim();
-  const nome = document.getElementById('nome').value.trim();
+// Close modal
+closeModalAluno.addEventListener("click", () => {
+  modalAluno.classList.remove("show");
+});
 
-  if (!matricula || !nome) {
-    alert("Preencha todos os campos!");
+// Save new student
+salvarAlunoBtn.addEventListener("click", async () => {
+  const nome = alunoNomeInput.value.trim();
+  const matricula = alunoMatriculaInput.value.trim();
+  const instituicao_id = instituicaoAlunoSelect.value;
+  const disciplina_id = disciplinaAlunoSelect.value;
+  const turma_id = turmaAlunoSelect.value;
+
+  if (!nome || !matricula || !instituicao_id || !disciplina_id || !turma_id) {
+    alert("Todos os campos são obrigatórios.");
     return;
   }
 
-  const novaLinha = document.createElement('tr');
-  novaLinha.innerHTML = `
-    <td>${matricula}</td>
-    <td>${nome}</td>
-    <td class="actions">
-      <button class="edit-btn">Editar</button>
-      <button class="delete-btn">Excluir</button>
-    </td>
-  `;
-  tabela.appendChild(novaLinha);
-  formCadastro.reset();
-});
-
-// 🟢 Importação de CSV e JSON
-const formImportar = document.getElementById('form-importar');
-
-formImportar.addEventListener('submit', (e) => {
-  e.preventDefault();
-  const arquivo = document.getElementById('arquivo').files[0];
-
-  if (!arquivo) {
-    alert('Selecione um arquivo para importar!');
-    return;
+  try {
+    const alunoData = { nome, matricula, instituicao_id, disciplina_id, turma_id };
+    await apiPost("/alunos", alunoData);
+    alert("Aluno cadastrado com sucesso!");
+    modalAluno.classList.remove("show");
+    carregarAlunos(); // Reload students
+  } catch (err) {
+    console.error("Erro ao salvar aluno:", err);
+    alert("Erro ao cadastrar aluno.");
   }
-
-  const leitor = new FileReader();
-
-  leitor.onload = function(event) {
-    const dados = event.target.result;
-
-    // ---------------- CSV ----------------
-    if (arquivo.name.endsWith('.csv')) {
-      const linhas = dados.split('\n');
-
-      linhas.forEach(linha => {
-        if (!linha.trim()) return; // ignora linha vazia
-
-        const [matricula, nome] = linha.split(',');
-
-        if (matricula && nome) {
-          const novaLinha = document.createElement('tr');
-          novaLinha.innerHTML = `
-            <td>${matricula.trim()}</td>
-            <td>${nome.trim()}</td>
-            <td class="actions">
-              <button class="edit-btn">Editar</button>
-              <button class="delete-btn">Excluir</button>
-            </td>
-          `;
-          tabela.appendChild(novaLinha);
-        }
-      });
-    }
-
-    // ---------------- JSON ----------------
-    if (arquivo.name.endsWith('.json')) {
-      let alunos;
-
-      try {
-        alunos = JSON.parse(dados);
-      } catch (e) {
-        alert("Arquivo JSON inválido!");
-        return;
-      }
-
-      alunos.forEach(a => {
-        // Fallbacks para diferentes formatos de JSON
-        const matricula =
-          a.matricula || a.id || a.codigo || a.RA || null;
-
-        const nome =
-          a.nome || a.fullName || a.completeName || a.name || null;
-
-        if (matricula && nome) {
-          const novaLinha = document.createElement('tr');
-          novaLinha.innerHTML = `
-            <td>${matricula}</td>
-            <td>${nome}</td>
-            <td class="actions">
-              <button class="edit-btn">Editar</button>
-              <button class="delete-btn">Excluir</button>
-            </td>
-          `;
-          tabela.appendChild(novaLinha);
-        }
-      });
-    }
-  };
-
-  leitor.readAsText(arquivo);
-  formImportar.reset();
 });
+
+// Apply filter
+btnAplicarFiltro.addEventListener("click", carregarAlunos);
+
+// Initialize the page
+(async function init() {
+  await carregarInstituicoes();
+  await carregarDisciplinas();
+  carregarAlunos();
+})();
