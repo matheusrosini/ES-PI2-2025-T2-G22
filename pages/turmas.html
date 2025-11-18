@@ -118,6 +118,30 @@
     </div>
   </div>
 
+<!-- Modal de Detalhes para Adicionar Alunos -->
+<div id="modalDetalhesTurma" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Adicionar Alunos</h2>
+      <button class="close-x" id="fecharModalDetalhes">&times;</button>
+    </div>
+
+    <div class="form-row">
+      <label for="alunoNome">Nome do Aluno</label>
+      <input type="text" id="alunoNome" class="input" placeholder="Nome do aluno">
+
+      <label for="alunoMatricula">Matrícula do Aluno</label>
+      <input type="text" id="alunoMatricula" class="input" placeholder="Matrícula">
+    </div>
+
+    <div class="modal-footer">
+      <button id="salvarAlunoBtn" class="btn">Salvar</button>
+      <button class="btn ghost" id="cancelarDetalhesBtn">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+
   <!-- Logout modal (usado por todas as páginas) -->
   <div id="logoutModal" class="logout-modal">
     <div class="logout-modal-content">

@@ -365,3 +365,53 @@ footer {
   from { opacity: 0; transform: translateY(-10px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+
+/* Modal de Detalhes para Adicionar Alunos */
+.modal {
+  display: none;  /* Escondido por padrão */
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);  /* Fundo semitransparente */
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  z-index: 9999;  /* Garantir que o modal esteja sobre os outros elementos */
+}
+
+.modal.show {
+  display: flex;  /* Exibe o modal quando a classe "show" for adicionada */
+}
+
+.modal-content {
+  background: white;
+  padding: 24px;
+  border-radius: 10px;
+  max-width: 500px;
+  width: 100%;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.close-x {
+  background: none;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+/* Outros estilos para o modal */
+.modal-footer {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.modal-footer button {
+  padding: 10px 20px;
+  font-size: 14px;
+  cursor: pointer;
+}

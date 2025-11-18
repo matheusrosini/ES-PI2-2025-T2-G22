@@ -9,6 +9,7 @@ function rowsOrEmpty(result) {
 }
 
 // GET /api/turmas?instituicao_id=...&disciplina_id=...
+// GET /api/turmas?instituicao_id=...&disciplina_id=...
 exports.getAllTurmas = async (req, res) => {
   try {
     const userId = req.user && req.user.id;
@@ -16,29 +17,29 @@ exports.getAllTurmas = async (req, res) => {
 
     const { instituicao_id, disciplina_id } = req.query;
 
-    // base SQL: somente turmas cujas disciplinas pertencem a instituições do usuário
+    // Base SQL
     let sql = `
       SELECT
-        t.ID              AS "id",
-        t.NOME            AS "nome",
-        t.CODIGO          AS "codigo",
-        t.PERIODO         AS "periodo",
-        t.DISCIPLINA_ID   AS "disciplina_id",
-        d.NOME            AS "disciplina_nome",
-        i.ID              AS "instituicao_id",
-        i.NOME            AS "instituicao_nome"
+        t.ID AS "id",
+        t.NOME AS "nome",
+        t.CODIGO AS "codigo",
+        t.PERIODO AS "periodo",
+        t.DISCIPLINA_ID AS "disciplina_id",
+        d.NOME AS "disciplina_nome",
+        i.ID AS "instituicao_id",
+        i.NOME AS "instituicao_nome"
       FROM TURMA t
       JOIN DISCIPLINA d ON d.ID = t.DISCIPLINA_ID
       JOIN INSTITUICAO i ON i.ID = d.INSTITUICAO_ID
       WHERE i.USUARIO_ID = :userId
     `;
-
     const binds = { userId: Number(userId) };
 
     if (instituicao_id) {
       sql += ` AND i.ID = :instituicao_id`;
       binds.instituicao_id = Number(instituicao_id);
     }
+
     if (disciplina_id) {
       sql += ` AND d.ID = :disciplina_id`;
       binds.disciplina_id = Number(disciplina_id);
@@ -53,6 +54,7 @@ exports.getAllTurmas = async (req, res) => {
     return res.status(500).json({ error: "Erro ao buscar turmas." });
   }
 };
+
 
 // GET /api/turmas/:id
 exports.getTurmaById = async (req, res) => {

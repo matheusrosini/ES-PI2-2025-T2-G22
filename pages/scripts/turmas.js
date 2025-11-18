@@ -101,31 +101,102 @@ async function aplicarFiltro() {
 }
 
 function renderTurmas(list) {
+  // Limpar o conteúdo da tabela antes de adicionar novas turmas
   tabelaBody.innerHTML = "";
+
+  // Verificar se a lista está vazia
   if (!list || list.length === 0) {
-    semTurmasMsg.style.display = "block";
+    semTurmasMsg.style.display = "block"; // Exibir mensagem de "nenhuma turma"
     return;
   }
-  semTurmasMsg.style.display = "none";
+  semTurmasMsg.style.display = "none"; // Esconder a mensagem caso existam turmas
 
-  list.forEach(t => {
+  // Iterar sobre a lista de turmas e criar uma nova linha para cada turma
+  list.forEach(turma => {
+    // Criar uma linha de tabela
     const tr = document.createElement("tr");
+
+    // Preencher a linha com os dados da turma
     tr.innerHTML = `
-      <td>${escapeHtml(t.nome || t.NOME || "")}</td>
-      <td>${escapeHtml(t.codigo || t.CODIGO || "")}</td>
-      <td>${escapeHtml(t.periodo || t.PERIODO || "")}</td>
-      <td>${escapeHtml(t.disciplina_nome || t.DISCIPLINA_NOME || "")}</td>
+      <td>${escapeHtml(turma.nome || turma.NOME || "")}</td>
+      <td>${escapeHtml(turma.codigo || turma.CODIGO || "")}</td>
+      <td>${escapeHtml(turma.periodo || turma.PERIODO || "")}</td>
+      <td>${escapeHtml(turma.disciplina_nome || turma.DISCIPLINA_NOME || "")}</td>
       <td>
-        <button class="btn small secondary btn-editar" data-id="${t.id || t.ID}">Editar</button>
-        <button class="btn small danger btn-excluir" data-id="${t.id || t.ID}">Excluir</button>
+        <button class="btn small secondary btn-editar" data-id="${turma.id || turma.ID}">Editar</button>
+        <button class="btn small danger btn-excluir" data-id="${turma.id || turma.ID}">Excluir</button>
+        <button class="btn small info btn-detalhes" data-id="${turma.id || turma.ID}">Detalhes</button>
       </td>
     `;
+    
+    // Adicionar a linha à tabela
     tabelaBody.appendChild(tr);
   });
 
-  // attach handlers
+  // Adicionar os eventos de clique para os botões de editar, excluir e detalhes
   tabelaBody.querySelectorAll(".btn-editar").forEach(b => b.addEventListener("click", onEditarClick));
   tabelaBody.querySelectorAll(".btn-excluir").forEach(b => b.addEventListener("click", onExcluirClick));
+  tabelaBody.querySelectorAll(".btn-detalhes").forEach(b => b.addEventListener("click", onDetalhesClick));  // Correção
+}
+
+// Ao clicar no botão de "Detalhes", abre o modal para adicionar alunos
+function onDetalhesClick(e) {
+  const turmaId = e.currentTarget.dataset.id;  // Recupera o ID da turma
+  abrirModalDetalhes(turmaId);  // Abre o modal de detalhes
+}
+
+// Abre o modal de detalhes e configura o botão de salvar
+function abrirModalDetalhes(turmaId) {
+  // Limpa os campos do modal
+  const alunoNomeInput = document.getElementById("alunoNome");
+  const alunoMatriculaInput = document.getElementById("alunoMatricula");
+  alunoNomeInput.value = "";
+  alunoMatriculaInput.value = "";
+
+  // Exibe o modal
+  const modalDetalhes = document.getElementById("modalDetalhesTurma");
+  modalDetalhes.classList.add("show");
+
+  // Salva o aluno quando o botão for clicado
+  const salvarAlunoBtn = document.getElementById("salvarAlunoBtn");
+  salvarAlunoBtn.onclick = () => adicionarAluno(turmaId);  // Correção para passar o ID da turma
+}
+
+// Fechar o modal
+document.getElementById("fecharModalDetalhes").addEventListener("click", () => {
+  const modalDetalhes = document.getElementById("modalDetalhesTurma");
+  modalDetalhes.classList.remove("show");
+});
+
+// Função para adicionar o aluno à turma
+async function adicionarAluno(turmaId) {
+  const nome = document.getElementById("alunoNome").value.trim();
+  const matricula = document.getElementById("alunoMatricula").value.trim();
+
+  if (!nome || !matricula) {
+    alert("Preencha os campos de nome e matrícula.");
+    return;
+  }
+
+  const alunoData = {
+    nome: nome,
+    matricula: matricula,
+    turma_id: turmaId
+  };
+
+  try {
+    // Envia a requisição para a API para adicionar o aluno
+    await apiPost("/alunos", alunoData);
+
+    // Fecha o modal após salvar
+    document.getElementById("modalDetalhesTurma").classList.remove("show");
+
+    // Exibe a mensagem de sucesso
+    alert("Aluno adicionado com sucesso!");
+  } catch (err) {
+    console.error("Erro ao adicionar aluno:", err);
+    alert("Erro ao adicionar aluno.");
+  }
 }
 
 // editar
