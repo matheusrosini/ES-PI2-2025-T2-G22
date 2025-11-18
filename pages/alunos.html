@@ -21,7 +21,7 @@
         <li><a href="disciplinas.html"><i data-lucide="book-open"></i> Disciplinas</a></li>
         <li><a href="turmas.html"><i data-lucide="users"></i> Turmas</a></li>
         <li><a href="notas.html"><i data-lucide="pencil"></i> Notas</a></li>
-        <li><a href="alunos.html"><i data-lucide="user"></i> Alunos</a></li>
+        <li><a href="aluno.html" class="active"><i data-lucide="user"></i> Alunos</a></li>
         <li><a href="#" id="logoutBtn" data-logout><i data-lucide="log-out"></i> Sair</a></li>
       </ul>
     </nav>
@@ -66,11 +66,30 @@
         </div>
       </h1>
 
+      <!-- Barra de informação -->
+      <div id="infoBar" class="info-bar" style="display:none;">
+        <div class="info-item">
+          <strong>Instituição:</strong>
+          <span id="infoInstituicao">-</span>
+        </div>
+        <div class="info-item">
+          <strong>Disciplina:</strong>
+          <span id="infoDisciplina">-</span>
+        </div>
+        <div class="info-item">
+          <strong>Turma:</strong>
+          <span id="infoTurma">-</span>
+        </div>
+      </div>
+
       <table id="tabela-alunos">
         <thead>
           <tr>
-            <th>Nome do Aluno</th>
             <th>Matrícula</th>
+            <th>Nome do Aluno</th>
+            <th>Disciplina</th>
+            <th>Turma</th>
+            <th>Instituição</th>
             <th>Ações</th>
           </tr>
         </thead>
@@ -127,6 +146,18 @@
       <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:16px;">
         <button id="salvarAlunoBtn" class="btn">Salvar</button>
         <button id="cancelarAlunoBtn" class="btn ghost">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Logout -->
+  <div id="logoutModal" class="logout-modal">
+    <div class="logout-modal-content">
+      <h3>Confirmar saída</h3>
+      <p>Tem certeza que deseja desconectar da sua conta?</p>
+      <div class="logout-modal-buttons">
+        <button id="logoutCancel" class="logout-cancel">Cancelar</button>
+        <button id="logoutConfirm" class="logout-confirm">Sair</button>
       </div>
     </div>
   </div>

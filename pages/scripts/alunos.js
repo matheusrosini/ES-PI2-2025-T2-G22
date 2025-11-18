@@ -1,4 +1,4 @@
-// pages/scripts/alunos.js
+// pages/scripts/aluno.js
 import { apiGet, apiPost, apiPut, apiDelete } from "./api.js";
 
 // DOM elements for the page
@@ -9,6 +9,10 @@ const btnAplicarFiltro = document.getElementById("btnAplicarFiltro");
 const listaContainer = document.getElementById("lista-container");
 const tabelaBody = document.querySelector("#tabela-alunos tbody");
 const semAlunosMsg = document.getElementById("semAlunosMsg");
+const infoBar = document.getElementById("infoBar");
+const infoInstituicao = document.getElementById("infoInstituicao");
+const infoDisciplina = document.getElementById("infoDisciplina");
+const infoTurma = document.getElementById("infoTurma");
 
 const novoAlunoBtn = document.getElementById("novoAlunoBtn");
 const modalAluno = document.getElementById("modalCadastroAluno");
@@ -20,11 +24,18 @@ const disciplinaAlunoSelect = document.getElementById("disciplinaAluno");
 const turmaAlunoSelect = document.getElementById("turmaAluno");
 const salvarAlunoBtn = document.getElementById("salvarAlunoBtn");
 const cancelarAlunoBtn = document.getElementById("cancelarAlunoBtn");
+const modalAlunoTitle = document.getElementById("modalAlunoTitle");
+
+// Verificar se os elementos foram encontrados
+if (!novoAlunoBtn) console.error("❌ Botão 'Adicionar Aluno' não encontrado!");
+if (!modalAluno) console.error("❌ Modal de cadastro não encontrado!");
+if (!salvarAlunoBtn) console.error("❌ Botão 'Salvar' não encontrado!");
 
 // Store data
 let instituicoesCache = [];
 let disciplinasCache = [];
 let turmasCache = [];
+let editingAlunoId = null; // Variável para controlar se está editando
 
 // Helper functions
 function escapeHtml(s) {
@@ -32,35 +43,111 @@ function escapeHtml(s) {
   return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
 
-async function openModal() {
-  modalAluno.classList.add("show");
-  // Preencher os campos do modal com os valores dos filtros se estiverem selecionados
-  if (selectInstituicao.value) {
-    instituicaoAlunoSelect.value = selectInstituicao.value;
-    // Popular disciplinas baseado na instituição selecionada
-    popularDisciplinaSelectByInstituicao(selectInstituicao.value, disciplinaAlunoSelect);
-    
-    if (selectDisciplina.value) {
-      disciplinaAlunoSelect.value = selectDisciplina.value;
-      // Carregar turmas baseado na instituição e disciplina selecionadas
-      await carregarTurmas(selectInstituicao.value, selectDisciplina.value, turmaAlunoSelect);
-      
-      if (selectTurma.value) {
-        turmaAlunoSelect.value = selectTurma.value;
-      }
-    } else {
-      // Limpar turma se não houver disciplina selecionada
-      turmaAlunoSelect.innerHTML = "<option value=''>Selecione...</option>";
-    }
+// Atualizar barra de informação com os filtros selecionados
+function atualizarBarraInfo() {
+  if (!infoBar || !infoInstituicao || !infoDisciplina || !infoTurma) return;
+
+  const instituicaoId = selectInstituicao.value;
+  const disciplinaId = selectDisciplina.value;
+  const turmaId = selectTurma.value;
+
+  // Buscar nomes dos itens selecionados
+  let instituicaoNome = "-";
+  let disciplinaNome = "-";
+  let turmaNome = "-";
+
+  if (instituicaoId) {
+    const instituicao = instituicoesCache.find(inst => (inst.id || inst.ID) == instituicaoId);
+    instituicaoNome = instituicao ? (instituicao.nome || instituicao.NOME) : "-";
+  }
+
+  if (disciplinaId) {
+    const disciplina = disciplinasCache.find(disc => (disc.id || disc.ID) == disciplinaId);
+    disciplinaNome = disciplina ? (disciplina.nome || disciplina.NOME) : "-";
+  }
+
+  if (turmaId) {
+    // Buscar nome da turma do cache ou do select
+    const turmaOption = selectTurma.querySelector(`option[value="${turmaId}"]`);
+    turmaNome = turmaOption ? turmaOption.textContent : "-";
+  }
+
+  // Atualizar textos
+  infoInstituicao.textContent = instituicaoNome;
+  infoDisciplina.textContent = disciplinaNome;
+  infoTurma.textContent = turmaNome;
+
+  // Mostrar barra se pelo menos um filtro estiver selecionado
+  if (instituicaoId || disciplinaId || turmaId) {
+    infoBar.style.display = "flex";
   } else {
-    // Se não houver instituição selecionada, popular disciplinas sem filtro
-    popularDisciplinaSelectByInstituicao(null, disciplinaAlunoSelect);
-    turmaAlunoSelect.innerHTML = "<option value=''>Selecione...</option>";
+    infoBar.style.display = "none";
   }
 }
 
+async function openModal() {
+  if (!modalAluno) {
+    console.error("❌ Modal não encontrado na função openModal!");
+    return;
+  }
+  
+  console.log("Abrindo modal...");
+  modalAluno.classList.add("show");
+  
+  // Preencher os campos do modal com os valores dos filtros se estiverem selecionados
+  if (selectInstituicao && selectInstituicao.value) {
+    if (instituicaoAlunoSelect) {
+      instituicaoAlunoSelect.value = selectInstituicao.value;
+      // Popular disciplinas baseado na instituição selecionada
+      popularDisciplinaSelectByInstituicao(selectInstituicao.value, disciplinaAlunoSelect);
+      
+      if (selectDisciplina && selectDisciplina.value) {
+        if (disciplinaAlunoSelect) {
+          disciplinaAlunoSelect.value = selectDisciplina.value;
+          // Carregar turmas baseado na instituição e disciplina selecionadas
+          await carregarTurmas(selectInstituicao.value, selectDisciplina.value, turmaAlunoSelect);
+          
+          if (selectTurma && selectTurma.value && turmaAlunoSelect) {
+            turmaAlunoSelect.value = selectTurma.value;
+          }
+        }
+      } else {
+        // Limpar turma se não houver disciplina selecionada
+        if (turmaAlunoSelect) {
+          turmaAlunoSelect.innerHTML = "<option value=''>Selecione...</option>";
+        }
+      }
+    }
+  } else {
+    // Se não houver instituição selecionada, popular disciplinas sem filtro
+    if (disciplinaAlunoSelect) {
+      popularDisciplinaSelectByInstituicao(null, disciplinaAlunoSelect);
+    }
+    if (turmaAlunoSelect) {
+      turmaAlunoSelect.innerHTML = "<option value=''>Selecione...</option>";
+    }
+  }
+  
+  console.log("✅ Modal aberto com sucesso!");
+}
+
 function closeModal() {
+  if (!modalAluno) {
+    console.error("❌ Modal não encontrado na função closeModal!");
+    return;
+  }
   modalAluno.classList.remove("show");
+  
+  // Limpar campos e resetar modo de edição
+  alunoNomeInput.value = "";
+  alunoMatriculaInput.value = "";
+  editingAlunoId = null;
+  
+  if (modalAlunoTitle) {
+    modalAlunoTitle.textContent = "Cadastrar Aluno";
+  }
+  
+  console.log("✅ Modal fechado!");
 }
 
 // Carregar as Instituições
@@ -178,6 +265,9 @@ async function carregarAlunos() {
     
     tabelaBody.innerHTML = "";
 
+    // Atualizar barra de informação
+    atualizarBarraInfo();
+
     if (alunosList.length === 0) {
       semAlunosMsg.style.display = "block";
       listaContainer.style.display = "block";
@@ -191,10 +281,16 @@ async function carregarAlunos() {
       const alunoId = aluno.id || aluno.ID || "";
       const alunoNome = aluno.nome || aluno.NOME || "";
       const alunoMatricula = aluno.matricula || aluno.MATRICULA || "";
+      const disciplinaNome = aluno.disciplina_nome || aluno.DISCIPLINA_NOME || "";
+      const turmaNome = aluno.turma_nome || aluno.TURMA_NOME || "";
+      const instituicaoNome = aluno.instituicao_nome || aluno.INSTITUICAO_NOME || "";
       
       tr.innerHTML = `
-        <td>${escapeHtml(alunoNome)}</td>
         <td>${escapeHtml(alunoMatricula)}</td>
+        <td>${escapeHtml(alunoNome)}</td>
+        <td>${escapeHtml(disciplinaNome)}</td>
+        <td>${escapeHtml(turmaNome)}</td>
+        <td>${escapeHtml(instituicaoNome)}</td>
         <td>
           <button class="btn small secondary btn-editar" data-id="${alunoId}">Editar</button>
           <button class="btn small danger btn-excluir" data-id="${alunoId}">Excluir</button>
@@ -205,10 +301,9 @@ async function carregarAlunos() {
     
     // Adicionar eventos aos botões
     tabelaBody.querySelectorAll(".btn-editar").forEach(btn => {
-      btn.addEventListener("click", (e) => {
+      btn.addEventListener("click", async (e) => {
         const id = e.currentTarget.dataset.id;
-        // TODO: Implementar edição
-        alert("Funcionalidade de edição ainda não implementada");
+        await editarAluno(id);
       });
     });
     
@@ -219,10 +314,11 @@ async function carregarAlunos() {
           try {
             await apiDelete(`/alunos/${id}`);
             alert("Aluno excluído com sucesso!");
-            carregarAlunos();
+            await carregarAlunos();
           } catch (err) {
             console.error("Erro ao excluir aluno:", err);
-            alert("Erro ao excluir aluno.");
+            const errorMsg = err.response?.data?.error || err.response?.data?.message || err.message || "Erro ao excluir aluno.";
+            alert(`Erro ao excluir aluno: ${errorMsg}`);
           }
         }
       });
@@ -244,6 +340,7 @@ selectInstituicao.addEventListener("change", () => {
   popularDisciplinaSelectByInstituicao(instId, selectDisciplina);
   // Limpar turma quando mudar instituição
   selectTurma.innerHTML = "<option value=''>Selecione...</option>";
+  atualizarBarraInfo();
 });
 
 // Quando mudar disciplina no filtro, carregar turmas
@@ -251,6 +348,12 @@ selectDisciplina.addEventListener("change", async () => {
   const instId = selectInstituicao.value;
   const discId = selectDisciplina.value;
   await carregarTurmas(instId, discId, selectTurma);
+  atualizarBarraInfo();
+});
+
+// Quando mudar turma no filtro, atualizar barra
+selectTurma.addEventListener("change", () => {
+  atualizarBarraInfo();
 });
 
 // Quando mudar instituição no modal, filtrar disciplinas
@@ -268,12 +371,89 @@ disciplinaAlunoSelect.addEventListener("change", async () => {
   await carregarTurmas(instId, discId, turmaAlunoSelect);
 });
 
+// Função para editar aluno
+async function editarAluno(id) {
+  try {
+    editingAlunoId = id;
+    
+    // Buscar dados do aluno
+    const aluno = await apiGet(`/alunos/${id}`);
+    
+    if (!aluno) {
+      alert("Aluno não encontrado.");
+      return;
+    }
+    
+    // Preencher campos do modal
+    alunoNomeInput.value = aluno.nome || aluno.NOME || "";
+    alunoMatriculaInput.value = aluno.matricula || aluno.MATRICULA || "";
+    
+    // Buscar dados completos do aluno para popular selects
+    const alunos = await apiGet(`/alunos?turma_id=${aluno.turma_id || aluno.TURMA_ID || aluno.id_turma || aluno.ID_TURMA}`);
+    const alunoCompleto = Array.isArray(alunos) ? alunos.find(a => (a.id || a.ID) == id) : null;
+    
+    if (alunoCompleto) {
+      const instituicaoId = alunoCompleto.instituicao_id || alunoCompleto.INSTITUICAO_ID;
+      const disciplinaId = alunoCompleto.disciplina_id || alunoCompleto.DISCIPLINA_ID;
+      const turmaId = alunoCompleto.turma_id || alunoCompleto.TURMA_ID;
+      
+      if (instituicaoId) {
+        instituicaoAlunoSelect.value = instituicaoId;
+        popularDisciplinaSelectByInstituicao(instituicaoId, disciplinaAlunoSelect);
+        
+        if (disciplinaId) {
+          disciplinaAlunoSelect.value = disciplinaId;
+          await carregarTurmas(instituicaoId, disciplinaId, turmaAlunoSelect);
+          
+          if (turmaId) {
+            turmaAlunoSelect.value = turmaId;
+          }
+        }
+      }
+    }
+    
+    // Atualizar título do modal
+    if (modalAlunoTitle) {
+      modalAlunoTitle.textContent = "Editar Aluno";
+    }
+    
+    await openModal();
+  } catch (err) {
+    console.error("Erro ao carregar aluno para edição:", err);
+    alert("Erro ao carregar dados do aluno.");
+  }
+}
+
 // Exibir o modal para adicionar aluno
-novoAlunoBtn.addEventListener("click", () => {
-  alunoNomeInput.value = "";
-  alunoMatriculaInput.value = "";
-  openModal();
-});
+if (novoAlunoBtn) {
+  novoAlunoBtn.addEventListener("click", async (e) => {
+    e.preventDefault();
+    console.log("✅ Botão 'Adicionar Aluno' clicado!");
+    
+    if (!modalAluno) {
+      console.error("❌ Modal não encontrado!");
+      return;
+    }
+    
+    // Resetar modo de edição
+    editingAlunoId = null;
+    
+    // Limpar campos
+    alunoNomeInput.value = "";
+    alunoMatriculaInput.value = "";
+    
+    // Atualizar título do modal
+    if (modalAlunoTitle) {
+      modalAlunoTitle.textContent = "Cadastrar Aluno";
+    }
+    
+    await openModal();
+    console.log("✅ Modal aberto!");
+  });
+  console.log("✅ Event listener adicionado ao botão 'Adicionar Aluno'");
+} else {
+  console.error("❌ Botão 'Adicionar Aluno' não encontrado!");
+}
 
 // Fechar modal
 closeModalAluno.addEventListener("click", closeModal);
@@ -281,36 +461,60 @@ if (cancelarAlunoBtn) {
   cancelarAlunoBtn.addEventListener("click", closeModal);
 }
 
-// Salvar novo aluno
-salvarAlunoBtn.addEventListener("click", async () => {
-  const nome = alunoNomeInput.value.trim();
-  const matricula = alunoMatriculaInput.value.trim();
-  const instituicao_id = instituicaoAlunoSelect.value;
-  const disciplina_id = disciplinaAlunoSelect.value;
-  const turma_id = turmaAlunoSelect.value;
+// Salvar novo aluno ou atualizar aluno existente
+if (salvarAlunoBtn) {
+  salvarAlunoBtn.addEventListener("click", async () => {
+    const nome = alunoNomeInput.value.trim();
+    const matricula = alunoMatriculaInput.value.trim();
+    const turma_id = turmaAlunoSelect.value;
 
-  if (!nome || !matricula || !instituicao_id || !disciplina_id || !turma_id) {
-    alert("Todos os campos são obrigatórios.");
-    return;
-  }
+    if (!nome || !matricula || !turma_id) {
+      alert("Por favor, preencha todos os campos obrigatórios (Nome, Matrícula e Turma).");
+      return;
+    }
 
-  try {
-    const alunoData = { 
-      nome, 
-      matricula, 
-      instituicao_id: Number(instituicao_id), 
-      disciplina_id: Number(disciplina_id), 
-      turma_id: Number(turma_id) 
-    };
-    await apiPost("/alunos", alunoData);
-    alert("Aluno cadastrado com sucesso!");
-    closeModal();
-    carregarAlunos(); // Recarregar a lista de alunos
-  } catch (err) {
-    console.error("Erro ao salvar aluno:", err);
-    alert("Erro ao cadastrar aluno.");
-  }
-});
+    try {
+      const alunoData = { 
+        nome, 
+        matricula, 
+        turma_id: Number(turma_id) 
+      };
+      
+      console.log("Enviando dados do aluno:", alunoData);
+      
+      let response;
+      if (editingAlunoId) {
+        // Atualizar aluno existente
+        response = await apiPut(`/alunos/${editingAlunoId}`, alunoData);
+        console.log("Resposta do servidor (atualização):", response);
+        alert("Aluno atualizado com sucesso!");
+      } else {
+        // Criar novo aluno
+        response = await apiPost("/alunos", alunoData);
+        console.log("Resposta do servidor (criação):", response);
+        alert("Aluno cadastrado com sucesso!");
+      }
+      
+      closeModal();
+      
+      // Limpar campos e resetar modo de edição
+      alunoNomeInput.value = "";
+      alunoMatriculaInput.value = "";
+      editingAlunoId = null;
+      
+      // Recarregar a lista de alunos se houver filtros aplicados
+      if (selectInstituicao.value || selectDisciplina.value || selectTurma.value) {
+        await carregarAlunos();
+      }
+    } catch (err) {
+      console.error("Erro ao salvar aluno:", err);
+      const errorMsg = err.response?.data?.error || err.response?.data?.message || err.message || "Erro ao salvar aluno.";
+      alert(`Erro ao salvar aluno: ${errorMsg}`);
+    }
+  });
+} else {
+  console.error("Botão 'Salvar' não encontrado!");
+}
 
 // Aplicar filtro
 btnAplicarFiltro.addEventListener("click", async () => {
