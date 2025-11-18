@@ -1,4 +1,3 @@
-// pages/scripts/aluno.js
 import { apiGet, apiPost, apiPut, apiDelete } from "./api.js";
 
 // DOM elements for the page
@@ -36,8 +35,9 @@ async function carregarInstituicoes() {
       option.textContent = inst.nome;
       selectInstituicao.appendChild(option);
     });
+    
     // Após carregar as instituições, carregar as disciplinas
-    carregarDisciplinas();
+    selectInstituicao.addEventListener('change', carregarDisciplinas); // Alteração: Garantir que disciplinas sejam carregadas ao selecionar uma instituição.
   } catch (err) {
     console.error("Erro ao carregar instituições:", err);
   }
@@ -45,8 +45,11 @@ async function carregarInstituicoes() {
 
 // Carregar as Disciplinas
 async function carregarDisciplinas() {
+  const instituicaoId = selectInstituicao.value;  // Pegar o id da instituição selecionada
+  if (!instituicaoId) return;  // Evitar erro se não houver instituição selecionada.
+
   try {
-    const resp = await apiGet("/disciplinas");
+    const resp = await apiGet(`/disciplinas?instituicao_id=${instituicaoId}`);
     disciplinasCache = resp;
     selectDisciplina.innerHTML = "<option value=''>Selecione...</option>";
     resp.forEach(disciplina => {
@@ -55,8 +58,9 @@ async function carregarDisciplinas() {
       option.textContent = disciplina.nome;
       selectDisciplina.appendChild(option);
     });
+
     // Após carregar as disciplinas, carregar as turmas
-    carregarTurmas();
+    selectDisciplina.addEventListener('change', carregarTurmas); // Alteração: Garantir que turmas sejam carregadas ao selecionar uma disciplina
   } catch (err) {
     console.error("Erro ao carregar disciplinas:", err);
   }
@@ -67,10 +71,12 @@ async function carregarTurmas() {
   const instituicaoId = selectInstituicao.value;
   const disciplinaId = selectDisciplina.value;
 
+  if (!instituicaoId || !disciplinaId) return;  // Garantir que há instituição e disciplina selecionadas.
+
   try {
     const params = new URLSearchParams();
-    if (instituicaoId) params.append("instituicao_id", instituicaoId);
-    if (disciplinaId) params.append("disciplina_id", disciplinaId);
+    params.append("instituicao_id", instituicaoId);
+    params.append("disciplina_id", disciplinaId);
 
     const turmas = await apiGet(`/turmas?${params.toString()}`);
     turmasCache = turmas;
