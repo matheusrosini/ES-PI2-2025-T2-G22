@@ -1,5 +1,4 @@
 //Feito por Matheus Henrique Portugal Narducci
-// Atualizado para implementar cascata Instituição → Disciplina → Turma
 
 import { apiGet, apiPost, apiPut, apiDelete } from "./api.js";
 

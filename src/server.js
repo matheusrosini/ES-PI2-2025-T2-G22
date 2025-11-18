@@ -1,3 +1,5 @@
+// Feito por Leonardo e Matheus Rosini
+
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");

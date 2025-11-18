@@ -1,4 +1,4 @@
-// pages/scripts/turmas.js
+// Feito por Leonardo
 // Frontend para turmas: carrega instituições -> disciplinas -> aplicar filtro -> lista turmas
 import { apiGet, apiPost, apiPut, apiDelete } from "./api.js";
 

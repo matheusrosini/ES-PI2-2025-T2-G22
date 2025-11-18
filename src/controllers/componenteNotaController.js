@@ -1,10 +1,8 @@
-// Feito por Leonardo - versão final corrigida para Oracle
+// Feito por Leonardo
 
 const db = require('../config/db');
 
-/* ===============================
-    LISTAR COMPONENTES POR DISCIPLINA
-================================= */
+/* LISTAR COMPONENTES POR DISCIPLINA */
 exports.getByDisciplina = async (req, res) => {
   try {
     const { disciplinaId } = req.params;

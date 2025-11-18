@@ -15,11 +15,33 @@ document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('resetForm');
   const tokenInput = document.getElementById('token');
   const emailInput = document.getElementById('email');
+  const enviarLinkBtn = document.getElementById('enviarLinkBtn');
 
   if (tokenInput) tokenInput.value = token;
   if (emailInput && email) emailInput.value = decodeURIComponent(email);
 
   if (!form) return;
+
+  // Handler para enviar link de recuperação
+  if (enviarLinkBtn) {
+    enviarLinkBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      
+      const emailValue = emailInput ? emailInput.value.trim() : '';
+      
+      if (!emailValue) {
+        return alert('Digite o e-mail cadastrado para receber o link de recuperação.');
+      }
+
+      try {
+        const res = await apiPost('/auth/forgot-password', { email: emailValue });
+        alert(res.message || 'Se o e-mail estiver cadastrado, você receberá instruções.');
+      } catch (err) {
+        console.error(err);
+        alert(err.message || 'Erro ao solicitar recuperação de senha.');
+      }
+    });
+  }
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();

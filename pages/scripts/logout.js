@@ -1,3 +1,5 @@
+// Feito por Leonardo 
+
 document.addEventListener("DOMContentLoaded", () => {
   // Seletores de fallback — tenta vários nomes/ids possíveis
   const logoutTrigger =

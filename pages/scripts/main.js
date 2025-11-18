@@ -1,6 +1,5 @@
 // Feito por Leonardo
-// Import correto (antes importava de './auth.js' por engano)
-// main.js
+
 import { login } from './auth.js';
 import { apiGet, apiPost } from './api.js';
 

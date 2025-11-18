@@ -1,4 +1,4 @@
-// pages/scripts/aluno.js
+// Feito por Leonardo e Matheus Rosini
 import { apiGet, apiPost, apiPut, apiDelete } from "./api.js";
 
 // DOM elements for the page

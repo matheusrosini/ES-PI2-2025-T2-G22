@@ -2,9 +2,7 @@
 
 const { open, close } = require("../config/db");
 
-// =======================================================
 // 1 — LISTAR ALUNOS + COMPONENTES + NOTAS
-// =======================================================
 exports.getNotasByTurmaEDisciplina = async (req, res) => {
     let conn;
 

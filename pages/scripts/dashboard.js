@@ -1,5 +1,4 @@
 //Feito por Matheus Rosini
-// Atualizado para usar rotas corretas e mostrar contadores do usuário logado
 
 import { apiGet } from "./api.js";
 

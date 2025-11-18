@@ -3,7 +3,7 @@
 const db = require("../config/db");
 const oracledb = require("oracledb");
 
-// Helper: normalizar rows (Oracle pode devolver array de objetos já)
+// Helper: normalizar rows
 function rowsOrEmpty(result) {
   return result && result.rows ? result.rows : [];
 }
