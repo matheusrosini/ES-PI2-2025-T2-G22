@@ -156,21 +156,33 @@ exports.forgotPassword = async (req, res) => {
 
     const resetLink = `${FRONT_URL.replace(/\/$/, '')}/reset-password.html?token=${token}&email=${encodeURIComponent(email)}`;
 
-    await sendMail({
-      to: email,
-      subject: "Recuperação de senha",
-      html: `
-        <p>Olá ${user.nome},</p>
-        <p>Para redefinir sua senha, clique no link abaixo (válido por 1 hora):</p>
-        <p><a href="${resetLink}">${resetLink}</a></p>
-      `,
-      text: resetLink
-    });
+    try {
+      await sendMail({
+        to: email,
+        subject: "Recuperação de senha",
+        html: `
+          <p>Olá ${user.nome},</p>
+          <p>Para redefinir sua senha, clique no link abaixo (válido por 1 hora):</p>
+          <p><a href="${resetLink}">${resetLink}</a></p>
+        `,
+        text: resetLink
+      });
 
-    res.json({ message: "Se o e-mail estiver cadastrado, você receberá instruções." });
+      console.log(`Email de recuperação enviado com sucesso para: ${email}`);
+      res.json({ message: "Se o e-mail estiver cadastrado, você receberá instruções." });
+    } catch (mailError) {
+      console.error("Erro ao enviar email de recuperação:", mailError);
+      // Ainda retorna sucesso para não revelar se o email existe
+      // Mas loga o erro para debug
+      res.json({ 
+        message: "Se o e-mail estiver cadastrado, você receberá instruções.",
+        warning: "Houve um problema ao enviar o email. Verifique os logs do servidor."
+      });
+    }
 
   } catch (err) {
     console.error("forgotPassword error:", err);
+    console.error("Stack trace:", err.stack);
     res.status(500).json({ message: "Erro ao processar recuperação de senha" });
   } finally {
     if (conn) await conn.close();

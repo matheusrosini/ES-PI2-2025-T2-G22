@@ -158,16 +158,25 @@ usuário
 senha
 connectString (EX: "meudb_high")
 
-## 4.📧 Configurar Envio de E-mail (Recuperação de Senha)
-No arquivo:
-src/config/email.js
+## 4.📧 Configurar Envio de E-mail (Recuperação de Senha) - Resend
 
-Configure:
+Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
 
-host SMTP (Gmail, Outlook, etc)
-porta
-usuário de e-mail
-senha/app password
+```
+RESEND_API_KEY=sua_chave_api_resend_aqui
+FROM_EMAIL=onboarding@resend.dev
+FRONT_URL=http://localhost:5500
+```
+
+**Como obter a chave do Resend:**
+1. Acesse https://resend.com
+2. Crie uma conta ou faça login
+3. Vá em "API Keys" e crie uma nova chave
+4. Copie a chave e cole no arquivo `.env` como `RESEND_API_KEY`
+
+**Importante:**
+- O `FROM_EMAIL` deve ser um domínio verificado no Resend (ou use o domínio padrão `onboarding@resend.dev` para testes)
+- Para produção, você precisa verificar seu domínio no Resend
 
 ## 5.▶️ Iniciar o Servidor
 npm start
